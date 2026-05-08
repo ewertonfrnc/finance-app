@@ -1,0 +1,130 @@
+@import "tailwindcss";
+@import "uniwind";
+
+@import "heroui-native/styles";
+
+@source './node_modules/heroui-native/lib';
+
+@theme {
+  --font-normal: "Inter-Regular";
+  --font-medium: "Inter-Medium";
+  --font-semibold: "Inter-SemiBold";
+
+  --radius: 0.5rem;
+}
+
+@layer theme {
+  @variant light {
+    --background: oklch(0.985 0.004 160);
+    --foreground: oklch(0.13 0.025 160);
+
+    --surface: oklch(1 0 0);
+    --surface-foreground: oklch(0.13 0.025 160);
+
+    --surface-secondary: oklch(0.97 0.008 160);
+    --surface-secondary-foreground: oklch(0.13 0.025 160);
+
+    --surface-tertiary: oklch(0.94 0.012 160);
+    --surface-tertiary-foreground: oklch(0.13 0.025 160);
+
+    --overlay: oklch(1 0 0);
+    --overlay-foreground: oklch(0.13 0.025 160);
+    --backdrop: oklch(0% 0 0 / 25%);
+
+    --muted: oklch(0.52 0.015 160);
+
+    --default: oklch(0.94 0.008 160);
+    --default-foreground: oklch(0.3 0.03 160);
+
+    /* deep green — FAB, active states, highlighted row text */
+    --accent: oklch(0.25 0.04 160);
+    --accent-foreground: oklch(0.97 0.006 160);
+
+    --field-background: oklch(0.97 0.008 160);
+    --field-foreground: oklch(0.13 0.025 160);
+    --field-placeholder: var(--muted);
+    --field-border: transparent;
+
+    /* mid green — positive amounts, success states */
+    --success: oklch(0.42 0.06 155);
+    --success-foreground: oklch(0.97 0.006 160);
+
+    --warning: oklch(0.75 0.13 85);
+    --warning-foreground: oklch(0.25 0.06 85);
+
+    --danger: oklch(0.62 0.16 15);
+    --danger-foreground: oklch(0.98 0.004 15);
+
+    --segment: oklch(0.96 0.015 160);
+    --segment-foreground: oklch(0.25 0.04 160);
+
+    --border: transparent;
+    --separator: oklch(0.92 0.008 160);
+    --focus: var(--accent);
+    --link: oklch(0.42 0.06 155);
+
+    --surface-shadow:
+      0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+      0 0 1px 0 rgba(0, 0, 0, 0.06);
+    --overlay-shadow:
+      0 2px 8px 0 rgba(0, 0, 0, 0.04), 0 14px 28px 0 rgba(0, 0, 0, 0.06);
+    --field-shadow:
+      0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+      0 0 1px 0 rgba(0, 0, 0, 0.06);
+  }
+
+  @variant dark {
+    /* V2 Imersivo — deep green dominant, creme foreground */
+    --background: oklch(0.15 0.03 160);
+    --foreground: oklch(0.93 0.015 160);
+
+    --surface: oklch(0.2 0.035 160);
+    --surface-foreground: oklch(0.91 0.012 160);
+
+    --surface-secondary: oklch(0.23 0.033 160);
+    --surface-secondary-foreground: oklch(0.91 0.012 160);
+
+    --surface-tertiary: oklch(0.26 0.032 160);
+    --surface-tertiary-foreground: oklch(0.91 0.012 160);
+
+    --overlay: oklch(0.22 0.034 160);
+    --overlay-foreground: oklch(0.91 0.012 160);
+    --backdrop: oklch(0% 0 0 / 35%);
+
+    --muted: oklch(0.48 0.025 160);
+
+    --default: oklch(0.23 0.035 160);
+    --default-foreground: oklch(0.87 0.015 160);
+
+    /* bright green — FAB, interactive elements */
+    --accent: oklch(0.72 0.16 155);
+    --accent-foreground: oklch(0.12 0.025 160);
+
+    --field-background: var(--default);
+    --field-foreground: var(--foreground);
+    --field-placeholder: var(--muted);
+    --field-border: transparent;
+
+    /* muted green — positive amounts, income */
+    --success: oklch(0.55 0.08 155);
+    --success-foreground: oklch(0.93 0.015 160);
+
+    --warning: oklch(0.75 0.12 85);
+    --warning-foreground: oklch(0.2 0.04 85);
+
+    --danger: oklch(0.65 0.18 15);
+    --danger-foreground: oklch(0.98 0.004 15);
+
+    --segment: oklch(0.22 0.034 160);
+    --segment-foreground: oklch(0.91 0.012 160);
+
+    --border: transparent;
+    --separator: oklch(0.25 0.033 160);
+    --focus: var(--accent);
+    --link: oklch(0.65 0.1 155);
+
+    --surface-shadow: 0 0 0 0 transparent inset;
+    --overlay-shadow: 0 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+    --field-shadow: 0 0 0 0 transparent inset;
+  }
+}
