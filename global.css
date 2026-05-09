@@ -9,6 +9,8 @@
   --font-normal: "Inter-Regular";
   --font-medium: "Inter-Medium";
   --font-semibold: "Inter-SemiBold";
+  --font-mono: "JetBrainsMono-Regular";
+  --font-mono-medium: "JetBrainsMono-Medium";
 
   --radius: 0.5rem;
 }
