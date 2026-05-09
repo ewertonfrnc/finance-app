@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { mmkvStorage } from '@/src/lib/storage';
+import { asyncStorage } from '@/src/lib/storage';
 
 interface SettingsState {
   initialBalance: number; // saldo de abertura do mês, em centavos
@@ -16,7 +16,7 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: 'settings-store',
-      storage: createJSONStorage(() => mmkvStorage),
+      storage: createJSONStorage(() => asyncStorage),
     },
   ),
 );

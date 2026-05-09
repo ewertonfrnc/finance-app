@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { mmkvStorage } from '@/src/lib/storage';
+import { asyncStorage } from '@/src/lib/storage';
 
 interface AuthState {
   token: string | null;
@@ -18,7 +18,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-store',
-      storage: createJSONStorage(() => mmkvStorage),
+      storage: createJSONStorage(() => asyncStorage),
     },
   ),
 );
