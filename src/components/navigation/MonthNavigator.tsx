@@ -3,16 +3,30 @@ import { useDateStore } from "@/src/stores/useDateStore";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react-native";
 import { Pressable, Text, View, useColorScheme } from "react-native";
 
-export function MonthNavigator() {
+interface MonthNavigatorProps {
+  onPrev?: () => void;
+  onNext?: () => void;
+  disabled?: boolean;
+}
+
+export function MonthNavigator({
+  onPrev,
+  onNext,
+  disabled = false,
+}: MonthNavigatorProps) {
   const { selectedYear, selectedMonth, goToPrevMonth, goToNextMonth } =
     useDateStore();
   const scheme = useColorScheme();
   const mutedColor = scheme === "dark" ? "#6b8c78" : "#7a9485";
 
+  const handlePrev = onPrev ?? goToPrevMonth;
+  const handleNext = onNext ?? goToNextMonth;
+
   return (
     <View className="flex-row items-center justify-between px-4 py-3">
       <Pressable
-        onPress={goToPrevMonth}
+        onPress={handlePrev}
+        disabled={disabled}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
         <ChevronLeft size={20} color={mutedColor} />
@@ -26,7 +40,8 @@ export function MonthNavigator() {
       </View>
 
       <Pressable
-        onPress={goToNextMonth}
+        onPress={handleNext}
+        disabled={disabled}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
         <ChevronRight size={20} color={mutedColor} />

@@ -1,7 +1,10 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { FlatList, ScrollView, Text, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated from "react-native-reanimated";
 
+import { useHorizontalSwipe } from "@/src/components/gestures/useHorizontalSwipe";
 import { DayNavigator } from "@/src/components/navigation/DayNavigator";
 import { TransactionItem } from "@/src/components/transactions/TransactionItem";
 import { Chip } from "@/src/components/ui/Chip";
@@ -26,6 +29,7 @@ export default function DayScreen() {
   const [selectedType, setSelectedType] = useState<TransactionType | null>(
     null,
   );
+  const filterScrollGesture = Gesture.Native();
 
   const [year, month, day] = date.split("-").map(Number);
 
@@ -72,14 +76,49 @@ export default function DayScreen() {
 
   const net = income - expenses;
 
+  const {
+    animatedContentStyle,
+    isTransitioning,
+    pointerEvents,
+    startTransition,
+    swipeGesture,
+  } = useHorizontalSwipe({
+    resetKey: date,
+    onSwipePrev: () => router.replace(`/day/${prevDate}`),
+    onSwipeNext: () => router.replace(`/day/${nextDate}`),
+    externalGestureToFail: filterScrollGesture,
+  });
+
+  function navigateToDay(targetDate: string) {
+    startTransition(() => router.replace(`/day/${targetDate}`));
+  }
+
+  function goBack() {
+    if (isTransitioning) return;
+    router.back();
+  }
+
+  function goToPrevDay() {
+    navigateToDay(prevDate);
+  }
+
+  function goToNextDay() {
+    navigateToDay(nextDate);
+  }
+
+  function openNewTransaction() {
+    if (isTransitioning) return;
+    router.push("/transaction/new");
+  }
+
   return (
     <Screen>
       <DayNavigator
         date={date}
-        onBack={() => router.back()}
-        onPrev={() => router.replace(`/day/${prevDate}`)}
-        onNext={() => router.replace(`/day/${nextDate}`)}
-        onAdd={() => router.push("/transaction/new")}
+        onBack={goBack}
+        onPrev={goToPrevDay}
+        onNext={goToNextDay}
+        onAdd={openNewTransaction}
       />
 
       {/* Saldo fim do dia */}
@@ -140,20 +179,26 @@ export default function DayScreen() {
 
       {/* Filtro */}
       <View className="flex-row items-center gap-3 px-4 py-3">
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerClassName="gap-2"
-        >
-          {FILTER_OPTIONS.map((opt) => (
-            <Chip
-              key={opt.label}
-              label={opt.label}
-              selected={selectedType === opt.value}
-              onPress={() => setSelectedType(opt.value)}
-            />
-          ))}
-        </ScrollView>
+        {/* Prioriza o scroll local dos chips para não disparar a troca de dia por engano. */}
+        <GestureDetector gesture={filterScrollGesture}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerClassName="gap-2"
+          >
+            {FILTER_OPTIONS.map((opt) => (
+              <Chip
+                key={opt.label}
+                label={opt.label}
+                selected={selectedType === opt.value}
+                onPress={() => {
+                  if (isTransitioning) return;
+                  setSelectedType(opt.value);
+                }}
+              />
+            ))}
+          </ScrollView>
+        </GestureDetector>
         <Text className="text-muted shrink-0 text-sm">
           {filtered.length} lançamento{filtered.length !== 1 ? "s" : ""}
         </Text>
@@ -161,21 +206,32 @@ export default function DayScreen() {
 
       <View className="bg-surface-secondary mx-4 h-px" />
 
-      {/* Lista */}
-      <FlatList
-        data={filtered}
-        keyExtractor={(tx) => tx.id}
-        renderItem={({ item }) => (
-          <TransactionItem
-            transaction={item}
-            onPress={() => router.push(`/transaction/${item.id}`)}
+      <GestureDetector gesture={swipeGesture}>
+        <Animated.View
+          className="flex-1"
+          style={animatedContentStyle}
+          pointerEvents={pointerEvents}
+        >
+          {/* Lista */}
+          <FlatList
+            data={filtered}
+            keyExtractor={(tx) => tx.id}
+            renderItem={({ item }) => (
+              <TransactionItem
+                transaction={item}
+                onPress={() => {
+                  if (isTransitioning) return;
+                  router.push(`/transaction/${item.id}`);
+                }}
+              />
+            )}
+            ItemSeparatorComponent={() => (
+              <View className="bg-surface-secondary mx-4 h-px" />
+            )}
+            contentContainerClassName="pb-8"
           />
-        )}
-        ItemSeparatorComponent={() => (
-          <View className="bg-surface-secondary mx-4 h-px" />
-        )}
-        contentContainerClassName="pb-8"
-      />
+        </Animated.View>
+      </GestureDetector>
     </Screen>
   );
 }
