@@ -223,12 +223,8 @@ flowchart TD
 | `prettier`, `prettier-plugin-tailwindcss` | Formatação e ordenação de classes utilitárias.  |
 | `@types/react`                            | Tipos do React para TypeScript.                 |
 
-### Presentes no `package.json`, mas sem uso direto na app principal atual
+### Dependências mantidas sem import direto no app principal
 
-| Dependência                                                                               | Situação observada                                                                       |
-| ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `@gorhom/bottom-sheet`                                                                    | Instalada, mas sem import no fluxo principal atual.                                      |
-| `@react-navigation/bottom-tabs`, `@react-navigation/elements`, `@react-navigation/native` | Aparecem no scaffold `app-example/`, não no app principal atual.                         |
-| `expo-haptics`, `expo-image`, `expo-linking`, `expo-symbols`, `expo-web-browser`          | Usadas apenas em `app-example/` ou sem uso encontrado no app principal.                  |
-| `@expo/vector-icons`                                                                      | Instalado, mas sem uso encontrado nas telas principais; o app usa `lucide-react-native`. |
-| `expo-constants`, `expo-status-bar`, `expo-system-ui`                                     | Presentes no pacote, mas sem uso explícito no código principal lido nesta revisão.       |
+| Dependência                      | Situação observada                                                                 |
+| -------------------------------- | ---------------------------------------------------------------------------------- |
+| `expo-constants`, `expo-linking` | Mantidas explicitamente porque `expo-router` ainda as trata como peers de runtime. |
