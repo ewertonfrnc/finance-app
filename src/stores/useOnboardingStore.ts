@@ -21,11 +21,9 @@ interface OnboardingState {
   name: string;
   email: string;
   password: string;
-  initialBalance: number;
   setCategory: (slug: CategorySlug, amount: number) => void;
   setDaysPerMonth: (days: number) => void;
   setCredentials: (name: string, email: string, password: string) => void;
-  setInitialBalance: (amount: number) => void;
   reset: () => void;
 }
 
@@ -35,7 +33,6 @@ const INITIAL_STATE = {
   name: "",
   email: "",
   password: "",
-  initialBalance: 0,
 };
 
 export const useOnboardingStore = create<OnboardingState>((set) => ({
@@ -44,6 +41,5 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
     set((state) => ({ categories: { ...state.categories, [slug]: amount } })),
   setDaysPerMonth: (days) => set({ daysPerMonth: days }),
   setCredentials: (name, email, password) => set({ name, email, password }),
-  setInitialBalance: (amount) => set({ initialBalance: amount }),
   reset: () => set(INITIAL_STATE),
 }));
