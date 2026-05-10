@@ -10,15 +10,17 @@ interface BalanceSummaryHeaderProps {
 export function BalanceSummaryHeader({ summary }: BalanceSummaryHeaderProps) {
   return (
     <View className="px-4 pt-2 pb-4">
-      <Text className="text-muted text-xs font-medium uppercase mb-1">Saldo atual</Text>
+      <Text className="text-muted mb-1 text-xs font-medium uppercase">
+        Saldo atual
+      </Text>
       <CurrencyText value={summary.currentBalance} variant="large" />
-      <View className="flex-row gap-6 mt-2">
+      <View className="mt-2 flex-row gap-6">
         <View>
-          <Text className="text-muted text-xs mb-0.5">Pico</Text>
+          <Text className="text-muted mb-0.5 text-xs">Pico</Text>
           <CurrencyText value={summary.peak} variant="small" />
         </View>
         <View>
-          <Text className="text-muted text-xs mb-0.5">Vale</Text>
+          <Text className="text-muted mb-0.5 text-xs">Vale</Text>
           <CurrencyText value={summary.valley} variant="small" />
         </View>
       </View>

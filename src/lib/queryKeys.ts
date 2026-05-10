@@ -5,4 +5,5 @@ export const queryKeys = {
     ['transactions', year, month, day, type] as const,
   transactionsAll: () => ['transactions'] as const,
   transaction: (id: string) => ['transactions', 'detail', id] as const,
+  balance: (year: number, month: number) => ['balance', year, month] as const,
 } as const;

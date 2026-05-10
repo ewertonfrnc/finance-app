@@ -1,5 +1,6 @@
 export type {
   ApiCreateTransactionPayload,
+  ApiDayBalance,
   ApiListTransactionsParams,
   ApiResponse,
   ApiTransaction,

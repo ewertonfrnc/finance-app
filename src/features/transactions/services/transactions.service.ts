@@ -1,5 +1,6 @@
 import type {
   ApiCreateTransactionPayload,
+  ApiDayBalance,
   ApiListTransactionsParams,
   ApiResponse,
   ApiTransaction,
@@ -55,4 +56,20 @@ export async function updateTransaction(
 
 export async function deleteTransaction(id: string): Promise<void> {
   await apiClient.delete(`/v1/transactions/${id}`);
+}
+
+export async function getMonthBalance(
+  year: number,
+  month: number,
+): Promise<ApiDayBalance[]> {
+  const response = await apiClient.get<ApiResponse<ApiDayBalance[]>>(
+    "/v1/balance",
+    { params: { year, month } },
+  );
+
+  if (!response.data.success) {
+    throw new Error("Resposta inválida da API");
+  }
+
+  return response.data.data;
 }

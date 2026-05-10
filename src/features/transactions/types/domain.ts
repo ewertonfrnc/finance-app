@@ -18,6 +18,10 @@ export interface DayBalance {
   endBalance: number; // centavos — saldo acumulado ao fim do dia
   totalIncome: number; // centavos — soma das entradas do dia
   totalSpending: number; // centavos — soma de saida + diario + economia
+  income: number; // centavos — entradas
+  expense: number; // centavos — saídas
+  daily: number; // centavos — diários
+  savings: number; // centavos — economia
 }
 
 export interface MonthSummary {

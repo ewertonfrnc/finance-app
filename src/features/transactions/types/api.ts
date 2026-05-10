@@ -38,3 +38,12 @@ export interface ApiUpdateTransactionPayload {
   description?: string;
   date?: string; // "YYYY-MM-DD"
 }
+
+export interface ApiDayBalance {
+  day: number;
+  income: number; // centavos
+  expense: number; // centavos
+  daily: number; // centavos
+  savings: number; // centavos
+  running_balance: number; // centavos
+}

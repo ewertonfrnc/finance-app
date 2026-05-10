@@ -27,7 +27,7 @@ export function TransactionItem({ transaction, onPress }: TransactionItemProps) 
       <TypeBadge type={type} size="md" />
 
       <View className="flex-1">
-        <Text className="text-foreground text-sm font-medium" numberOfLines={1}>
+        <Text className="text-foreground text-base font-medium" numberOfLines={1}>
           {description}
         </Text>
         <View className="flex-row items-center gap-2 mt-0.5">

@@ -10,8 +10,7 @@ import { useMonthSummary } from "@/src/features/saldos/hooks/useMonthSummary";
 import { useDateStore } from "@/src/stores/useDateStore";
 
 export default function SaldosScreen() {
-  const { selectedYear, selectedMonth, selectedDate, setSelectedDate } =
-    useDateStore();
+  const { selectedYear, selectedMonth, setSelectedDate } = useDateStore();
   const { data: dailyBalances } = useDailyBalances(selectedYear, selectedMonth);
   const { data: summary } = useMonthSummary(selectedYear, selectedMonth);
   const router = useRouter();
@@ -29,11 +28,7 @@ export default function SaldosScreen() {
       <MonthNavigator />
       <BalanceSummaryHeader summary={summary} />
 
-      <DayList
-        days={dailyBalances}
-        selectedDate={selectedDate}
-        onDayPress={handleDayPress}
-      />
+      <DayList days={dailyBalances} onDayPress={handleDayPress} />
     </Screen>
   );
 }
