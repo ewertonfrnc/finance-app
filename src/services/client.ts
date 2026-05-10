@@ -1,5 +1,7 @@
 import { create } from "axios";
 
+import { useAuthStore } from "@/src/stores/useAuthStore";
+
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://127.0.0.1:8080";
 
 export const apiClient = create({
@@ -7,18 +9,22 @@ export const apiClient = create({
   timeout: 10_000,
   headers: {
     "Content-Type": "application/json",
-    // TODO: substituir pelo token do useAuthStore quando auth estiver implementada
-    Authorization: `Bearer ${process.env.EXPO_PUBLIC_API_TOKEN ?? ""}`,
   },
 });
 
-// Traduz erros HTTP para mensagens legíveis
+apiClient.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
-      const msg =
-        error.response.data?.message ?? `Erro ${error.response.status}`;
+      const msg = error.response.data?.error ?? `Erro ${error.response.status}`;
       return Promise.reject(new Error(msg));
     }
     if (error.request) {

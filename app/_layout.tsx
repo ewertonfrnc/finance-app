@@ -1,12 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { useRouter, useSegments, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { HeroUINativeProvider } from "heroui-native";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { useAuthStore } from "@/src/stores/useAuthStore";
 import "../global.css";
 
 SplashScreen.preventAutoHideAsync();
@@ -19,6 +20,26 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+function AuthGuard() {
+  const token = useAuthStore((s) => s.token);
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Cast necessário enquanto (auth) não tem telas registradas no sistema de tipos
+    const segment = segments[0] as string;
+    const inUnprotected = segment === "(auth)" || segment === "(onboarding)";
+
+    if (!token && !inUnprotected) {
+      router.replace("/(onboarding)");
+    } else if (token && inUnprotected) {
+      router.replace("/(tabs)");
+    }
+  }, [token, segments, router]);
+
+  return null;
+}
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -47,6 +68,8 @@ export default function RootLayout() {
           <HeroUINativeProvider>
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="(onboarding)" />
+              <Stack.Screen name="(auth)" />
               <Stack.Screen name="day/[date]" />
               <Stack.Screen
                 name="transaction/new"
@@ -54,6 +77,7 @@ export default function RootLayout() {
               />
               <Stack.Screen name="transaction/[id]" />
             </Stack>
+            <AuthGuard />
           </HeroUINativeProvider>
         </QueryClientProvider>
       </SafeAreaProvider>
