@@ -2,11 +2,11 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { FlatList, ScrollView, Text, View } from "react-native";
 
+import { DayNavigator } from "@/src/components/navigation/DayNavigator";
 import { TransactionItem } from "@/src/components/transactions/TransactionItem";
 import { Chip } from "@/src/components/ui/Chip";
 import { CurrencyText } from "@/src/components/ui/CurrencyText";
 import { Screen } from "@/src/components/ui/Screen";
-import { DayNavigator } from "@/src/components/navigation/DayNavigator";
 import { useBalanceQuery } from "@/src/features/saldos/hooks/useBalanceQuery";
 import { useDayTransactions } from "@/src/features/transactions/hooks/useDayTransactions";
 import type { TransactionType } from "@/src/features/transactions/types";
@@ -79,7 +79,7 @@ export default function DayScreen() {
         onBack={() => router.back()}
         onPrev={() => router.replace(`/day/${prevDate}`)}
         onNext={() => router.replace(`/day/${nextDate}`)}
-        onAdd={() => router.push(`/transaction/new?date=${date}`)}
+        onAdd={() => router.push("/transaction/new")}
       />
 
       {/* Saldo fim do dia */}
