@@ -1,6 +1,15 @@
 import { addDays, format, parseISO, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+export function formatIsoDate(date: Date): string {
+  return format(date, "yyyy-MM-dd");
+}
+
+export function isIsoDate(date: string): boolean {
+  const parsed = parseISO(date);
+  return !Number.isNaN(parsed.getTime()) && format(parsed, "yyyy-MM-dd") === date;
+}
+
 /** "2026-04-12" → "12/04" */
 export function formatDayHeader(date: string): string {
   return format(parseISO(date), "dd/MM");

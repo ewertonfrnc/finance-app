@@ -79,7 +79,7 @@ export default function DayScreen() {
         onBack={() => router.back()}
         onPrev={() => router.replace(`/day/${prevDate}`)}
         onNext={() => router.replace(`/day/${nextDate}`)}
-        onAdd={() => router.push("/transaction/new")}
+        onAdd={() => router.push(`/transaction/new?date=${date}`)}
       />
 
       {/* Saldo fim do dia */}
