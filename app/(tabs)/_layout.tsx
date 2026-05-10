@@ -1,6 +1,6 @@
 import { FABButton } from "@/src/components/ui/FABButton";
 import { Tabs, useRouter } from "expo-router";
-import { Activity, BarChart2, Menu, Tag } from "lucide-react-native";
+import { Activity, Menu } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -45,17 +45,13 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="totais"
           options={{
-            title: "Totais",
-            tabBarIcon: ({ color, size }) => (
-              <BarChart2 color={color} size={size} />
-            ),
+            href: null,
           }}
         />
         <Tabs.Screen
           name="tags"
           options={{
-            title: "Tags",
-            tabBarIcon: ({ color, size }) => <Tag color={color} size={size} />,
+            href: null,
           }}
         />
         <Tabs.Screen

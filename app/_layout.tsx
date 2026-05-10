@@ -4,14 +4,15 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
-import { useRouter, useSegments, Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { HeroUINativeProvider } from "heroui-native";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { useAuthStore } from "@/src/stores/useAuthStore";
+import { useAuthHydration, useAuthStore } from "@/src/stores/useAuthStore";
 import "../global.css";
 
 SplashScreen.preventAutoHideAsync();
@@ -25,22 +26,45 @@ const queryClient = new QueryClient({
   },
 });
 
-function AuthGuard() {
+function AuthGuard({
+  hasHydrated,
+  onResolvedChange,
+}: {
+  hasHydrated: boolean;
+  onResolvedChange: (resolved: boolean) => void;
+}) {
   const token = useAuthStore((s) => s.token);
   const segments = useSegments();
   const router = useRouter();
+  const segment = segments[0] as string | undefined;
+  const inUnprotected = segment === "(auth)" || segment === "(onboarding)";
+  const authResolved =
+    hasHydrated && ((!!token && !inUnprotected) || (!token && inUnprotected));
+
+  const onResolvedChangeRef = useRef(onResolvedChange);
+  onResolvedChangeRef.current = onResolvedChange;
 
   useEffect(() => {
-    // Cast necessário enquanto (auth) não tem telas registradas no sistema de tipos
-    const segment = segments[0] as string;
-    const inUnprotected = segment === "(auth)" || segment === "(onboarding)";
+    onResolvedChangeRef.current(authResolved);
+  }, [authResolved]);
+
+  useEffect(() => {
+    if (!hasHydrated) {
+      return;
+    }
 
     if (!token && !inUnprotected) {
       router.replace("/(onboarding)");
     } else if (token && inUnprotected) {
       router.replace("/(tabs)");
     }
-  }, [token, segments, router]);
+  }, [hasHydrated, inUnprotected, token, router]);
+
+  if (!authResolved) {
+    return (
+      <View className="bg-background" style={StyleSheet.absoluteFillObject} />
+    );
+  }
 
   return null;
 }
@@ -66,6 +90,8 @@ function QuerySessionSync() {
 }
 
 export default function RootLayout() {
+  const hasHydrated = useAuthHydration();
+  const [authResolved, setAuthResolved] = useState(false);
   const [loaded, error] = useFonts({
     "Inter-Regular": require("../assets/fonts/inter/Inter_18pt-Regular.ttf"),
     "Inter-Medium": require("../assets/fonts/inter/Inter_18pt-Medium.ttf"),
@@ -74,14 +100,15 @@ export default function RootLayout() {
     "JetBrainsMono-Regular": require("../assets/fonts/jetbrains/JetBrainsMono-Regular.ttf"),
     "JetBrainsMono-Medium": require("../assets/fonts/jetbrains/JetBrainsMono-Medium.ttf"),
   });
+  const assetsReady = hasHydrated && (loaded || error);
 
   useEffect(() => {
-    if (loaded || error) {
+    if (assetsReady && authResolved) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, error]);
+  }, [assetsReady, authResolved]);
 
-  if (!loaded && !error) {
+  if (!assetsReady) {
     return null;
   }
 
@@ -102,7 +129,10 @@ export default function RootLayout() {
               <Stack.Screen name="transaction/[id]" />
             </Stack>
             <QuerySessionSync />
-            <AuthGuard />
+            <AuthGuard
+              hasHydrated={hasHydrated}
+              onResolvedChange={setAuthResolved}
+            />
           </HeroUINativeProvider>
         </QueryClientProvider>
       </SafeAreaProvider>
