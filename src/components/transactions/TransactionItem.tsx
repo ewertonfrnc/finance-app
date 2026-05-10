@@ -1,5 +1,5 @@
 import { formatDayHeader } from "@/src/lib/date";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import type { Transaction, TransactionType } from "@/src/features/transactions/types";
 import { CurrencyText } from "../ui/CurrencyText";
@@ -14,15 +14,16 @@ const TYPE_LABEL: Record<TransactionType, string> = {
 
 interface TransactionItemProps {
   transaction: Transaction;
+  onPress?: () => void;
 }
 
-export function TransactionItem({ transaction }: TransactionItemProps) {
+export function TransactionItem({ transaction, onPress }: TransactionItemProps) {
   const { type, amount, description, date } = transaction;
   const isIncome = type === "entrada";
   const signedAmount = isIncome ? amount : -amount;
 
   return (
-    <View className="flex-row items-center px-4 py-3 gap-3">
+    <Pressable onPress={onPress} className="flex-row items-center px-4 py-3 gap-3">
       <TypeBadge type={type} size="md" />
 
       <View className="flex-1">
@@ -38,6 +39,6 @@ export function TransactionItem({ transaction }: TransactionItemProps) {
         <CurrencyText value={signedAmount} variant="small" />
         <Text className="text-muted text-xs mt-0.5">{TYPE_LABEL[type]}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 }

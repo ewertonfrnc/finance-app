@@ -1,19 +1,35 @@
 import { useRouter } from "expo-router";
-import { Text, TouchableOpacity, View } from "react-native";
+
+import {
+  TransactionForm,
+  type FormValues,
+} from "@/src/components/transactions/TransactionForm";
+import { useCreateTransaction } from "@/src/features/transactions/hooks/useCreateTransaction";
+import { Screen } from "@/src/components/ui/Screen";
 
 export default function NewTransactionScreen() {
   const router = useRouter();
+  const { mutate: create, isPending } = useCreateTransaction();
+
+  function handleSubmit(values: FormValues) {
+    create(
+      {
+        type: values.type,
+        amount: values.amountCents,
+        description: values.description,
+        date: values.date,
+      },
+      { onSuccess: () => router.back() },
+    );
+  }
 
   return (
-    <View className="flex-1 bg-background">
-      <View className="flex-1 items-center justify-center gap-4">
-        <Text className="text-foreground text-lg font-semibold">
-          Nova Transação
-        </Text>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text className="text-accent font-medium">Fechar</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <Screen>
+      <TransactionForm
+        mode="new"
+        onSubmit={handleSubmit}
+        isLoading={isPending}
+      />
+    </Screen>
   );
 }

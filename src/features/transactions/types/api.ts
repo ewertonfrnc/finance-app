@@ -24,3 +24,17 @@ export interface ApiListTransactionsParams {
   day?: number;
   type?: TransactionType;
 }
+
+export interface ApiCreateTransactionPayload {
+  type: TransactionType;
+  amount: number; // centavos
+  description: string;
+  date: string; // "YYYY-MM-DD"
+}
+
+export interface ApiUpdateTransactionPayload {
+  type?: TransactionType;
+  amount?: number; // centavos
+  description?: string;
+  date?: string; // "YYYY-MM-DD"
+}

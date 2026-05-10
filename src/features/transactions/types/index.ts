@@ -1,7 +1,9 @@
 export type {
+  ApiCreateTransactionPayload,
   ApiListTransactionsParams,
   ApiResponse,
   ApiTransaction,
+  ApiUpdateTransactionPayload,
   TransactionType,
 } from './api';
 

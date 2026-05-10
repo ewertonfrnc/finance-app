@@ -110,7 +110,12 @@ export default function DayScreen() {
       <FlatList
         data={filtered}
         keyExtractor={(tx) => tx.id}
-        renderItem={({ item }) => <TransactionItem transaction={item} />}
+        renderItem={({ item }) => (
+          <TransactionItem
+            transaction={item}
+            onPress={() => router.push(`/transaction/${item.id}`)}
+          />
+        )}
         ItemSeparatorComponent={() => (
           <View className="h-px bg-surface-secondary mx-4" />
         )}
