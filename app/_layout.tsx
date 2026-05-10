@@ -1,9 +1,13 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { useRouter, useSegments, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { HeroUINativeProvider } from "heroui-native";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -37,6 +41,26 @@ function AuthGuard() {
       router.replace("/(tabs)");
     }
   }, [token, segments, router]);
+
+  return null;
+}
+
+function QuerySessionSync() {
+  const userId = useAuthStore((s) => s.userId);
+  const queryClient = useQueryClient();
+  const previousUserId = useRef<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    if (previousUserId.current === undefined) {
+      previousUserId.current = userId;
+      return;
+    }
+
+    if (previousUserId.current !== userId) {
+      queryClient.clear();
+      previousUserId.current = userId;
+    }
+  }, [userId, queryClient]);
 
   return null;
 }
@@ -77,6 +101,7 @@ export default function RootLayout() {
               />
               <Stack.Screen name="transaction/[id]" />
             </Stack>
+            <QuerySessionSync />
             <AuthGuard />
           </HeroUINativeProvider>
         </QueryClientProvider>

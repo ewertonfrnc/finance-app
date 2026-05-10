@@ -1,9 +1,22 @@
-import type { TransactionType } from '@/src/features/transactions/types';
+import type { TransactionType } from "@/src/features/transactions/types";
+
+function getScope(userId: string | null) {
+  return userId ?? "anonymous";
+}
 
 export const queryKeys = {
-  transactions: (year: number, month: number, day?: number, type?: TransactionType) =>
-    ['transactions', year, month, day, type] as const,
-  transactionsAll: () => ['transactions'] as const,
-  transaction: (id: string) => ['transactions', 'detail', id] as const,
-  balance: (year: number, month: number) => ['balance', year, month] as const,
+  transactions: (
+    userId: string | null,
+    year: number,
+    month: number,
+    day?: number,
+    type?: TransactionType,
+  ) => ["transactions", getScope(userId), year, month, day, type] as const,
+  transactionsAll: (userId: string | null) =>
+    ["transactions", getScope(userId)] as const,
+  transaction: (userId: string | null, id: string) =>
+    ["transactions", getScope(userId), "detail", id] as const,
+  balance: (userId: string | null, year: number, month: number) =>
+    ["balance", getScope(userId), year, month] as const,
+  balanceAll: (userId: string | null) => ["balance", getScope(userId)] as const,
 } as const;

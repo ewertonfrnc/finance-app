@@ -5,12 +5,12 @@ import { login } from "../services/auth.service";
 import type { ApiLoginPayload } from "../types";
 
 export function useLogin() {
-  const setToken = useAuthStore((s) => s.setToken);
+  const setAuth = useAuthStore((s) => s.setAuth);
 
   return useMutation({
     mutationFn: (payload: ApiLoginPayload) => login(payload),
     onSuccess: (data) => {
-      setToken(data.token);
+      setAuth(data.token, data.user.id);
     },
   });
 }

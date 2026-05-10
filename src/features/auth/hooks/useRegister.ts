@@ -5,12 +5,12 @@ import { register } from "../services/auth.service";
 import type { ApiRegisterPayload } from "../types";
 
 export function useRegister() {
-  const setToken = useAuthStore((s) => s.setToken);
+  const setAuth = useAuthStore((s) => s.setAuth);
 
   return useMutation({
     mutationFn: (payload: ApiRegisterPayload) => register(payload),
     onSuccess: (data) => {
-      setToken(data.token);
+      setAuth(data.token, data.user.id);
     },
   });
 }

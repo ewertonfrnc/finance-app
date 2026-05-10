@@ -7,11 +7,11 @@ import { useAuthStore } from "@/src/stores/useAuthStore";
 
 export default function MenuScreen() {
   const { top, bottom } = useSafeAreaInsets();
-  const clearToken = useAuthStore((s) => s.clearToken);
+  const clearAuth = useAuthStore((s) => s.clearAuth);
   const router = useRouter();
 
   function handleLogout() {
-    clearToken();
+    clearAuth();
     router.replace("/(onboarding)");
   }
 
