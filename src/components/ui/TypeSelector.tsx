@@ -7,6 +7,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import type { TransactionType } from "@/src/features/transactions/types";
+import { SPRING } from "@/src/lib/animations";
 
 interface TypeSelectorProps {
   value: TransactionType;
@@ -14,9 +15,9 @@ interface TypeSelectorProps {
 }
 
 const TYPES: { value: TransactionType; label: string }[] = [
-  { value: "diario", label: "Diário" },
-  { value: "saida", label: "Saída" },
   { value: "entrada", label: "Entrada" },
+  { value: "saida", label: "Saída" },
+  { value: "diario", label: "Diário" },
   { value: "economia", label: "Economia" },
 ];
 
@@ -29,11 +30,20 @@ const TYPE_COLORS: Record<TransactionType, { dot: string; text: string }> = {
 
 // Pill background hex — matches CurrencyInput's COLORS palette
 const PILL_COLORS = {
-  light: { diario: "#CBA12226", saida: "#D64E4526", entrada: "#355E4526", economia: "#1E3D2B26" },
-  dark:  { diario: "#C89F2226", saida: "#E65A4A26", entrada: "#4C8A6226", economia: "#5AB87A26" },
+  light: {
+    diario: "#CBA12226",
+    saida: "#D64E4526",
+    entrada: "#355E4526",
+    economia: "#1E3D2B26",
+  },
+  dark: {
+    diario: "#C89F2226",
+    saida: "#E65A4A26",
+    entrada: "#4C8A6226",
+    economia: "#5AB87A26",
+  },
 } as const;
 
-const SPRING = { damping: 20, stiffness: 220, mass: 0.8 };
 
 export function TypeSelector({ value, onChange }: TypeSelectorProps) {
   const scheme = useColorScheme();
@@ -67,7 +77,7 @@ export function TypeSelector({ value, onChange }: TypeSelectorProps) {
       {/* Sliding pill background */}
       <Animated.View
         style={pillStyle}
-        className="absolute bottom-1.5 top-1.5 rounded-xl"
+        className="absolute top-1.5 bottom-1.5 rounded-xl"
       />
 
       {TYPES.map((type, i) => {

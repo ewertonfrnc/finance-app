@@ -10,7 +10,7 @@ import {
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
-const SPRING = { damping: 20, stiffness: 220, mass: 0.8 };
+import { SPRING } from "@/src/lib/animations";
 const EXIT_ANIMATION = { duration: 180 };
 const SWIPE_VELOCITY = 650;
 
