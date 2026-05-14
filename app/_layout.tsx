@@ -15,6 +15,11 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useAuthHydration, useAuthStore } from "@/src/stores/useAuthStore";
 import "../global.css";
 
+if (__DEV__) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require("@/src/lib/reactotron");
+}
+
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient({

@@ -53,7 +53,10 @@ export function DayRow({ dayBalance, filter, peak, onPress }: DayRowProps) {
   const balanceColor = getBalanceColor(dayBalance.endBalance, peak);
 
   return (
-    <Pressable onPress={onPress} className="flex-row items-center gap-3 rounded-lg px-4 py-3">
+    <Pressable
+      onPress={onPress}
+      className="flex-row items-center gap-3 rounded-lg px-4 py-3"
+    >
       <View className="w-8 items-center">
         <Text
           className={`font-mono-medium text-sm ${isToday ? "text-success" : "text-foreground"}`}

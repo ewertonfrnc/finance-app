@@ -49,6 +49,7 @@
     "oxlint": "^1.63.0",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
+    "reactotron-react-native": "^5.1.18",
     "typescript": "~5.9.2"
   },
   "private": true
