@@ -36,14 +36,27 @@ export function DayList({ days, filter, onDayPress }: DayListProps) {
     [days],
   );
 
+  // Re-anchora ao trocar de mês: dia atual quando o mês contém TODAY, topo caso contrário.
+  // Refetches do mesmo mês mantêm o scroll do usuário porque monthKey não muda.
+  const monthKey = days[0]?.date.slice(0, 7) ?? "";
+
   useEffect(() => {
+    if (!monthKey) return;
     const idx = days.findIndex((d) => d.date === TODAY);
-    if (idx <= 0) return;
     const id = requestAnimationFrame(() => {
-      listRef.current?.scrollToIndex({ index: idx, animated: false, viewPosition: 0.3 });
+      if (idx > 0) {
+        listRef.current?.scrollToIndex({
+          index: idx,
+          animated: true,
+          viewPosition: 0.3,
+        });
+      } else {
+        listRef.current?.scrollToOffset({ offset: 0, animated: true });
+      }
     });
     return () => cancelAnimationFrame(id);
-  }, [days]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [monthKey]);
 
   const renderItem = useCallback(
     ({ item }: { item: DayBalance }) => (

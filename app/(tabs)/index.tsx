@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -31,18 +31,18 @@ export default function SaldosScreen() {
   const indicatorX = useSharedValue(0);
   const indicatorW = useSharedValue(0);
 
-  useEffect(() => {
-    if (!tabInitialized.current) return;
-    const layout = tabLayouts.current[filterIndex];
-    if (!layout) return;
-    indicatorX.value = withSpring(layout.x, SPRING);
-    indicatorW.value = withSpring(layout.width, SPRING);
-  }, [filterIndex, indicatorX, indicatorW]);
-
   const indicatorStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: indicatorX.value }],
     width: indicatorW.value,
   }));
+
+  function selectFilter(index: number) {
+    setFilterIndex(index);
+    const layout = tabLayouts.current[index];
+    if (!layout) return;
+    indicatorX.value = withSpring(layout.x, SPRING);
+    indicatorW.value = withSpring(layout.width, SPRING);
+  }
 
   const {
     animatedContentStyle,
@@ -89,7 +89,7 @@ export default function SaldosScreen() {
         {DAY_FILTER_OPTIONS.map((opt, index) => (
           <Pressable
             key={opt.label}
-            onPress={() => setFilterIndex(index)}
+            onPress={() => selectFilter(index)}
             className="items-center pb-1"
             onLayout={(e) => {
               const { x, width } = e.nativeEvent.layout;

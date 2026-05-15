@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Pressable, Text, View, useColorScheme } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -55,22 +55,20 @@ export function TypeSelector({ value, onChange }: TypeSelectorProps) {
   const pillX = useSharedValue(0);
   const pillW = useSharedValue(0);
 
-  const currentIndex = TYPES.findIndex((t) => t.value === value);
-
-  // Animate pill when value changes (after initial layout)
-  useEffect(() => {
-    if (!initialized.current) return;
-    const layout = chipLayouts.current[currentIndex];
-    if (!layout) return;
-    pillX.value = withSpring(layout.x, SPRING);
-    pillW.value = withSpring(layout.width, SPRING);
-  }, [currentIndex, pillX, pillW]);
-
   const pillStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: pillX.value }],
     width: pillW.value,
     backgroundColor: palette[value],
   }));
+
+  function handlePress(index: number, type: TransactionType) {
+    const layout = chipLayouts.current[index];
+    if (layout) {
+      pillX.value = withSpring(layout.x, SPRING);
+      pillW.value = withSpring(layout.width, SPRING);
+    }
+    onChange(type);
+  }
 
   return (
     <View className="bg-surface-secondary flex-row gap-1 rounded-2xl p-1.5">
@@ -87,14 +85,14 @@ export function TypeSelector({ value, onChange }: TypeSelectorProps) {
         return (
           <Pressable
             key={type.value}
-            onPress={() => onChange(type.value)}
+            onPress={() => handlePress(i, type.value)}
             className="flex-1 flex-row items-center justify-center gap-1.5 py-2"
             onLayout={(e) => {
               const { x, width } = e.nativeEvent.layout;
               chipLayouts.current[i] = { x, width };
 
               // Set initial position without animation
-              if (!initialized.current && i === currentIndex) {
+              if (!initialized.current && active) {
                 pillX.value = x;
                 pillW.value = width;
                 initialized.current = true;
