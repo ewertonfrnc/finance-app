@@ -1,4 +1,5 @@
-import { useCallback, useMemo } from "react";
+import { format } from "date-fns";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { FlatList, Text, View } from "react-native";
 
 import type {
@@ -25,11 +26,24 @@ interface DayListProps {
   onDayPress: (date: string) => void;
 }
 
+const TODAY = format(new Date(), "yyyy-MM-dd");
+
 export function DayList({ days, filter, onDayPress }: DayListProps) {
+  const listRef = useRef<FlatList<DayBalance>>(null);
+
   const peak = useMemo(
     () => days.reduce((max, d) => Math.max(max, d.endBalance), 0),
     [days],
   );
+
+  useEffect(() => {
+    const idx = days.findIndex((d) => d.date === TODAY);
+    if (idx <= 0) return;
+    const id = requestAnimationFrame(() => {
+      listRef.current?.scrollToIndex({ index: idx, animated: false, viewPosition: 0.3 });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [days]);
 
   const renderItem = useCallback(
     ({ item }: { item: DayBalance }) => (
@@ -52,11 +66,18 @@ export function DayList({ days, filter, onDayPress }: DayListProps) {
       </View>
 
       <FlatList
+        ref={listRef}
         data={days}
         keyExtractor={(item) => item.date}
         renderItem={renderItem}
         ItemSeparatorComponent={() => <Separator variant="thin" />}
         showsVerticalScrollIndicator={false}
+        onScrollToIndexFailed={(info) => {
+          listRef.current?.scrollToOffset({
+            offset: info.averageItemLength * info.index,
+            animated: false,
+          });
+        }}
       />
     </View>
   );

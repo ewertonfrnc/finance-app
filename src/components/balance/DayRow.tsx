@@ -94,6 +94,9 @@ export function DayRow({ dayBalance, filter, peak, onPress }: DayRowProps) {
         >
           {dayNum}
         </Text>
+        {isToday && (
+          <View className="bg-success absolute -right-1 top-1 h-1.5 w-1.5 rounded-full" />
+        )}
         <Text className="text-muted text-xs">{weekday}</Text>
       </View>
 
