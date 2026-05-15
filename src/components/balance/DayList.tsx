@@ -24,12 +24,19 @@ interface DayListProps {
   days: DayBalance[];
   filter: TransactionType | null;
   onDayPress: (date: string) => void;
+  isTransitioning?: boolean;
 }
 
 const TODAY = format(new Date(), "yyyy-MM-dd");
 
-export function DayList({ days, filter, onDayPress }: DayListProps) {
+export function DayList({
+  days,
+  filter,
+  onDayPress,
+  isTransitioning = false,
+}: DayListProps) {
   const listRef = useRef<FlatList<DayBalance>>(null);
+  const lastScrolledMonthKey = useRef<string>("");
 
   const peak = useMemo(
     () => days.reduce((max, d) => Math.max(max, d.endBalance), 0),
@@ -38,10 +45,15 @@ export function DayList({ days, filter, onDayPress }: DayListProps) {
 
   // Re-anchora ao trocar de mês: dia atual quando o mês contém TODAY, topo caso contrário.
   // Refetches do mesmo mês mantêm o scroll do usuário porque monthKey não muda.
+  // Aguarda isTransitioning=false para não competir com a animação de entrada do swipe.
   const monthKey = days[0]?.date.slice(0, 7) ?? "";
 
   useEffect(() => {
     if (!monthKey) return;
+    if (isTransitioning) return;
+    if (lastScrolledMonthKey.current === monthKey) return;
+    lastScrolledMonthKey.current = monthKey;
+
     const idx = days.findIndex((d) => d.date === TODAY);
     const id = requestAnimationFrame(() => {
       if (idx > 0) {
@@ -56,7 +68,7 @@ export function DayList({ days, filter, onDayPress }: DayListProps) {
     });
     return () => cancelAnimationFrame(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [monthKey]);
+  }, [monthKey, isTransitioning]);
 
   const renderItem = useCallback(
     ({ item }: { item: DayBalance }) => (

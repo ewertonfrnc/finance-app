@@ -23,17 +23,27 @@ function mapApiDayBalance(year: number, month: number) {
   };
 }
 
-export function useBalanceQuery(year: number, month: number) {
-  const userId = useAuthStore((s) => s.userId);
-
-  return useQuery({
+export function balanceQueryOptions(
+  userId: string | null,
+  year: number,
+  month: number,
+) {
+  return {
     queryKey: queryKeys.balance(userId, year, month),
     queryFn: async () => {
       const raw = await getMonthBalance(year, month);
       return raw.map(mapApiDayBalance(year, month));
     },
-    enabled: !!userId,
     staleTime: 5 * 60 * 1000,
+  };
+}
+
+export function useBalanceQuery(year: number, month: number) {
+  const userId = useAuthStore((s) => s.userId);
+
+  return useQuery({
+    ...balanceQueryOptions(userId, year, month),
+    enabled: !!userId,
     placeholderData: keepPreviousData,
   });
 }

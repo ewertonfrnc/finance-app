@@ -89,8 +89,11 @@ export default function DayScreen() {
     externalGestureToFail: filterScrollGesture,
   });
 
-  function navigateToDay(targetDate: string) {
-    startTransition(() => router.replace(`/day/${targetDate}`));
+  function navigateToDay(
+    targetDate: string,
+    direction: "prev" | "next",
+  ) {
+    startTransition(() => router.replace(`/day/${targetDate}`), direction);
   }
 
   function goBack() {
@@ -99,11 +102,11 @@ export default function DayScreen() {
   }
 
   function goToPrevDay() {
-    navigateToDay(prevDate);
+    navigateToDay(prevDate, "prev");
   }
 
   function goToNextDay() {
-    navigateToDay(nextDate);
+    navigateToDay(nextDate, "next");
   }
 
   function openNewTransaction() {

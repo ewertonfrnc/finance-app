@@ -32,24 +32,41 @@ export function useHorizontalSwipe({
 
   const translateX = useSharedValue(0);
   const isNavigating = useSharedValue(false);
+  // Direção da última troca: +1 entra pela direita (next), -1 pela esquerda (prev), 0 sem entrada animada.
+  const enterFrom = useSharedValue(0);
   const screenWidth = Math.max(width, 1);
   const swipeDistance = Math.min(screenWidth * 0.22, 88);
   const maxDrag = screenWidth * 0.35;
 
   useEffect(() => {
-    translateX.value = 0;
-    isNavigating.value = false;
-    setIsTransitioning(false);
-  }, [isNavigating, resetKey, translateX]);
+    const dir = enterFrom.value;
+    if (dir !== 0) {
+      translateX.value = dir * screenWidth;
+      enterFrom.value = 0;
+      translateX.value = withSpring(0, SPRING, (finished) => {
+        if (finished) {
+          isNavigating.value = false;
+          scheduleOnRN(setIsTransitioning, false);
+        }
+      });
+    } else {
+      translateX.value = 0;
+      isNavigating.value = false;
+      setIsTransitioning(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetKey]);
 
   const startTransition = useCallback(
-    (action: () => void) => {
+    (action: () => void, direction?: "prev" | "next") => {
       if (isTransitioning) return false;
       setIsTransitioning(true);
+      if (direction === "next") enterFrom.value = 1;
+      else if (direction === "prev") enterFrom.value = -1;
       action();
       return true;
     },
-    [isTransitioning],
+    [isTransitioning, enterFrom],
   );
 
   const swipeGesture = Gesture.Pan()
@@ -81,6 +98,7 @@ export function useHorizontalSwipe({
           EXIT_ANIMATION,
           (finished) => {
             if (finished) {
+              enterFrom.value = 1;
               scheduleOnRN(onSwipeNext);
             } else {
               isNavigating.value = false;
@@ -99,6 +117,7 @@ export function useHorizontalSwipe({
           EXIT_ANIMATION,
           (finished) => {
             if (finished) {
+              enterFrom.value = -1;
               scheduleOnRN(onSwipePrev);
             } else {
               isNavigating.value = false;
