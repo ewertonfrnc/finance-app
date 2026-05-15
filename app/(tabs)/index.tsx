@@ -8,7 +8,6 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
-import { BalanceSummaryHeader } from "@/src/components/balance/BalanceSummaryHeader";
 import { DAY_FILTER_OPTIONS, DayList } from "@/src/components/balance/DayList";
 import { useHorizontalSwipe } from "@/src/components/gestures/useHorizontalSwipe";
 import { MonthNavigator } from "@/src/components/navigation/MonthNavigator";
@@ -80,7 +79,7 @@ export default function SaldosScreen() {
         onNext={navigateToNextMonth}
         disabled={isTransitioning}
       />
-      <BalanceSummaryHeader summary={summary} />
+      {/* <BalanceSummaryHeader summary={summary} /> */}
 
       <View className="border-surface-secondary flex-row justify-between border-b px-4 pt-2">
         <Animated.View

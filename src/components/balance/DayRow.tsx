@@ -1,5 +1,5 @@
 import { format, parseISO } from "date-fns";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, useColorScheme } from "react-native";
 
 import type {
   DayBalance,
@@ -24,18 +24,47 @@ const CATEGORIES: { type: TransactionType; label: string }[] = [
 
 const TODAY = format(new Date(), "yyyy-MM-dd");
 
-function getBalanceColor(balance: number, peak: number): string {
-  if (balance <= 0) return "text-danger";
-  if (peak <= 0) return "text-foreground";
-  const ratio = balance / peak;
-  if (ratio >= 0.5) return "text-success";
-  if (ratio >= 0.25) return "text-yellow-400";
-  return "text-danger";
+type HealthLevel = "dark-green" | "light-green" | "yellow" | "light-red" | "dark-red";
+
+const HEALTH_COLORS = {
+  light: {
+    "dark-green":  { bg: "#b8ecd4", text: "#114d36" },
+    "light-green": { bg: "#dbf4e7", text: "#185b43" },
+    "yellow":      { bg: "#f8edc8", text: "#73580f" },
+    "light-red":   { bg: "#f8d9dd", text: "#852035" },
+    "dark-red":    { bg: "#efbcc5", text: "#701529" },
+  },
+  dark: {
+    "dark-green":  { bg: "#214f3c", text: "#baf5d7" },
+    "light-green": { bg: "#1a3f31", text: "#a6efca" },
+    "yellow":      { bg: "#493f25", text: "#f4d98e" },
+    "light-red":   { bg: "#4a2b31", text: "#f8b8c3" },
+    "dark-red":    { bg: "#5a2530", text: "#ffd2da" },
+  },
+} as const;
+
+// balance e peak em centavos; -500 reais = -50000 centavos
+function getHealthLevel(balance: number, peak: number): HealthLevel {
+  if (peak > 0) {
+    const ratio = balance / peak;
+    if (ratio > 0.6) return "dark-green";
+    if (ratio > 0.2) return "light-green";
+  }
+  if (balance >= 0) return "yellow";
+  if (balance >= -50000) return "light-red";
+  return "dark-red";
 }
 
 export function DayRow({ dayBalance, filter, peak, onPress }: DayRowProps) {
   const isToday = dayBalance.date === TODAY;
   const isFuture = dayBalance.date > TODAY;
+  const isProjectionOnly =
+    isFuture &&
+    dayBalance.daily > 0 &&
+    dayBalance.income === 0 &&
+    dayBalance.expense === 0 &&
+    dayBalance.savings === 0;
+  const futureOpacity = isProjectionOnly ? "opacity-50" : isFuture ? "opacity-80" : "";
   const dayNum = format(parseISO(dayBalance.date), "dd");
   const weekday = formatWeekday(dayBalance.date);
 
@@ -50,7 +79,9 @@ export function DayRow({ dayBalance, filter, peak, onPress }: DayRowProps) {
     (cat) => (filter === null || cat.type === filter) && amounts[cat.type] > 0,
   );
 
-  const balanceColor = getBalanceColor(dayBalance.endBalance, peak);
+  const scheme = useColorScheme();
+  const healthLevel = getHealthLevel(dayBalance.endBalance, peak);
+  const colors = HEALTH_COLORS[scheme === "dark" ? "dark" : "light"][healthLevel];
 
   return (
     <Pressable
@@ -66,25 +97,18 @@ export function DayRow({ dayBalance, filter, peak, onPress }: DayRowProps) {
         <Text className="text-muted text-xs">{weekday}</Text>
       </View>
 
-      <View className="flex-1 gap-1">
+      <View className={`flex-1 gap-1 ${futureOpacity}`}>
         {visibleLines.length > 0 ? (
-          visibleLines.map((cat) => {
-            const compact = isFuture && visibleLines.length === 1;
-            return (
-              <View key={cat.type} className="flex-row items-center">
-                <View className="flex-1">
-                  {!compact && (
-                    <Text className="text-muted text-sm">{cat.label}</Text>
-                  )}
-                </View>
-                <CurrencyText
-                  value={amounts[cat.type]}
-                  variant="small"
-                  sign="neutral"
-                />
-              </View>
-            );
-          })
+          visibleLines.map((cat) => (
+            <View key={cat.type} className="flex-row items-center">
+              <Text className="text-muted text-xs flex-1">{cat.label}</Text>
+              <CurrencyText
+                value={amounts[cat.type]}
+                variant="small"
+                sign="neutral"
+              />
+            </View>
+          ))
         ) : (
           <View className="flex-row items-center justify-between opacity-35">
             <Text className="text-muted text-xs">Sem lançamento</Text>
@@ -93,12 +117,14 @@ export function DayRow({ dayBalance, filter, peak, onPress }: DayRowProps) {
         )}
       </View>
 
-      <CurrencyText
-        value={dayBalance.endBalance}
-        variant="small"
-        sign="neutral"
-        className={balanceColor}
-      />
+      <View style={{ backgroundColor: colors.bg, minWidth: 128 }} className={`items-end rounded-md px-2.5 py-1 ${futureOpacity}`}>
+        <CurrencyText
+          value={dayBalance.endBalance}
+          variant="small"
+          sign="neutral"
+          style={{ color: colors.text }}
+        />
+      </View>
     </Pressable>
   );
 }
