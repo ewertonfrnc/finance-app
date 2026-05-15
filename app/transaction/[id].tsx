@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 
@@ -7,16 +8,22 @@ import {
 } from "@/src/components/transactions/TransactionForm";
 import { Screen } from "@/src/components/ui/Screen";
 import { useDeleteTransaction } from "@/src/features/transactions/hooks/useDeleteTransaction";
+import { useInvalidateTransactionData } from "@/src/features/transactions/hooks/useInvalidateTransactionData";
 import { useTransaction } from "@/src/features/transactions/hooks/useTransaction";
 import { useUpdateTransaction } from "@/src/features/transactions/hooks/useUpdateTransaction";
+import { queryKeys } from "@/src/lib/queryKeys";
+import { useAuthStore } from "@/src/stores/useAuthStore";
 
 export default function EditTransactionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const userId = useAuthStore((s) => s.userId);
 
   const { data: transaction, isLoading } = useTransaction(id);
   const { mutate: update, isPending: isUpdating } = useUpdateTransaction();
   const { mutate: remove, isPending: isDeleting } = useDeleteTransaction();
+  const invalidate = useInvalidateTransactionData();
 
   function handleSubmit(values: FormValues) {
     update(
@@ -29,12 +36,25 @@ export default function EditTransactionScreen() {
           date: values.date,
         },
       },
-      { onSuccess: () => router.back() },
+      {
+        onSuccess: async () => {
+          await invalidate();
+          router.back();
+        },
+      },
     );
   }
 
   function handleDelete() {
-    remove(id, { onSuccess: () => router.back() });
+    remove(id, {
+      onSuccess: async () => {
+        queryClient.removeQueries({
+          queryKey: queryKeys.transaction(userId, id),
+        });
+        await invalidate();
+        router.back();
+      },
+    });
   }
 
   if (isLoading || !transaction) {

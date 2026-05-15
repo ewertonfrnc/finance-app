@@ -4,15 +4,18 @@ import {
   TransactionForm,
   type FormValues,
 } from "@/src/components/transactions/TransactionForm";
-import { useCreateTransaction } from "@/src/features/transactions/hooks/useCreateTransaction";
-import { isIsoDate } from "@/src/lib/date";
 import { Screen } from "@/src/components/ui/Screen";
+import { useCreateTransaction } from "@/src/features/transactions/hooks/useCreateTransaction";
+import { useInvalidateTransactionData } from "@/src/features/transactions/hooks/useInvalidateTransactionData";
+import { isIsoDate } from "@/src/lib/date";
 
 export default function NewTransactionScreen() {
   const { date } = useLocalSearchParams<{ date?: string }>();
   const router = useRouter();
   const { mutate: create, isPending } = useCreateTransaction();
-  const initialDate = typeof date === "string" && isIsoDate(date) ? date : undefined;
+  const invalidate = useInvalidateTransactionData();
+  const initialDate =
+    typeof date === "string" && isIsoDate(date) ? date : undefined;
 
   function handleSubmit(values: FormValues) {
     create(
@@ -22,7 +25,12 @@ export default function NewTransactionScreen() {
         description: values.description,
         date: values.date,
       },
-      { onSuccess: () => router.back() },
+      {
+        onSuccess: async () => {
+          await invalidate();
+          router.back();
+        },
+      },
     );
   }
 
