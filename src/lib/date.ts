@@ -22,9 +22,19 @@ export function formatWeekday(date: string): string {
     .toUpperCase();
 }
 
-/** "2026-04-12" → "TER-FEIRA" (para o header da tela de detalhe) */
+/** "2026-04-12" → "TER-FEIRA" | "SÁBADO" | "DOMINGO" (para o header da tela de detalhe) */
 export function formatWeekdayLong(date: string): string {
-  return format(parseISO(date), "EEE'-feira'", { locale: ptBR }).toUpperCase();
+  const parsed = parseISO(date);
+  const day = parsed.getDay();
+  if (day === 0) return "DOMINGO";
+  if (day === 6) return "SÁBADO";
+  return format(parsed, "EEE", { locale: ptBR }).replace(".", "").toUpperCase() + "-FEIRA";
+}
+
+/** "2026-04-12" → true se sábado ou domingo */
+export function isWeekend(date: string): boolean {
+  const day = parseISO(date).getDay();
+  return day === 0 || day === 6;
 }
 
 /** "2026-04-12" → "2026-04-11" */

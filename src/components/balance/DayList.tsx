@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { FlatList, Text, View } from "react-native";
 
 import type {
@@ -38,11 +38,6 @@ export function DayList({
   const listRef = useRef<FlatList<DayBalance>>(null);
   const lastScrolledMonthKey = useRef<string>("");
 
-  const peak = useMemo(
-    () => days.reduce((max, d) => Math.max(max, d.endBalance), 0),
-    [days],
-  );
-
   // Re-anchora ao trocar de mês: dia atual quando o mês contém TODAY, topo caso contrário.
   // Refetches do mesmo mês mantêm o scroll do usuário porque monthKey não muda.
   // Aguarda isTransitioning=false para não competir com a animação de entrada do swipe.
@@ -75,11 +70,10 @@ export function DayList({
       <DayRow
         dayBalance={item}
         filter={filter}
-        peak={peak}
         onPress={() => onDayPress(item.date)}
       />
     ),
-    [onDayPress, filter, peak],
+    [onDayPress, filter],
   );
 
   return (

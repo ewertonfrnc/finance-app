@@ -43,7 +43,8 @@ export interface ApiDayBalance {
   day: number;
   income: number; // centavos
   expense: number; // centavos
-  daily: number; // centavos
+  daily: number; // centavos — daily_actual + daily_projected
+  daily_projected: number; // centavos — só a projeção do orçamento diário
   savings: number; // centavos
   running_balance: number; // centavos
 }

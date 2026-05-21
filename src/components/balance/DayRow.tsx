@@ -5,13 +5,12 @@ import type {
   DayBalance,
   TransactionType,
 } from "@/src/features/transactions/types";
-import { formatWeekday } from "@/src/lib/date";
+import { formatWeekday, isWeekend } from "@/src/lib/date";
 import { CurrencyText } from "../ui/CurrencyText";
 
 interface DayRowProps {
   dayBalance: DayBalance;
   filter: TransactionType | null;
-  peak: number;
   onPress: () => void;
 }
 
@@ -43,24 +42,23 @@ const HEALTH_COLORS = {
   },
 } as const;
 
-// balance e peak em centavos; -500 reais = -50000 centavos
-function getHealthLevel(balance: number, peak: number): HealthLevel {
-  if (peak > 0) {
-    const ratio = balance / peak;
-    if (ratio > 0.6) return "dark-green";
-    if (ratio > 0.2) return "light-green";
-  }
+// balance em centavos; limiares: 2000, 1000, 0, -500 reais
+function getHealthLevel(balance: number): HealthLevel {
+  if (balance >= 200000) return "dark-green";
+  if (balance >= 100000) return "light-green";
   if (balance >= 0) return "yellow";
-  if (balance >= -50000) return "light-red";
+  if (balance > -50000) return "light-red";
   return "dark-red";
 }
 
-export function DayRow({ dayBalance, filter, peak, onPress }: DayRowProps) {
+export function DayRow({ dayBalance, filter, onPress }: DayRowProps) {
   const isToday = dayBalance.date === TODAY;
   const isFuture = dayBalance.date > TODAY;
+  const weekend = isWeekend(dayBalance.date);
   const isProjectionOnly =
     isFuture &&
     dayBalance.daily > 0 &&
+    dayBalance.daily === dayBalance.dailyProjected &&
     dayBalance.income === 0 &&
     dayBalance.expense === 0 &&
     dayBalance.savings === 0;
@@ -80,15 +78,24 @@ export function DayRow({ dayBalance, filter, peak, onPress }: DayRowProps) {
   );
 
   const scheme = useColorScheme();
-  const healthLevel = getHealthLevel(dayBalance.endBalance, peak);
+  const healthLevel = getHealthLevel(dayBalance.endBalance);
   const colors = HEALTH_COLORS[scheme === "dark" ? "dark" : "light"][healthLevel];
+
+  const weekendDayBg = weekend
+    ? scheme === "dark"
+      ? "rgba(120, 100, 60, 0.25)"
+      : "rgba(200, 160, 60, 0.13)"
+    : undefined;
 
   return (
     <Pressable
       onPress={onPress}
       className="flex-row items-center gap-3 rounded-lg px-4 py-3"
     >
-      <View className="w-8 items-center">
+      <View
+        style={weekendDayBg ? { backgroundColor: weekendDayBg } : undefined}
+        className="w-8 items-center rounded-md py-0.5"
+      >
         <Text
           className={`font-mono-medium text-sm ${isToday ? "text-success" : "text-foreground"}`}
         >

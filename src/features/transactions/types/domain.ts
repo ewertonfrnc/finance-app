@@ -20,7 +20,8 @@ export interface DayBalance {
   totalSpending: number; // centavos — soma de saida + diario + economia
   income: number; // centavos — entradas
   expense: number; // centavos — saídas
-  daily: number; // centavos — diários
+  daily: number; // centavos — daily_actual + daily_projected
+  dailyProjected: number; // centavos — só a projeção (0 para passado/hoje)
   savings: number; // centavos — economia
 }
 

@@ -11,6 +11,7 @@ export function useInvalidateTransactionData() {
     Promise.all([
       queryClient.invalidateQueries({
         queryKey: queryKeys.transactionsAll(userId),
+        predicate: (query) => !query.queryKey.includes("detail"),
       }),
       queryClient.invalidateQueries({ queryKey: queryKeys.balanceAll(userId) }),
     ]);

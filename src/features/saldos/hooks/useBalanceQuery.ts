@@ -18,6 +18,7 @@ function mapApiDayBalance(year: number, month: number) {
       income: api.income,
       expense: api.expense,
       daily: api.daily,
+      dailyProjected: api.daily_projected,
       savings: api.savings,
     };
   };

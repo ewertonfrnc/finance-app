@@ -1,8 +1,10 @@
+import { format, parseISO } from "date-fns";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { FlatList, ScrollView, Text, View } from "react-native";
+import { FlatList, Pressable, ScrollView, Text, View, useColorScheme } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
+import { useToast } from "heroui-native";
 
 import { useHorizontalSwipe } from "@/src/components/gestures/useHorizontalSwipe";
 import { DayNavigator } from "@/src/components/navigation/DayNavigator";
@@ -15,6 +17,67 @@ import { useDayTransactions } from "@/src/features/transactions/hooks/useDayTran
 import type { TransactionType } from "@/src/features/transactions/types";
 import { formatDayHeader, nextDay, prevDay } from "@/src/lib/date";
 
+const TODAY = format(new Date(), "yyyy-MM-dd");
+
+const PROJECTION_CARD_COLORS = {
+  light: { bg: "#dbf4e7", title: "#185b43", badge: "#b8ecd4", badgeText: "#114d36", bullet: "#2d6b4e" },
+  dark:  { bg: "#1a3f31", title: "#a6efca", badge: "#214f3c", badgeText: "#baf5d7", bullet: "#7edcb0" },
+} as const;
+
+function DailyProjectionCard({ date, amount, onAdjustPress }: {
+  date: string;
+  amount: number;
+  onAdjustPress: () => void;
+}) {
+  const scheme = useColorScheme();
+  const c = PROJECTION_CARD_COLORS[scheme === "dark" ? "dark" : "light"];
+  const dayLabel = format(parseISO(date), "dd/MM");
+
+  return (
+    <View style={{ backgroundColor: c.bg }} className="mx-4 mb-2 mt-3 rounded-xl px-4 py-3 gap-2">
+      <View className="flex-row items-center gap-2">
+        <Text style={{ color: c.title }} className="flex-1 font-medium text-sm">
+          Diário previsto
+        </Text>
+        <View style={{ backgroundColor: c.badge }} className="rounded px-1.5 py-0.5">
+          <Text style={{ color: c.badgeText }} className="text-xs font-medium tracking-wide">
+            PREVISÃO
+          </Text>
+        </View>
+        <CurrencyText value={amount} variant="small" sign="negative" style={{ color: c.title }} />
+      </View>
+
+      <View className="gap-1.5">
+        <View className="flex-row gap-1.5">
+          <Text style={{ color: c.bullet }} className="text-xs leading-5">•</Text>
+          <Text style={{ color: c.bullet }} className="flex-1 text-xs leading-5">
+            No dia <Text className="font-semibold">{dayLabel}</Text> será descontado este previsto{" "}
+            <Text className="font-semibold">somado</Text> ao que você lançar.
+          </Text>
+        </View>
+        <View className="flex-row gap-1.5">
+          <Text style={{ color: c.bullet }} className="text-xs leading-5">•</Text>
+          <Text style={{ color: c.bullet }} className="flex-1 text-xs leading-5">
+            Quando o dia chegar, o previsto{" "}
+            <Text className="font-semibold">zera à meia-noite</Text> — fica só o que foi lançado.
+          </Text>
+        </View>
+        <View className="flex-row gap-1.5">
+          <Text style={{ color: c.bullet }} className="text-xs leading-5">•</Text>
+          <Text style={{ color: c.bullet }} className="flex-1 text-xs leading-5">
+            Vem da sua previsão mensal de diários.{" "}
+            <Pressable onPress={onAdjustPress} hitSlop={8}>
+              <Text style={{ color: c.title }} className="text-xs font-semibold underline">
+                Toque para ajustar.
+              </Text>
+            </Pressable>
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
 const FILTER_OPTIONS: { label: string; value: TransactionType | null }[] = [
   { label: "Todas", value: null },
   { label: "Entradas", value: "entrada" },
@@ -26,6 +89,7 @@ const FILTER_OPTIONS: { label: string; value: TransactionType | null }[] = [
 export default function DayScreen() {
   const { date } = useLocalSearchParams<{ date: string }>();
   const router = useRouter();
+  const { toast } = useToast();
   const [selectedType, setSelectedType] = useState<TransactionType | null>(
     null,
   );
@@ -43,10 +107,13 @@ export default function DayScreen() {
   const { data: currMonthBalance = [] } = useBalanceQuery(year, month);
   const { data: nextMonthBalance = [] } = useBalanceQuery(nextYear, nextMonth);
 
+  const isFuture = date > TODAY;
+  const dayBalance = currMonthBalance.find((d) => d.date === date);
+  const projectedDaily = dayBalance?.dailyProjected ?? 0;
+
   const yesterdayBalance =
     prevMonthBalance.find((d) => d.date === prevDate)?.endBalance ?? null;
-  const todayBalance =
-    currMonthBalance.find((d) => d.date === date)?.endBalance ?? null;
+  const todayBalance = dayBalance?.endBalance ?? null;
   const tomorrowBalance =
     nextMonthBalance.find((d) => d.date === nextDate)?.endBalance ?? null;
 
@@ -111,7 +178,7 @@ export default function DayScreen() {
 
   function openNewTransaction() {
     if (isTransitioning) return;
-    router.push("/transaction/new");
+    router.push({ pathname: "/transaction/new", params: { date } });
   }
 
   return (
@@ -219,6 +286,22 @@ export default function DayScreen() {
           <FlatList
             data={filtered}
             keyExtractor={(tx) => tx.id}
+            ListHeaderComponent={
+              isFuture && projectedDaily > 0 ? (
+                <DailyProjectionCard
+                  date={date}
+                  amount={projectedDaily}
+                  onAdjustPress={() => {
+                    toast.show({
+                      placement: "top",
+                      duration: 3500,
+                      label: "Em breve",
+                      description: "A tela de ajuste do diário será adicionada em breve.",
+                    });
+                  }}
+                />
+              ) : null
+            }
             renderItem={({ item }) => (
               <TransactionItem
                 transaction={item}
