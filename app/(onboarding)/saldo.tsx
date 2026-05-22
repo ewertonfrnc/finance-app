@@ -1,15 +1,14 @@
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useRegister } from "@/src/features/auth/hooks/useRegister";
+import { Screen } from "@/src/components/ui/Screen";
 import { formatBRL } from "@/src/lib/currency";
 import { useOnboardingStore } from "@/src/stores/useOnboardingStore";
 
 export default function SaldoScreen() {
   const router = useRouter();
-  const { top, bottom } = useSafeAreaInsets();
 
   const { name, email, password, categories, daysPerMonth, reset } =
     useOnboardingStore();
@@ -38,7 +37,7 @@ export default function SaldoScreen() {
   }
 
   return (
-    <View className="bg-accent flex-1 px-6" style={{ paddingTop: top }}>
+    <Screen className="bg-accent px-6">
       <View className="flex-1 pt-10">
         <Text className="text-accent-foreground/60 mb-2 text-xs font-medium tracking-widest uppercase">
           Oi, {firstName}
@@ -85,7 +84,7 @@ export default function SaldoScreen() {
         )}
       </View>
 
-      <View style={{ paddingBottom: bottom + 16 }}>
+      <View className="pb-4">
         <Pressable
           onPress={handleConcluir}
           disabled={isPending}
@@ -102,6 +101,6 @@ export default function SaldoScreen() {
           </Text>
         </Pressable>
       </View>
-    </View>
+    </Screen>
   );
 }

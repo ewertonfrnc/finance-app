@@ -1,15 +1,20 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useToast } from "heroui-native";
-import { ChevronLeft } from "lucide-react-native";
+import { Button, useToast } from "heroui-native";
 import { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  KeyboardAvoidingView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { CurrencyInput } from "@/src/components/ui/CurrencyInput";
+import { Screen } from "@/src/components/ui/Screen";
 import {
   type CategorySlug,
   useOnboardingStore,
 } from "@/src/stores/useOnboardingStore";
+import { ChevronLeft } from "lucide-react-native";
 
 type Step = {
   slug: CategorySlug;
@@ -65,7 +70,6 @@ const STEPS: Step[] = [
 export default function CategoryStepScreen() {
   const { step } = useLocalSearchParams<{ step: string }>();
   const router = useRouter();
-  const { top, bottom } = useSafeAreaInsets();
   const { categories, setCategory } = useOnboardingStore();
   const { toast } = useToast();
 
@@ -104,74 +108,79 @@ export default function CategoryStepScreen() {
   }
 
   return (
-    <View className="bg-background flex-1 px-6" style={{ paddingTop: top }}>
-      {/* Header */}
-      <View className="flex-row items-center justify-between py-4">
-        <TouchableOpacity
-          onPress={() => router.back()}
-          hitSlop={12}
-          activeOpacity={0.7}
-        >
-          <ChevronLeft size={22} color="#13251a" strokeWidth={2} />
-        </TouchableOpacity>
+    <Screen className="bg-background flex-1 px-6">
+      <KeyboardAvoidingView className="flex-1" behavior="padding">
+        {/* Header */}
+        <View className="flex-row items-center justify-between py-4">
+          <TouchableOpacity
+            onPress={() => router.back()}
+            hitSlop={12}
+            activeOpacity={0.7}
+          >
+            <ChevronLeft size={22} color="#13251a" strokeWidth={2} />
+          </TouchableOpacity>
 
-        <View className="flex-row items-center gap-1.5">
-          {STEPS.map((_, i) => (
-            <View
-              key={i}
-              className={
-                i < currentIndex
-                  ? "bg-foreground h-1.5 w-4 rounded-full opacity-30"
-                  : i === currentIndex
-                    ? "bg-foreground h-1.5 w-4 rounded-full"
-                    : "bg-surface-tertiary h-1.5 w-1.5 rounded-full"
-              }
-            />
-          ))}
+          <View className="flex-row items-center gap-1.5">
+            {STEPS.map((_, i) => (
+              <View
+                key={i}
+                className={
+                  i < currentIndex
+                    ? "bg-foreground h-1.5 w-4 rounded-full opacity-30"
+                    : i === currentIndex
+                      ? "bg-foreground h-1.5 w-4 rounded-full"
+                      : "bg-surface-tertiary h-1.5 w-1.5 rounded-full"
+                }
+              />
+            ))}
+          </View>
+
+          <TouchableOpacity
+            onPress={() => advance(0)}
+            hitSlop={12}
+            activeOpacity={0.7}
+          >
+            <Text className="text-muted text-sm font-medium">Pular</Text>
+          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          onPress={() => advance(0)}
-          hitSlop={12}
-          activeOpacity={0.7}
-        >
-          <Text className="text-muted text-sm font-medium">Pular</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Conteúdo */}
-      <View className="flex-1 pt-6">
-        <Text className="text-muted mb-3 text-xs font-medium tracking-widest uppercase">
-          {current.number} · {current.label}
-        </Text>
-
-        <Text className="text-foreground mb-10 text-2xl leading-snug font-semibold">
-          {current.heading}
-        </Text>
-
-        <Text className="text-muted mb-4 text-xs font-medium tracking-widest uppercase">
-          Valor Mensal
-        </Text>
-
-        <CurrencyInput value={value} onValueChange={setValue} type="entrada" />
-
-        <Text className="text-muted mt-6 text-sm leading-relaxed">
-          {current.description}
-        </Text>
-      </View>
-
-      {/* Rodapé */}
-      <View style={{ paddingBottom: bottom + 16 }}>
-        <TouchableOpacity
-          activeOpacity={0.85}
-          className="bg-foreground items-center rounded-xl py-4"
-          onPress={() => advance(value)}
-        >
-          <Text className="text-background text-base font-semibold">
-            Próximo
+        {/* Conteúdo */}
+        <View className="flex-1 pt-6">
+          <Text className="text-muted mb-3 text-xs font-medium tracking-widest uppercase">
+            {current.number} · {current.label}
           </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+
+          <Text className="text-foreground mb-10 text-2xl leading-snug font-semibold">
+            {current.heading}
+          </Text>
+
+          <Text className="text-muted mb-4 text-xs font-medium tracking-widest uppercase">
+            Valor Mensal
+          </Text>
+
+          <CurrencyInput
+            value={value}
+            onValueChange={setValue}
+            type="economia"
+          />
+
+          <Text className="text-muted mt-6 text-sm leading-relaxed">
+            {current.description}
+          </Text>
+        </View>
+
+        {/* Rodapé */}
+        <View className="pb-2">
+          <Button
+            onPress={() => advance(value)}
+            className="bg-foreground h-14 rounded-4xl"
+          >
+            <Button.Label className="text-background text-base font-semibold">
+              Próximo
+            </Button.Label>
+          </Button>
+        </View>
+      </KeyboardAvoidingView>
+    </Screen>
   );
 }

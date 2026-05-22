@@ -1,12 +1,11 @@
 import { useRouter } from "expo-router";
 import { LogOut } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Screen } from "@/src/components/ui/Screen";
 import { useAuthStore } from "@/src/stores/useAuthStore";
 
 export default function MenuScreen() {
-  const { top, bottom } = useSafeAreaInsets();
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const router = useRouter();
 
@@ -16,10 +15,7 @@ export default function MenuScreen() {
   }
 
   return (
-    <View
-      className="bg-background flex-1 px-6"
-      style={{ paddingTop: top, paddingBottom: bottom + 16 }}
-    >
+    <Screen className="px-6 pb-4">
       <View className="flex-1" />
 
       <Pressable
@@ -29,6 +25,6 @@ export default function MenuScreen() {
         <LogOut size={18} color="#D64E45" strokeWidth={2} />
         <Text className="text-danger text-base font-medium">Sair da conta</Text>
       </Pressable>
-    </View>
+    </Screen>
   );
 }

@@ -1,8 +1,8 @@
 import { useRouter } from "expo-router";
 import { Text, TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CurrencyText } from "@/src/components/ui/CurrencyText";
+import { Screen } from "@/src/components/ui/Screen";
 import { formatBRL } from "@/src/lib/currency";
 import { useOnboardingStore } from "@/src/stores/useOnboardingStore";
 
@@ -16,7 +16,6 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default function ResumoScreen() {
   const router = useRouter();
-  const { top, bottom } = useSafeAreaInsets();
   const { categories, daysPerMonth } = useOnboardingStore();
 
   const totalMensal = Object.values(categories).reduce((sum, v) => sum + v, 0);
@@ -27,7 +26,7 @@ export default function ResumoScreen() {
   );
 
   return (
-    <View className="bg-background flex-1 px-6" style={{ paddingTop: top }}>
+    <Screen className="px-6">
       <View className="flex-1 pt-10">
         <Text className="text-muted mb-2 text-xs font-medium tracking-widest uppercase">
           Pronto
@@ -90,7 +89,7 @@ export default function ResumoScreen() {
         </Text>
       </View>
 
-      <View style={{ paddingBottom: bottom + 16 }}>
+      <View className="pb-4">
         <TouchableOpacity
           activeOpacity={0.85}
           className="bg-foreground items-center rounded-xl py-4"
@@ -101,6 +100,6 @@ export default function ResumoScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </Screen>
   );
 }
