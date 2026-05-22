@@ -5,28 +5,31 @@ import type {
   Transaction,
   TransactionType,
 } from "@/src/features/transactions/types";
+import { formatDayHeader } from "@/src/lib/date";
 import { CurrencyText } from "../ui/CurrencyText";
 import { TypeBadge } from "../ui/TypeBadge";
 
 const TYPE_LABEL: Record<TransactionType, string> = {
-  entrada: "Entradas",
-  saida: "Saídas",
-  diario: "Diários",
+  entrada: "Entrada",
+  saida: "Saída",
+  diario: "Diário",
   economia: "Economia",
 };
 
 interface TransactionItemProps {
   transaction: Transaction;
   onPress?: () => void;
+  showDate?: boolean;
 }
 
 export function TransactionItem({
   transaction,
   onPress,
+  showDate = false,
 }: TransactionItemProps) {
   const { type, amount, description } = transaction;
-  const isIncome = type === "entrada";
-  const signedAmount = isIncome ? amount : -amount;
+
+  const hasSubline = showDate || transaction.tags.length > 0;
 
   return (
     <Pressable
@@ -43,8 +46,13 @@ export function TransactionItem({
           {description}
         </Text>
 
-        {transaction.tags.length > 0 && (
-          <View className="mt-1 flex-row flex-wrap gap-1">
+        {hasSubline && (
+          <View className="mt-1 flex-row flex-wrap items-center gap-1">
+            {showDate && (
+              <Text className="text-muted text-xs">
+                {formatDayHeader(transaction.date)}
+              </Text>
+            )}
             {transaction.tags.map((tag) => (
               <TagBadge
                 key={tag.id}
@@ -58,7 +66,7 @@ export function TransactionItem({
       </View>
 
       <View className="items-end">
-        <CurrencyText value={signedAmount} variant="small" />
+        <CurrencyText value={amount} sign="neutral" variant="small" />
         <Text className="text-muted mt-0.5 text-xs">{TYPE_LABEL[type]}</Text>
       </View>
     </Pressable>

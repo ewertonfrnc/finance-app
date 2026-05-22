@@ -5,29 +5,27 @@ import {
   BottomSheetTextInput,
   type BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
-import { useQueryClient } from "@tanstack/react-query";
 import { Check, Trash2, X } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { queryKeys } from "@/src/lib/queryKeys";
-import { useAuthStore } from "@/src/stores/useAuthStore";
 import { useCreateTag } from "../hooks/useCreateTag";
 import { useDeleteTag } from "../hooks/useDeleteTag";
+import { useInvalidateTagData } from "../hooks/useInvalidateTagData";
 import { useUpdateTag } from "../hooks/useUpdateTag";
 import type { Tag } from "../types";
 import { TagBadge } from "./TagBadge";
 
 const TAG_COLOR_PALETTE = [
-  { label: "Cinza", hex: "#CCCCCC" },
-  { label: "Vermelho", hex: "#F4A4A4" },
-  { label: "Laranja", hex: "#F4C4A4" },
-  { label: "Amarelo", hex: "#F4F4A4" },
-  { label: "Verde", hex: "#A4F4A4" },
-  { label: "Azul claro", hex: "#A4E4F4" },
-  { label: "Azul", hex: "#7BB5F4" },
-  { label: "Roxo", hex: "#C4A4F4" },
-  { label: "Rosa", hex: "#F4A4D4" },
+  { label: "Marrom", hex: "#D4A87A" }, // quente terroso
+  { label: "Laranja", hex: "#F4934A" }, // quente vibrante
+  { label: "Rosa", hex: "#E86FA8" }, // quente frio
+  { label: "Roxo", hex: "#C4A4F4" }, // frio escuro
+  { label: "Azul", hex: "#4A7CE0" }, // frio médio
+  { label: "Verde", hex: "#7EC8A0" }, // frio claro
+  { label: "Cinza", hex: "#9E9E9E" }, // neutro escuro
+  { label: "Marfim", hex: "#E8D5A3" }, // neutro quente — fora da lista original
 ] as const;
 
 const MAX_TAGS = 100;
@@ -62,14 +60,13 @@ export function TagFormModal({
 
   const hasError = touched && !name.trim();
 
-  const queryClient = useQueryClient();
-  const userId = useAuthStore((s) => s.userId);
-
+  const invalidate = useInvalidateTagData();
   const { mutate: create, isPending: isCreating } = useCreateTag();
   const { mutate: update, isPending: isUpdating } = useUpdateTag();
   const { mutate: remove, isPending: isDeleting } = useDeleteTag();
 
   const isPending = isCreating || isUpdating || isDeleting;
+  const { bottom } = useSafeAreaInsets();
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -94,12 +91,6 @@ export function TagFormModal({
     sheetRef.current?.present();
   }, [mode, tag]);
 
-  function invalidateTags() {
-    return queryClient.invalidateQueries({
-      queryKey: queryKeys.tagsAll(userId),
-    });
-  }
-
   function handleSubmit() {
     setTouched(true);
     const trimmed = name.trim();
@@ -110,7 +101,7 @@ export function TagFormModal({
         { name: trimmed, color },
         {
           onSuccess: async () => {
-            await invalidateTags();
+            await invalidate();
             sheetRef.current?.dismiss();
           },
         },
@@ -120,7 +111,7 @@ export function TagFormModal({
         { id: tag.id, payload: { name: trimmed, color } },
         {
           onSuccess: async () => {
-            await invalidateTags();
+            await invalidate();
             sheetRef.current?.dismiss();
           },
         },
@@ -141,7 +132,7 @@ export function TagFormModal({
           onPress: () => {
             remove(tag.id, {
               onSuccess: async () => {
-                await invalidateTags();
+                await invalidate();
                 sheetRef.current?.dismiss();
               },
             });
@@ -158,9 +149,10 @@ export function TagFormModal({
       enablePanDownToClose
       backdropComponent={renderBackdrop}
       keyboardBehavior="extend"
+      bottomInset={bottom}
       onDismiss={onClose}
     >
-      <BottomSheetScrollView contentContainerClassName="px-6 pt-2 pb-10">
+      <BottomSheetScrollView contentContainerClassName="px-6 pt-2 pb-6">
         <View className="mb-5 flex-row items-center justify-between">
           <Text className="text-foreground text-lg font-semibold">
             {mode === "create" ? "Criar tag" : "Editar tag"}
@@ -216,8 +208,9 @@ export function TagFormModal({
               style={{
                 backgroundColor: item.hex,
                 width: "48%",
-                borderWidth: color === item.hex ? 2 : 0,
-                borderColor: "rgba(0,0,0,0.25)",
+                borderWidth: 2,
+                borderColor:
+                  color === item.hex ? "rgba(0,0,0,0.25)" : "transparent",
               }}
               className="flex-row items-center justify-between rounded-xl px-3 py-3"
               onPress={() => setColor(item.hex)}
@@ -233,7 +226,7 @@ export function TagFormModal({
           ))}
         </View>
 
-        <View className="bg-surface-secondary mb-6 flex-row items-center gap-3 rounded-xl px-4 py-3">
+        <View className="bg-surface-secondary border-foreground/30 mb-6 flex-row items-center gap-3 rounded-xl border border-dotted px-4 py-3">
           <Text className="text-muted text-xs tracking-wider uppercase">
             Prévia
           </Text>
@@ -250,16 +243,13 @@ export function TagFormModal({
           disabled={isPending}
         >
           <Text className="text-background text-sm font-semibold">
-            {isPending
-              ? "Salvando..."
-              : mode === "create"
-                ? "Criar"
-                : "Salvar"}
+            {isPending ? "Salvando..." : mode === "create" ? "Criar" : "Salvar"}
           </Text>
         </Pressable>
 
         <Text className="text-muted text-center text-xs">
-          {currentCount} de {MAX_TAGS} tags disponíveis
+          <Text className="font-mono">{currentCount}</Text> de{" "}
+          <Text className="font-mono">{MAX_TAGS}</Text> tags disponíveis
         </Text>
       </BottomSheetScrollView>
     </BottomSheetModal>

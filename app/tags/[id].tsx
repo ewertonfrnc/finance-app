@@ -6,14 +6,15 @@ import {
   Pencil,
   Plus,
 } from "lucide-react-native";
-import { FlatList, Pressable, Text, View, useColorScheme } from "react-native";
 import { useState } from "react";
+import { FlatList, Pressable, Text, View, useColorScheme } from "react-native";
 
 import { TransactionItem } from "@/src/components/transactions/TransactionItem";
 import { Screen } from "@/src/components/ui/Screen";
 import { TagFormModal } from "@/src/features/tags/components/TagFormModal";
 import { useTags } from "@/src/features/tags/hooks/useTags";
 import { useTagTransactions } from "@/src/features/tags/hooks/useTagTransactions";
+import { formatBRL } from "@/src/lib/currency";
 import { formatMonthHeader } from "@/src/lib/date";
 import { useDateStore } from "@/src/stores/useDateStore";
 
@@ -84,12 +85,19 @@ export default function TagDetailScreen() {
             style={{ backgroundColor: tag.color }}
             className="h-3 w-3 rounded-full"
           />
-          <Text
-            className="text-foreground flex-1 text-lg font-semibold"
-            numberOfLines={1}
-          >
-            {tag.name}
-          </Text>
+          <View className="flex-1">
+            <Text
+              className="text-foreground text-lg font-semibold"
+              numberOfLines={1}
+            >
+              {tag.name}
+            </Text>
+            <Text className="text-muted text-xs">
+              {transactions.length} lançamento
+              {transactions.length !== 1 ? "s" : ""} ·{" "}
+              {formatBRL(tag.monthlyTotal)}
+            </Text>
+          </View>
           <Pressable
             onPress={() => setShowEdit(true)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -117,6 +125,7 @@ export default function TagDetailScreen() {
           <TransactionItem
             transaction={item}
             onPress={() => router.push(`/transaction/${item.id}`)}
+            showDate
           />
         )}
         ItemSeparatorComponent={() => (

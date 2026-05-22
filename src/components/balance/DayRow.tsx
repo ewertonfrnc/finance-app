@@ -56,6 +56,37 @@ function getHealthLevel(balance: number): HealthLevel {
   return "dark-red";
 }
 
+interface TransactionLinesProps {
+  lines: { type: TransactionType; label: string }[];
+  amounts: Record<TransactionType, number>;
+}
+
+function TransactionLines({ lines, amounts }: TransactionLinesProps) {
+  if (lines.length === 0) {
+    return (
+      <View className="flex-row items-center justify-between opacity-35">
+        <Text className="text-muted text-xs">Sem lançamento</Text>
+        <CurrencyText value={0} variant="small" sign="neutral" />
+      </View>
+    );
+  }
+
+  return (
+    <>
+      {lines.map((cat) => (
+        <View key={cat.type} className="flex-row items-center">
+          <Text className="text-muted flex-1 text-xs">{cat.label}</Text>
+          <CurrencyText
+            value={amounts[cat.type]}
+            variant="small"
+            sign="neutral"
+          />
+        </View>
+      ))}
+    </>
+  );
+}
+
 export function DayRow({ dayBalance, filter, onPress }: DayRowProps) {
   const isToday = dayBalance.date === TODAY;
   const isFuture = dayBalance.date > TODAY;
@@ -100,7 +131,7 @@ export function DayRow({ dayBalance, filter, onPress }: DayRowProps) {
   return (
     <Pressable
       onPress={onPress}
-      className="flex-row items-center gap-3 rounded-lg px-4 py-3"
+      className="flex-row items-center gap-3 rounded-lg px-4 py-2"
     >
       <View
         style={weekendDayBg ? { backgroundColor: weekendDayBg } : undefined}
@@ -118,28 +149,12 @@ export function DayRow({ dayBalance, filter, onPress }: DayRowProps) {
       </View>
 
       <View className={`flex-1 gap-1 ${futureOpacity}`}>
-        {visibleLines.length > 0 ? (
-          visibleLines.map((cat) => (
-            <View key={cat.type} className="flex-row items-center">
-              <Text className="text-muted flex-1 text-xs">{cat.label}</Text>
-              <CurrencyText
-                value={amounts[cat.type]}
-                variant="small"
-                sign="neutral"
-              />
-            </View>
-          ))
-        ) : (
-          <View className="flex-row items-center justify-between opacity-35">
-            <Text className="text-muted text-xs">Sem lançamento</Text>
-            <CurrencyText value={0} variant="small" sign="neutral" />
-          </View>
-        )}
+        <TransactionLines lines={visibleLines} amounts={amounts} />
       </View>
 
       <View
         style={{ backgroundColor: colors.bg, minWidth: 128 }}
-        className={`items-end rounded-md px-2.5 py-1 ${futureOpacity}`}
+        className={`items-end rounded-md px-2.5 py-3 ${futureOpacity}`}
       >
         <CurrencyText
           value={dayBalance.endBalance}

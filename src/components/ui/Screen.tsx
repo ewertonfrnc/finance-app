@@ -9,7 +9,7 @@ export function Screen({ children, className, style, ...props }: ScreenProps) {
   const { top, bottom } = useSafeAreaInsets();
   return (
     <View
-      className={`bg-background flex-1 ${className ?? ""}`}
+      className={`bg-surface flex-1 ${className ?? ""}`}
       style={[{ paddingTop: top, paddingBottom: bottom }, style]}
       {...props}
     >
