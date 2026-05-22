@@ -132,6 +132,10 @@ export default function RootLayout() {
                 options={{ presentation: "modal" }}
               />
               <Stack.Screen name="transaction/[id]" />
+              <Stack.Screen
+                name="tags/form"
+                options={{ presentation: "modal" }}
+              />
             </Stack>
             <QuerySessionSync />
             <AuthGuard

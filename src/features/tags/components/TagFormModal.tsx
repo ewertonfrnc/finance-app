@@ -1,6 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { BottomSheet } from "heroui-native";
+import { Check, Trash2, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { Alert, Modal, Pressable, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, Text, TextInput, View } from "react-native";
 
 import { queryKeys } from "@/src/lib/queryKeys";
 import { useAuthStore } from "@/src/stores/useAuthStore";
@@ -8,34 +10,49 @@ import { useCreateTag } from "../hooks/useCreateTag";
 import { useDeleteTag } from "../hooks/useDeleteTag";
 import { useUpdateTag } from "../hooks/useUpdateTag";
 import type { Tag } from "../types";
+import { TagBadge } from "./TagBadge";
 
-const TAG_COLORS = [
-  "#CCCCCC",
-  "#F4A4A4",
-  "#F4C4A4",
-  "#F4F4A4",
-  "#A4F4A4",
-  "#A4E4F4",
-  "#7BB5F4",
-  "#C4A4F4",
-  "#F4A4D4",
-];
+const TAG_COLOR_PALETTE = [
+  { label: "Cinza", hex: "#CCCCCC" },
+  { label: "Vermelho", hex: "#F4A4A4" },
+  { label: "Laranja", hex: "#F4C4A4" },
+  { label: "Amarelo", hex: "#F4F4A4" },
+  { label: "Verde", hex: "#A4F4A4" },
+  { label: "Azul claro", hex: "#A4E4F4" },
+  { label: "Azul", hex: "#7BB5F4" },
+  { label: "Roxo", hex: "#C4A4F4" },
+  { label: "Rosa", hex: "#F4A4D4" },
+] as const;
+
+const MAX_TAGS = 100;
+
+function getTextColor(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? "#333333" : "#FFFFFF";
+}
 
 interface TagFormModalProps {
-  visible: boolean;
   onClose: () => void;
   mode: "create" | "edit";
   tag?: Tag;
+  currentCount: number;
 }
 
 export function TagFormModal({
-  visible,
   onClose,
   mode,
   tag,
+  currentCount,
 }: TagFormModalProps) {
   const [name, setName] = useState("");
-  const [color, setColor] = useState(TAG_COLORS[0]);
+  const [color, setColor] = useState<string>(TAG_COLOR_PALETTE[0].hex);
+  const [touched, setTouched] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const hasError = touched && !name.trim();
 
   const queryClient = useQueryClient();
   const userId = useAuthStore((s) => s.userId);
@@ -47,15 +64,16 @@ export function TagFormModal({
   const isPending = isCreating || isUpdating || isDeleting;
 
   useEffect(() => {
-    if (!visible) return;
     if (mode === "edit" && tag) {
       setName(tag.name);
       setColor(tag.color);
     } else {
       setName("");
-      setColor(TAG_COLORS[0]);
+      setColor(TAG_COLOR_PALETTE[0].hex);
+      setTouched(false);
     }
-  }, [visible, mode, tag]);
+    requestAnimationFrame(() => setIsOpen(true));
+  }, [mode, tag]);
 
   function invalidateTags() {
     return queryClient.invalidateQueries({
@@ -64,6 +82,7 @@ export function TagFormModal({
   }
 
   function handleSubmit() {
+    setTouched(true);
     const trimmed = name.trim();
     if (!trimmed) return;
 
@@ -114,74 +133,120 @@ export function TagFormModal({
   }
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent
-      onRequestClose={onClose}
+    <BottomSheet
+      isOpen={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
     >
-      <View className="flex-1 justify-end">
-        <Pressable className="absolute inset-0 bg-black/50" onPress={onClose} />
-        <View className="bg-background rounded-t-2xl px-6 pt-4 pb-8">
-          <View className="bg-surface-secondary mb-5 h-1 w-10 self-center rounded-full" />
-
-          <Text className="text-foreground mb-5 text-lg font-semibold">
-            {mode === "create" ? "Criar tag" : "Editar tag"}
-          </Text>
+      <BottomSheet.Portal>
+        <BottomSheet.Overlay />
+        <BottomSheet.Content
+          keyboardBehavior="extend"
+          contentContainerClassName="px-6 pt-2 pb-8"
+        >
+          <View className="mb-5 flex-row items-center justify-between">
+            <Text className="text-foreground text-lg font-semibold">
+              {mode === "create" ? "Criar tag" : "Editar tag"}
+            </Text>
+            <View className="flex-row items-center gap-4">
+              {mode === "edit" && (
+                <Pressable onPress={handleDelete} disabled={isPending}>
+                  <Trash2 size={18} color="#ef4444" />
+                </Pressable>
+              )}
+              <Pressable onPress={onClose}>
+                <X size={18} color="#888888" />
+              </Pressable>
+            </View>
+          </View>
 
           <Text className="text-muted mb-2 text-xs tracking-wider uppercase">
             Nome
           </Text>
           <TextInput
-            className="bg-surface-secondary text-foreground mb-5 rounded-xl px-4 py-3 text-base"
-            placeholder="Ex: Assinatura"
+            className="text-foreground py-2 text-base"
+            style={{
+              borderBottomWidth: 1.5,
+              borderBottomColor: hasError ? "#ef4444" : "#cccccc",
+            }}
+            placeholder="Como vamos chamar essa tag?"
             value={name}
             onChangeText={setName}
             autoCorrect={false}
-            maxLength={40}
+            maxLength={38}
           />
+          <View className="mt-1 mb-5 flex-row items-center justify-between">
+            {hasError ? (
+              <Text className="text-xs text-red-500">
+                Dê um nome pra continuar
+              </Text>
+            ) : (
+              <View />
+            )}
+            <Text className="text-muted text-xs">{name.length}/38</Text>
+          </View>
 
-          <Text className="text-muted mb-3 text-xs tracking-wider uppercase">
-            Cor
-          </Text>
-          <View className="mb-6 flex-row flex-wrap gap-3">
-            {TAG_COLORS.map((c) => (
+          <View className="mb-3 flex-row items-center justify-between">
+            <Text className="text-muted text-xs tracking-wider uppercase">
+              Cor de fundo
+            </Text>
+            <Text className="text-muted text-xs">Toque pra escolher</Text>
+          </View>
+          <View className="mb-6 flex-row flex-wrap gap-2">
+            {TAG_COLOR_PALETTE.map((item) => (
               <Pressable
-                key={c}
+                key={item.hex}
                 style={{
-                  backgroundColor: c,
-                  borderWidth: color === c ? 2.5 : 0,
-                  borderColor: "#1e3d2b",
+                  backgroundColor: item.hex,
+                  width: "48%",
+                  borderWidth: color === item.hex ? 2 : 0,
+                  borderColor: "rgba(0,0,0,0.25)",
                 }}
-                className="h-9 w-9 rounded-full"
-                onPress={() => setColor(c)}
-              />
+                className="flex-row items-center justify-between rounded-xl px-3 py-3"
+                onPress={() => setColor(item.hex)}
+              >
+                <Text
+                  className="text-sm font-medium"
+                  style={{ color: getTextColor(item.hex) }}
+                >
+                  {item.label}
+                </Text>
+                {color === item.hex && <Check size={14} color="#333" />}
+              </Pressable>
             ))}
+          </View>
+
+          <View className="bg-surface-secondary mb-6 flex-row items-center gap-3 rounded-xl px-4 py-3">
+            <Text className="text-muted text-xs tracking-wider uppercase">
+              Prévia
+            </Text>
+            <TagBadge
+              name={name.trim() || "Nome da tag"}
+              color={color}
+              size="sm"
+            />
           </View>
 
           <Pressable
             className="bg-foreground mb-3 items-center rounded-xl py-3.5"
             onPress={handleSubmit}
-            disabled={isPending || !name.trim()}
+            disabled={isPending}
           >
             <Text className="text-background text-sm font-semibold">
-              {isPending ? "Salvando..." : "Salvar"}
+              {isPending
+                ? "Salvando..."
+                : mode === "create"
+                  ? "Criar"
+                  : "Salvar"}
             </Text>
           </Pressable>
 
-          {mode === "edit" && (
-            <Pressable
-              className="items-center py-3"
-              onPress={handleDelete}
-              disabled={isPending}
-            >
-              <Text className="text-sm font-medium text-red-500">
-                Excluir tag
-              </Text>
-            </Pressable>
-          )}
-        </View>
-      </View>
-    </Modal>
+          <Text className="text-muted text-center text-xs">
+            {currentCount} de {MAX_TAGS} tags disponíveis
+          </Text>
+        </BottomSheet.Content>
+      </BottomSheet.Portal>
+    </BottomSheet>
   );
 }

@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
-import { Plus, Search } from "lucide-react-native";
+import { useToast } from "heroui-native";
+import { ArrowUpDown, Plus, Search } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
   FlatList,
@@ -9,11 +10,11 @@ import {
   View,
   useColorScheme,
 } from "react-native";
+import Svg, { Polygon } from "react-native-svg";
 
 import { MonthNavigator } from "@/src/components/navigation/MonthNavigator";
 import { CurrencyText } from "@/src/components/ui/CurrencyText";
 import { Screen } from "@/src/components/ui/Screen";
-import { TagFormModal } from "@/src/features/tags/components/TagFormModal";
 import { useTags } from "@/src/features/tags/hooks/useTags";
 import type { TagWithTotal } from "@/src/features/tags/types";
 import { useDateStore } from "@/src/stores/useDateStore";
@@ -23,26 +24,25 @@ interface TagRowProps {
   onPress: () => void;
 }
 
+function TagFlag({ color }: { color: string }) {
+  // Flag/chevron shape: straight left, pointed right — mirrors CSS polygon(0 0, 78% 0, 100% 50%, 78% 100%, 0 100%)
+  return (
+    <Svg width={12} height={16} viewBox="0 0 12 16">
+      <Polygon points="0,0 9.36,0 12,8 9.36,16 0,16" fill={color} />
+    </Svg>
+  );
+}
+
 function TagRow({ tag, onPress }: TagRowProps) {
   return (
     <Pressable
       onPress={onPress}
       className="flex-row items-center gap-3 px-4 py-3"
     >
-      <View
-        style={{ backgroundColor: tag.color }}
-        className="h-3 w-3 rounded-full"
-      />
+      <TagFlag color={tag.color} />
       <View className="flex-1">
-        <Text
-          className="text-foreground text-base font-medium"
-          numberOfLines={1}
-        >
+        <Text className="text-foreground text-base" numberOfLines={1}>
           {tag.name}
-        </Text>
-        <Text className="text-muted mt-0.5 text-xs">
-          {tag.transactionCount} lançamento
-          {tag.transactionCount !== 1 ? "s" : ""}
         </Text>
       </View>
       <CurrencyText value={tag.monthlyTotal} sign="neutral" variant="small" />
@@ -90,8 +90,8 @@ export default function TagsScreen() {
   const { selectedYear, selectedMonth } = useDateStore();
   const { data: tags = [], isLoading } = useTags(selectedYear, selectedMonth);
   const [search, setSearch] = useState("");
-  const [showCreate, setShowCreate] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
   const scheme = useColorScheme();
   const iconColor = scheme === "dark" ? "#6b8c78" : "#7a9485";
 
@@ -103,16 +103,55 @@ export default function TagsScreen() {
 
   const showEmpty = filtered.length === 0 && !isLoading;
 
+  function handleSortPress() {
+    toast.show({
+      placement: "top",
+      duration: 3500,
+      label: "Em breve",
+      description: "A ordenacao de tags sera adicionada em breve.",
+    });
+  }
+
+  function openCreate() {
+    router.push({ pathname: "/tags/form", params: { mode: "create" } });
+  }
+
   return (
     <Screen>
       <MonthNavigator onCalendarPress={() => router.navigate("/")} />
 
       <View className="gap-2 px-4 pb-2">
+        <View className="flex-row items-center justify-between pt-1">
+          <View className="flex-row items-baseline gap-2">
+            <Text className="text-foreground text-xs font-semibold tracking-[2px]">
+              TAGS
+            </Text>
+            <Text className="text-muted text-sm font-medium">
+              {tags.length}
+            </Text>
+          </View>
+
+          <View className="flex-row items-center gap-4">
+            <Pressable
+              onPress={openCreate}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Plus size={18} color={iconColor} />
+            </Pressable>
+            <Pressable
+              onPress={handleSortPress}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <ArrowUpDown size={18} color={iconColor} />
+            </Pressable>
+          </View>
+        </View>
+
         <View className="bg-surface-secondary flex-row items-center gap-2 rounded-xl px-3">
           <Search size={16} color={iconColor} />
           <TextInput
             className="text-foreground flex-1 py-2.5 text-sm"
-            placeholder="Buscar tag..."
+            placeholder="Filtrar tags"
             placeholderTextColor={iconColor}
             value={search}
             onChangeText={setSearch}
@@ -120,19 +159,13 @@ export default function TagsScreen() {
             autoCapitalize="none"
             returnKeyType="search"
           />
-          <Pressable
-            onPress={() => setShowCreate(true)}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Plus size={18} color={iconColor} />
-          </Pressable>
         </View>
       </View>
 
       {showEmpty ? (
         <EmptyState
           hasSearch={search.trim().length > 0}
-          onCreatePress={() => setShowCreate(true)}
+          onCreatePress={openCreate}
         />
       ) : (
         <FlatList
@@ -149,12 +182,6 @@ export default function TagsScreen() {
           )}
         />
       )}
-
-      <TagFormModal
-        visible={showCreate}
-        onClose={() => setShowCreate(false)}
-        mode="create"
-      />
     </Screen>
   );
 }

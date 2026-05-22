@@ -6,12 +6,10 @@ import {
   Pencil,
   Plus,
 } from "lucide-react-native";
-import { useState } from "react";
 import { FlatList, Pressable, Text, View, useColorScheme } from "react-native";
 
 import { TransactionItem } from "@/src/components/transactions/TransactionItem";
 import { Screen } from "@/src/components/ui/Screen";
-import { TagFormModal } from "@/src/features/tags/components/TagFormModal";
 import { useTags } from "@/src/features/tags/hooks/useTags";
 import { useTagTransactions } from "@/src/features/tags/hooks/useTagTransactions";
 import { formatMonthHeader } from "@/src/lib/date";
@@ -26,7 +24,6 @@ export default function TagDetailScreen() {
 
   const { selectedYear, selectedMonth, goToPrevMonth, goToNextMonth } =
     useDateStore();
-  const [showEdit, setShowEdit] = useState(false);
 
   const { data: tags = [] } = useTags(selectedYear, selectedMonth);
   const { data: transactions = [] } = useTagTransactions(
@@ -39,7 +36,6 @@ export default function TagDetailScreen() {
 
   return (
     <Screen>
-      {/* Header: back · month nav · + */}
       <View className="flex-row items-center justify-between px-4 py-3">
         <Pressable
           onPress={() => router.back()}
@@ -76,7 +72,6 @@ export default function TagDetailScreen() {
         </Pressable>
       </View>
 
-      {/* Colored tag identity row */}
       {tag && (
         <View
           style={{ backgroundColor: tag.color + "22" }}
@@ -93,7 +88,12 @@ export default function TagDetailScreen() {
             {tag.name}
           </Text>
           <Pressable
-            onPress={() => setShowEdit(true)}
+            onPress={() =>
+              router.push({
+                pathname: "/tags/form",
+                params: { mode: "edit", id },
+              })
+            }
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Pencil size={18} color={mutedColor} />
@@ -103,7 +103,6 @@ export default function TagDetailScreen() {
 
       <View className="bg-surface-secondary h-px" />
 
-      {/* Transaction list */}
       <FlatList
         data={transactions}
         keyExtractor={(item) => item.id}
@@ -125,15 +124,6 @@ export default function TagDetailScreen() {
         )}
         contentContainerClassName="pb-8"
       />
-
-      {tag && (
-        <TagFormModal
-          visible={showEdit}
-          onClose={() => setShowEdit(false)}
-          mode="edit"
-          tag={tag}
-        />
-      )}
     </Screen>
   );
 }
