@@ -1,11 +1,19 @@
 import { useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
-import { useRegister } from "@/src/features/auth/hooks/useRegister";
 import { Screen } from "@/src/components/ui/Screen";
+import { useRegister } from "@/src/features/auth/hooks/useRegister";
+import { useSpinAnimation } from "@/src/lib/animations";
 import { formatBRL } from "@/src/lib/currency";
 import { useOnboardingStore } from "@/src/stores/useOnboardingStore";
+import { Button } from "heroui-native";
+import { LoaderCircle } from "lucide-react-native";
 
 export default function SaldoScreen() {
   const router = useRouter();
@@ -17,6 +25,17 @@ export default function SaldoScreen() {
   const [initialBalance, setInitialBalance] = useState(0);
   const inputRef = useRef<TextInput>(null);
 
+  const opacity = useSharedValue(0.35);
+  const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+
+  const spinStyle = useSpinAnimation(isPending);
+
+  useEffect(() => {
+    opacity.value = withTiming(initialBalance === 0 ? 0.35 : 1, {
+      duration: 200,
+    });
+  }, [initialBalance, opacity]);
+
   const firstName = name.split(" ")[0];
 
   function handleChangeText(text: string) {
@@ -25,15 +44,21 @@ export default function SaldoScreen() {
   }
 
   function handleConcluir() {
-    register(
-      { name, email, password, initialBalance, daysPerMonth, categories },
-      {
-        onSuccess: () => {
-          reset();
-          router.replace("/(tabs)");
-        },
+    const registerPayload = {
+      name,
+      email,
+      password,
+      initialBalance,
+      daysPerMonth,
+      categories,
+    };
+
+    register(registerPayload, {
+      onSuccess: () => {
+        reset();
+        router.replace("/(tabs)");
       },
-    );
+    });
   }
 
   return (
@@ -53,9 +78,12 @@ export default function SaldoScreen() {
 
         {/* Currency input manual para fundo escuro */}
         <Pressable onPress={() => inputRef.current?.focus()}>
-          <Text className="text-accent-foreground font-mono-medium text-5xl">
+          <Animated.Text
+            style={animatedStyle}
+            className="text-accent-foreground font-mono-medium text-5xl"
+          >
             {formatBRL(initialBalance)}
-          </Text>
+          </Animated.Text>
           <View className="bg-accent-foreground/30 mt-2 h-0.5" />
           <TextInput
             ref={inputRef}
@@ -67,7 +95,7 @@ export default function SaldoScreen() {
           />
         </Pressable>
 
-        <Text className="text-accent-foreground/60 mt-8 text-sm leading-relaxed">
+        <Text className="text-accent-foreground mt-8 text-sm leading-relaxed">
           Olha pra sua conta corrente do dia a dia. Aquela onde caem salários,
           sai aluguel, mercado, gasolina.
           {"\n\n"}
@@ -85,21 +113,22 @@ export default function SaldoScreen() {
       </View>
 
       <View className="pb-4">
-        <Pressable
+        <Button
           onPress={handleConcluir}
-          disabled={isPending}
-          className={`items-center rounded-xl py-4 ${
-            isPending ? "bg-accent-foreground/20" : "bg-accent-foreground"
-          }`}
+          isIconOnly={isPending}
+          isDisabled={isPending}
+          className="bg-accent-foreground h-14 rounded-4xl"
         >
-          <Text
-            className={`text-base font-semibold ${
-              isPending ? "text-accent-foreground/40" : "text-accent"
-            }`}
-          >
-            {isPending ? "Criando conta..." : "Concluir"}
-          </Text>
-        </Pressable>
+          <Button.Label>
+            {isPending ? (
+              <Animated.View style={spinStyle}>
+                <LoaderCircle color="#000" size={20} />
+              </Animated.View>
+            ) : (
+              <Text className="text-foreground font-semibold">Concluir</Text>
+            )}
+          </Button.Label>
+        </Button>
       </View>
     </Screen>
   );

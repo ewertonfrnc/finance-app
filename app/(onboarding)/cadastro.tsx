@@ -3,7 +3,6 @@ import { Eye, EyeOff } from "lucide-react-native";
 import { useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
-  Pressable,
   ScrollView,
   Text,
   TextInput,
@@ -14,6 +13,7 @@ import {
 import { Screen } from "@/src/components/ui/Screen";
 import { registerSchema } from "@/src/features/auth/schemas";
 import { useOnboardingStore } from "@/src/stores/useOnboardingStore";
+import { Button } from "heroui-native";
 
 export default function CadastroScreen() {
   const router = useRouter();
@@ -163,38 +163,24 @@ export default function CadastroScreen() {
 
         {/* Rodapé */}
         <View className="gap-3 px-6 pb-4">
-          <Pressable
+          <Button
             onPress={handleSubmit}
-            className={`items-center rounded-xl py-4 ${
-              isValid || !submitted ? "bg-foreground" : "bg-surface-tertiary"
-            }`}
+            isDisabled={!isValid && submitted}
+            className="bg-foreground h-14 rounded-4xl"
           >
-            <Text
-              className={`text-base font-semibold ${
-                isValid || !submitted ? "text-background" : "text-muted"
-              }`}
-            >
+            <Button.Label className="text-background text-base font-semibold">
               Cadastrar
-            </Text>
-          </Pressable>
+            </Button.Label>
+          </Button>
 
-          <Pressable
-            className="items-center py-2"
-            onPress={() => router.push("/(auth)/login")}
-          >
-            <Text className="text-muted text-sm">
+          <Button variant="ghost" onPress={() => router.push("/(auth)/login")}>
+            <Button.Label className="text-muted text-sm">
               Já tem cadastro?{" "}
               <Text className="text-foreground font-medium underline">
                 Entrar
               </Text>
-            </Text>
-          </Pressable>
-
-          <Text className="text-muted text-center text-xs leading-relaxed">
-            Ao continuar você concorda com os{" "}
-            <Text className="underline">termos de uso</Text> e a{" "}
-            <Text className="underline">política de privacidade</Text>.
-          </Text>
+            </Button.Label>
+          </Button>
         </View>
       </KeyboardAvoidingView>
     </Screen>

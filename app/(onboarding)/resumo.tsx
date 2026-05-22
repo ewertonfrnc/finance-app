@@ -1,10 +1,11 @@
 import { useRouter } from "expo-router";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { CurrencyText } from "@/src/components/ui/CurrencyText";
 import { Screen } from "@/src/components/ui/Screen";
 import { formatBRL } from "@/src/lib/currency";
 import { useOnboardingStore } from "@/src/stores/useOnboardingStore";
+import { Button, Separator } from "heroui-native";
 
 const CATEGORY_LABELS: Record<string, string> = {
   comida: "Comida",
@@ -37,68 +38,74 @@ export default function ResumoScreen() {
         </Text>
 
         {/* Totais */}
-        <View className="mb-8 gap-5">
-          <View className="flex-row items-center justify-between">
-            <Text className="text-muted text-xs font-medium tracking-widest uppercase">
-              Total Mensal
-            </Text>
-            <CurrencyText
-              value={totalMensal}
-              sign="neutral"
-              variant="regular"
-            />
-          </View>
-
-          <View className="gap-1">
-            <View className="flex-row items-baseline gap-2">
+        <View className="border-separator rounded-xl border p-4">
+          <View className="mb-8 gap-5">
+            <View className="flex-row items-center justify-between">
               <Text className="text-muted text-xs font-medium tracking-widest uppercase">
-                Diário Previsto
+                Total Mensal
               </Text>
-              <Text className="text-muted text-xs">÷ {daysPerMonth} dias</Text>
+              <CurrencyText
+                value={totalMensal}
+                sign="neutral"
+                variant="regular"
+              />
             </View>
-            <Text className="text-foreground font-mono-medium text-5xl">
-              {formatBRL(dailyBudget)}
-            </Text>
-          </View>
-        </View>
 
-        {/* Separador + lista de categorias */}
-        {activeCategories.length > 0 && (
-          <View className="gap-3">
-            <View className="bg-separator h-px" />
+            <Separator />
 
-            {activeCategories.map(([slug, amount]) => (
-              <View
-                key={slug}
-                className="flex-row items-center justify-between"
-              >
-                <Text className="text-foreground text-sm font-medium">
-                  {CATEGORY_LABELS[slug] ?? slug}
+            <View className="flex-row items-center justify-between gap-1">
+              <View>
+                <Text className="text-link text-xs font-bold tracking-widest uppercase">
+                  Diário Previsto
                 </Text>
-                <CurrencyText value={amount} sign="neutral" variant="small" />
+                <Text className="text-muted text-xs">
+                  ÷ {daysPerMonth} dias
+                </Text>
               </View>
-            ))}
+              <Text className="text-foreground font-mono-medium text-4xl">
+                {formatBRL(dailyBudget)}
+              </Text>
+            </View>
           </View>
-        )}
+
+          {/* Separador + lista de categorias */}
+          {activeCategories.length > 0 && (
+            <View className="gap-3">
+              <View className="border-separator border-b border-dashed" />
+
+              {activeCategories.map(([slug, amount]) => (
+                <View
+                  key={slug}
+                  className="flex-row items-center justify-between"
+                >
+                  <Text className="text-foreground text-sm font-medium">
+                    {CATEGORY_LABELS[slug] ?? slug}
+                  </Text>
+                  <CurrencyText value={amount} sign="neutral" variant="small" />
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
 
         {/* Explicação */}
         <Text className="text-muted mt-8 text-sm leading-relaxed">
-          Esse é o número que vai aparecer no velocímetro da sua tela inicial.
-          Gastou abaixo? Sobra pro próximo dia. Passou? A gente lança a saída em
-          seguida.
+          Esse é o número que vai aparecer no{" "}
+          <Text className="text-link font-bold">velocímetro</Text> da sua tela
+          inicial. Gastou abaixo? Sobra pro próximo dia. Passou? A gente lança a
+          saída em seguida.
         </Text>
       </View>
 
-      <View className="pb-4">
-        <TouchableOpacity
-          activeOpacity={0.85}
-          className="bg-foreground items-center rounded-xl py-4"
+      <View className="pb-2">
+        <Button
           onPress={() => router.push("/(onboarding)/cadastro")}
+          className="bg-foreground h-14 rounded-4xl"
         >
-          <Text className="text-background text-base font-semibold">
+          <Button.Label className="text-background text-base font-semibold">
             Continuar
-          </Text>
-        </TouchableOpacity>
+          </Button.Label>
+        </Button>
       </View>
     </Screen>
   );

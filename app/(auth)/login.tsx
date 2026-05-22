@@ -1,19 +1,21 @@
 import { useRouter } from "expo-router";
-import { Eye, EyeOff } from "lucide-react-native";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react-native";
 import { useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
-  Pressable,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import Animated from "react-native-reanimated";
 
 import { Screen } from "@/src/components/ui/Screen";
 import { useLogin } from "@/src/features/auth/hooks/useLogin";
 import { loginSchema } from "@/src/features/auth/schemas";
+import { useSpinAnimation } from "@/src/lib/animations";
+import { Button } from "heroui-native";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -49,6 +51,8 @@ export default function LoginScreen() {
       { onSuccess: () => router.replace("/(tabs)") },
     );
   }
+
+  const spinStyle = useSpinAnimation(isPending);
 
   return (
     <Screen>
@@ -140,37 +144,34 @@ export default function LoginScreen() {
 
         {/* Rodapé */}
         <View className="gap-3 px-6 pb-4">
-          <Pressable
+          <Button
             onPress={handleSubmit}
-            disabled={isPending}
-            className={`items-center rounded-xl py-4 ${
-              (!submitted || isValid) && !isPending
-                ? "bg-foreground"
-                : "bg-surface-tertiary"
-            }`}
+            isIconOnly={isPending}
+            isDisabled={isPending}
+            className="bg-foreground h-14 rounded-4xl"
           >
-            <Text
-              className={`text-base font-semibold ${
-                (!submitted || isValid) && !isPending
-                  ? "text-background"
-                  : "text-muted"
-              }`}
-            >
-              {isPending ? "Entrando..." : "Entrar"}
-            </Text>
-          </Pressable>
+            <Button.Label>
+              {isPending ? (
+                <Animated.View style={spinStyle}>
+                  <LoaderCircle color="#000" size={20} />
+                </Animated.View>
+              ) : (
+                <Text className="text-background font-semibold">Entrar</Text>
+              )}
+            </Button.Label>
+          </Button>
 
-          <Pressable
-            className="items-center py-2"
+          <Button
+            variant="ghost"
             onPress={() => router.replace("/(onboarding)")}
           >
-            <Text className="text-muted text-sm">
+            <Button.Label className="text-muted text-sm">
               Não tem conta?{" "}
               <Text className="text-foreground font-medium underline">
                 Criar conta
               </Text>
-            </Text>
-          </Pressable>
+            </Button.Label>
+          </Button>
         </View>
       </KeyboardAvoidingView>
     </Screen>
