@@ -39,3 +39,10 @@ export interface MonthSummary {
   totalIncome: number; // soma de todas entradas do mês
   totalExpenses: number; // soma de todas saídas do mês
 }
+
+export interface FormValues {
+  type: TransactionType;
+  amountCents: number;
+  description: string;
+  date: string; // "YYYY-MM-DD"
+}

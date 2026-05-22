@@ -1,20 +1,21 @@
-import { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
 
-import {
-  TransactionForm,
-  type FormValues,
-} from "@/src/components/transactions/TransactionForm";
+import { TransactionForm } from "@/src/components/transactions/TransactionForm";
 import { Screen } from "@/src/components/ui/Screen";
 import { TagPicker } from "@/src/features/tags/components/TagPicker";
 import { useInvalidateTagData } from "@/src/features/tags/hooks/useInvalidateTagData";
 import { useSetTransactionTags } from "@/src/features/tags/hooks/useSetTransactionTags";
 import { useCreateTransaction } from "@/src/features/transactions/hooks/useCreateTransaction";
 import { useInvalidateTransactionData } from "@/src/features/transactions/hooks/useInvalidateTransactionData";
+import type { FormValues } from "@/src/features/transactions/types";
 import { isIsoDate } from "@/src/lib/date";
 
 export default function NewTransactionScreen() {
-  const { date, tagId } = useLocalSearchParams<{ date?: string; tagId?: string }>();
+  const { date, tagId } = useLocalSearchParams<{
+    date?: string;
+    tagId?: string;
+  }>();
   const router = useRouter();
   const { mutate: create, isPending } = useCreateTransaction();
   const { mutateAsync: setTags } = useSetTransactionTags();
@@ -54,7 +55,10 @@ export default function NewTransactionScreen() {
         onSubmit={handleSubmit}
         isLoading={isPending}
       >
-        <TagPicker selectedTagIds={selectedTagIds} onChangeTagIds={setSelectedTagIds} />
+        <TagPicker
+          selectedTagIds={selectedTagIds}
+          onChangeTagIds={setSelectedTagIds}
+        />
       </TransactionForm>
     </Screen>
   );

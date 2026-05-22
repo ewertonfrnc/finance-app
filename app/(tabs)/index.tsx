@@ -1,20 +1,17 @@
 import { useRouter } from "expo-router";
-import { useCallback, useRef, useState } from "react";
+import { useCallback } from "react";
 import { Pressable, Text, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
-import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
-import { DAY_FILTER_OPTIONS, DayList } from "@/src/components/balance/DayList";
+import { DayList } from "@/src/components/balance/DayList";
 import { useHorizontalSwipe } from "@/src/components/gestures/useHorizontalSwipe";
 import { MonthNavigator } from "@/src/components/navigation/MonthNavigator";
 import { Screen } from "@/src/components/ui/Screen";
 import { useDailyBalances } from "@/src/features/saldos/hooks/useDailyBalances";
 import { usePrefetchAdjacentBalances } from "@/src/features/saldos/hooks/usePrefetchAdjacentBalances";
-import { SPRING } from "@/src/lib/animations";
+import { useTabIndicator } from "@/src/features/saldos/hooks/useTabIndicator";
+import { DAY_FILTER_OPTIONS } from "@/src/features/transactions/constants";
 import { useDateStore } from "@/src/stores/useDateStore";
 
 export default function SaldosScreen() {
@@ -28,26 +25,13 @@ export default function SaldosScreen() {
   const { data: dailyBalances } = useDailyBalances(selectedYear, selectedMonth);
   usePrefetchAdjacentBalances(selectedYear, selectedMonth);
   const router = useRouter();
-  const [filterIndex, setFilterIndex] = useState(0);
+  const {
+    activeIndex: filterIndex,
+    indicatorStyle,
+    selectTab,
+    onTabLayout,
+  } = useTabIndicator();
   const filter = DAY_FILTER_OPTIONS[filterIndex];
-
-  const tabLayouts = useRef<{ x: number; width: number }[]>([]);
-  const tabInitialized = useRef(false);
-  const indicatorX = useSharedValue(0);
-  const indicatorW = useSharedValue(0);
-
-  const indicatorStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: indicatorX.value }],
-    width: indicatorW.value,
-  }));
-
-  function selectFilter(index: number) {
-    setFilterIndex(index);
-    const layout = tabLayouts.current[index];
-    if (!layout) return;
-    indicatorX.value = withSpring(layout.x, SPRING);
-    indicatorW.value = withSpring(layout.width, SPRING);
-  }
 
   const {
     animatedContentStyle,
@@ -77,8 +61,6 @@ export default function SaldosScreen() {
         onCalendarPress={goToCurrentMonth}
         disabled={isTransitioning}
       />
-      {/* <BalanceSummaryHeader summary={summary} /> */}
-
       <View className="border-surface-secondary flex-row justify-between border-b px-4 pt-2">
         <Animated.View
           style={indicatorStyle}
@@ -87,17 +69,9 @@ export default function SaldosScreen() {
         {DAY_FILTER_OPTIONS.map((opt, index) => (
           <Pressable
             key={opt.label}
-            onPress={() => selectFilter(index)}
+            onPress={() => selectTab(index)}
             className="items-center pb-1"
-            onLayout={(e) => {
-              const { x, width } = e.nativeEvent.layout;
-              tabLayouts.current[index] = { x, width };
-              if (!tabInitialized.current && index === filterIndex) {
-                indicatorX.value = x;
-                indicatorW.value = width;
-                tabInitialized.current = true;
-              }
-            }}
+            onLayout={(e) => onTabLayout(index, e)}
           >
             <Text
               className={`text-sm font-medium ${filterIndex === index ? "text-foreground" : "text-muted"}`}

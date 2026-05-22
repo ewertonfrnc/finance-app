@@ -1,12 +1,9 @@
-import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 
-import {
-  TransactionForm,
-  type FormValues,
-} from "@/src/components/transactions/TransactionForm";
+import { TransactionForm } from "@/src/components/transactions/TransactionForm";
 import { Screen } from "@/src/components/ui/Screen";
 import { TagPicker } from "@/src/features/tags/components/TagPicker";
 import { useInvalidateTagData } from "@/src/features/tags/hooks/useInvalidateTagData";
@@ -15,6 +12,7 @@ import { useDeleteTransaction } from "@/src/features/transactions/hooks/useDelet
 import { useInvalidateTransactionData } from "@/src/features/transactions/hooks/useInvalidateTransactionData";
 import { useTransaction } from "@/src/features/transactions/hooks/useTransaction";
 import { useUpdateTransaction } from "@/src/features/transactions/hooks/useUpdateTransaction";
+import type { FormValues } from "@/src/features/transactions/types";
 import { queryKeys } from "@/src/lib/queryKeys";
 import { useAuthStore } from "@/src/stores/useAuthStore";
 
@@ -99,7 +97,10 @@ export default function EditTransactionScreen() {
         isLoading={isUpdating}
         isDeleting={isDeleting}
       >
-        <TagPicker selectedTagIds={selectedTagIds} onChangeTagIds={setSelectedTagIds} />
+        <TagPicker
+          selectedTagIds={selectedTagIds}
+          onChangeTagIds={setSelectedTagIds}
+        />
       </TransactionForm>
     </Screen>
   );

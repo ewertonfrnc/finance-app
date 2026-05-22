@@ -12,17 +12,13 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import type { TransactionType } from "@/src/features/transactions/types";
 import { CurrencyInput } from "@/src/components/ui/CurrencyInput";
 import { DateField } from "@/src/components/ui/DateField";
 import { TypeSelector } from "@/src/components/ui/TypeSelector";
-
-export interface FormValues {
-  type: TransactionType;
-  amountCents: number;
-  description: string;
-  date: string; // "YYYY-MM-DD"
-}
+import type {
+  FormValues,
+  TransactionType,
+} from "@/src/features/transactions/types";
 
 interface TransactionFormProps {
   mode: "new" | "edit";
