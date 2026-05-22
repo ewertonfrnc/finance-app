@@ -3,9 +3,10 @@ export type {
   ApiDayBalance,
   ApiListTransactionsParams,
   ApiResponse,
+  ApiTagRef,
   ApiTransaction,
   ApiUpdateTransactionPayload,
   TransactionType,
-} from './api';
+} from "./api";
 
-export type { DayBalance, MonthSummary, Transaction } from './domain';
+export type { DayBalance, MonthSummary, TagRef, Transaction } from "./domain";

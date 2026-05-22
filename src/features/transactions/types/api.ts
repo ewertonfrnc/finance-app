@@ -1,6 +1,14 @@
 /** Tipos que espelham exatamente o contrato do backend Go. Não usar diretamente no app. */
 
-export type TransactionType = 'entrada' | 'saida' | 'diario' | 'economia';
+export type { ApiResponse } from '@/src/lib/types';
+
+export type TransactionType = "entrada" | "saida" | "diario" | "economia";
+
+export interface ApiTagRef {
+  id: string;
+  name: string;
+  color: string;
+}
 
 export interface ApiTransaction {
   id: string;
@@ -11,11 +19,7 @@ export interface ApiTransaction {
   created_at: string;
   updated_at: string;
   user_id: string;
-}
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
+  tags?: ApiTagRef[];
 }
 
 export interface ApiListTransactionsParams {

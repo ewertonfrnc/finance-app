@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Plan · Tags Feature · finance-app</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:        #0c0b0a;
+    --bg-2:      #141311;
+    --bg-3:      #1c1a18;
+    --border:    #2a2724;
+    --border-hi: #3d3a35;
+    --text:      #e8e4dc;
+    --text-2:    #a09890;
+    --text-3:    #6b6258;
+    --accent:    #e8a838;
+    --accent-2:  #f0c060;
+    --accent-dim:#3d2e10;
+    --green:     #5cbf8a;
+    --green-dim: #1a3325;
+    --red:       #e05c5c;
+    --red-dim:   #321515;
+    --yellow:    #e8c84a;
+    --yellow-dim:#2e2810;
+    --blue:      #60a8e0;
+    --blue-dim:  #102030;
+    --sidebar-w: 220px;
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .shell {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    background: var(--bg-2);
+    border-right: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 28px 0 24px;
+  }
+
+  .sidebar-logo {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-logo .label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .sidebar-logo .title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.15;
+  }
+
+  .sidebar-logo .accent-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  .sidebar-meta {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-2);
+  }
+
+  .meta-pill .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .sidebar-nav {
+    padding: 20px 0;
+    flex: 1;
+  }
+
+  .nav-section {
+    padding: 0 20px 4px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 6px;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    font-size: 13px;
+    color: var(--text-2);
+    text-decoration: none;
+    transition: color .15s, background .15s;
+    border-left: 2px solid transparent;
+  }
+
+  .nav-link:hover {
+    color: var(--text);
+    background: var(--bg-3);
+  }
+
+  .nav-link.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+  }
+
+  .nav-link .num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-3);
+    min-width: 16px;
+  }
+
+  .nav-link.active .num {
+    color: var(--accent-2);
+  }
+
+  /* ── Main ── */
+  .main {
+    flex: 1;
+    max-width: 900px;
+    padding: 48px 48px 96px;
+    overflow-x: hidden;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    margin-bottom: 56px;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -.02em;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .hero-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero-subtitle {
+    font-size: 15px;
+    color: var(--text-2);
+    max-width: 540px;
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .hero-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    border: 1px solid var(--border);
+    color: var(--text-2);
+  }
+
+  .chip.accent {
+    background: var(--accent-dim);
+    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+    color: var(--accent-2);
+  }
+
+  .chip .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* ── Section ── */
+  section {
+    margin-bottom: 64px;
+    scroll-margin-top: 32px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+    min-width: 28px;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -.01em;
+  }
+
+  /* ── Slices ── */
+  .slices {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .slice-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+
+  .slice-card:hover {
+    border-color: var(--border-hi);
+  }
+
+  .slice-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .slice-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--bg-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+
+  .slice-info {
+    flex: 1;
+  }
+
+  .slice-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .slice-desc {
+    font-size: 12px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+  }
+
+  .slice-badge {
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  .badge-ui { background: var(--blue-dim); color: var(--blue); }
+  .badge-data { background: var(--green-dim); color: var(--green); }
+  .badge-form { background: var(--accent-dim); color: var(--accent-2); }
+
+  .slice-chevron {
+    color: var(--text-3);
+    transition: transform .2s;
+    font-size: 14px;
+  }
+
+  .slice-card.open .slice-chevron {
+    transform: rotate(90deg);
+  }
+
+  .slice-body {
+    display: none;
+    padding: 0 22px 22px;
+    border-top: 1px solid var(--border);
+  }
+
+  .slice-card.open .slice-body {
+    display: block;
+  }
+
+  .files-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 18px;
+  }
+
+  .files-col-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .file-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    background: var(--bg-3);
+    margin-bottom: 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-2);
+    line-height: 1.5;
+  }
+
+  .file-item .icon {
+    color: var(--text-3);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .file-item.new .icon { color: var(--green); }
+  .file-item.mod .icon { color: var(--accent); }
+
+  .file-item .note {
+    font-size: 10px;
+    color: var(--text-3);
+    margin-top: 2px;
+    font-style: italic;
+  }
+
+  /* ── Code snippets ── */
+  .code-block {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-2);
+  }
+
+  .code-lang {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .code-file {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+  }
+
+  pre {
+    padding: 16px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text-2);
+    tab-size: 2;
+  }
+
+  .kw  { color: #c678dd; }
+  .ty  { color: #e5c07b; }
+  .str { color: #98c379; }
+  .cm  { color: var(--text-3); font-style: italic; }
+  .fn  { color: #61afef; }
+  .num { color: #d19a66; }
+  .op  { color: var(--text-3); }
+
+  /* ── Data flow ── */
+  .flow-container {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 32px 24px;
+    overflow-x: auto;
+  }
+
+  .flow-diagram {
+    min-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* ── Risk table ── */
+  .risk-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .risk-table th {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
+  }
+
+  .risk-table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+
+  .risk-table tr:last-child td { border-bottom: none; }
+
+  .risk-table tr:hover td {
+    background: var(--bg-2);
+  }
+
+  .sev {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 9px;
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .sev.high { background: var(--red-dim); color: var(--red); }
+  .sev.med  { background: var(--yellow-dim); color: var(--yellow); }
+  .sev.low  { background: var(--green-dim); color: var(--green); }
+
+  /* ── Questions ── */
+  .q-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .q-item {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    display: flex;
+    gap: 14px;
+  }
+
+  .q-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    flex-shrink: 0;
+    font-weight: 500;
+    min-width: 20px;
+  }
+
+  .q-body {}
+
+  .q-text {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .q-context {
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  .q-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .q-opt {
+    padding: 3px 11px;
+    border-radius: 100px;
+    border: 1px solid var(--border-hi);
+    font-size: 12px;
+    color: var(--text-2);
+    font-family: var(--font-mono);
+  }
+
+  .q-opt.recommended {
+    background: var(--accent-dim);
+    border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    color: var(--accent-2);
+  }
+
+  /* ── Color palette ── */
+  .palette {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .color-swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .swatch-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+
+  .swatch-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-3);
+    text-align: center;
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 720px) {
+    .sidebar { display: none; }
+    .main { padding: 28px 20px 64px; }
+    .hero-title { font-size: 32px; }
+    .files-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── Animations ── */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero         { animation: fade-up .5s ease both; }
+  section       { animation: fade-up .5s ease both; }
+  section:nth-child(2) { animation-delay: .08s; }
+  section:nth-child(3) { animation-delay: .12s; }
+  section:nth-child(4) { animation-delay: .16s; }
+  section:nth-child(5) { animation-delay: .20s; }
+  section:nth-child(6) { animation-delay: .24s; }
+
+  /* ── Callout ── */
+  .callout {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 1px solid;
+    margin: 16px 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .callout.warn {
+    background: var(--yellow-dim);
+    border-color: color-mix(in srgb, var(--yellow) 25%, transparent);
+    color: var(--yellow);
+  }
+
+  .callout.info {
+    background: var(--blue-dim);
+    border-color: color-mix(in srgb, var(--blue) 25%, transparent);
+    color: var(--blue);
+  }
+
+  .callout-icon { flex-shrink: 0; font-size: 15px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="label">finance-app</div>
+      <div class="title">Tags Feature<span class="accent-dot"></span></div>
+    </div>
+
+    <div class="sidebar-meta">
+      <div class="meta-pill"><span class="dot"></span>2026-05-21</div>
+      <div class="meta-pill"><span class="dot"></span>5 slices · ~8 dias</div>
+      <div class="meta-pill"><span class="dot"></span>Backend done</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">Visão geral</div>
+      <a href="#overview"  class="nav-link active"><span class="num">00</span>Overview</a>
+      <a href="#dataflow"  class="nav-link"><span class="num">01</span>Data Flow</a>
+
+      <div class="nav-section" style="margin-top:16px">Slices</div>
+      <a href="#slice-1" class="nav-link"><span class="num">S1</span>Data Layer</a>
+      <a href="#slice-2" class="nav-link"><span class="num">S2</span>Tags Tab</a>
+      <a href="#slice-3" class="nav-link"><span class="num">S3</span>Forms & Badge</a>
+      <a href="#slice-4" class="nav-link"><span class="num">S4</span>Detail Screen</a>
+      <a href="#slice-5" class="nav-link"><span class="num">S5</span>Tag Picker</a>
+
+      <div class="nav-section" style="margin-top:16px">Referência</div>
+      <a href="#key-code"   class="nav-link"><span class="num">★</span>Key Code</a>
+      <a href="#risks"      class="nav-link"><span class="num">!</span>Riscos</a>
+      <a href="#questions"  class="nav-link"><span class="num">?</span>Perguntas</a>
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- Hero -->
+    <div class="hero" id="overview">
+      <div class="hero-eyebrow">Implementation Plan · Frontend</div>
+      <h1 class="hero-title">Tela de<br/><em>Tags</em></h1>
+      <p class="hero-subtitle">
+        Labels personalizáveis para agrupar transações. Backend Go já implementado.
+        Este plano cobre os 5 slices de frontend, da camada de dados até o tag picker nas transações.
+      </p>
+      <div class="hero-chips">
+        <span class="chip accent"><span class="dot"></span>Expo 54 · RN 0.81</span>
+        <span class="chip"><span class="dot"></span>expo-router</span>
+        <span class="chip"><span class="dot"></span>React Query</span>
+        <span class="chip"><span class="dot"></span>NativeWind</span>
+        <span class="chip"><span class="dot"></span>Reanimated</span>
+        <span class="chip"><span class="dot"></span>5 PRs independentes</span>
+      </div>
+    </div>
+
+    <!-- Data Flow -->
+    <section id="dataflow">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <h2 class="section-title">Data Flow</h2>
+      </div>
+
+      <div class="flow-container">
+        <svg class="flow-diagram" viewBox="0 0 700 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background grid -->
+          <defs>
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#2a2724" stroke-width="0.5"/>
+            </pattern>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#3d3a35"/>
+            </marker>
+            <marker id="arrow-accent" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#e8a838"/>
+            </marker>
+          </defs>
+          <rect width="700" height="320" fill="url(#grid)" rx="8"/>
+
+          <!-- Column labels -->
+          <text x="60"  y="24" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="9" letter-spacing="1" text-anchor="middle">SCREEN</text>
+          <text x="210" y="24" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="9" letter-spacing="1" text-anchor="middle">HOOK</text>
+          <text x="370" y="24" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="9" letter-spacing="1" text-anchor="middle">SERVICE</text>
+          <text x="530" y="24" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="9" letter-spacing="1" text-anchor="middle">API</text>
+          <text x="648" y="24" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="9" letter-spacing="1" text-anchor="middle">STORE</text>
+
+          <!-- Dividers -->
+          <line x1="140" y1="30" x2="140" y2="300" stroke="#2a2724" stroke-width="1" stroke-dasharray="4 4"/>
+          <line x1="300" y1="30" x2="300" y2="300" stroke="#2a2724" stroke-width="1" stroke-dasharray="4 4"/>
+          <line x1="460" y1="30" x2="460" y2="300" stroke="#2a2724" stroke-width="1" stroke-dasharray="4 4"/>
+          <line x1="600" y1="30" x2="600" y2="300" stroke="#2a2724" stroke-width="1" stroke-dasharray="4 4"/>
+
+          <!-- Row 1: Tags list -->
+          <!-- app/(tabs)/tags.tsx -->
+          <rect x="10" y="45" width="100" height="32" rx="5" fill="#1c1a18" stroke="#3d3a35"/>
+          <text x="60" y="65" fill="#e8e4dc" font-family="'DM Sans'" font-size="10" text-anchor="middle">tags.tsx</text>
+
+          <!-- useTags hook -->
+          <rect x="158" y="45" width="106" height="32" rx="5" fill="#1c1a18" stroke="#5cbf8a" stroke-opacity=".5"/>
+          <text x="211" y="61" fill="#5cbf8a" font-family="'IBM Plex Mono'" font-size="10" text-anchor="middle">useTags</text>
+          <text x="211" y="72" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="8" text-anchor="middle">(year, month)</text>
+
+          <!-- service -->
+          <rect x="316" y="45" width="112" height="32" rx="5" fill="#1c1a18" stroke="#3d3a35"/>
+          <text x="372" y="65" fill="#a09890" font-family="'IBM Plex Mono'" font-size="9" text-anchor="middle">getTagsWithTotals</text>
+
+          <!-- api endpoint -->
+          <rect x="476" y="45" width="110" height="32" rx="5" fill="#1c1a18" stroke="#e8a838" stroke-opacity=".4"/>
+          <text x="531" y="61" fill="#e8a838" font-family="'IBM Plex Mono'" font-size="9" text-anchor="middle">GET /v1/tags</text>
+          <text x="531" y="72" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="8" text-anchor="middle">?year=&amp;month=</text>
+
+          <!-- Arrows row 1 -->
+          <line x1="110" y1="61" x2="155" y2="61" stroke="#3d3a35" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="264" y1="61" x2="313" y2="61" stroke="#3d3a35" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="428" y1="61" x2="473" y2="61" stroke="#e8a838" stroke-width="1.5" stroke-opacity=".7" marker-end="url(#arrow-accent)"/>
+
+          <!-- useDateStore -->
+          <rect x="614" y="45" width="76" height="32" rx="5" fill="#1c1a18" stroke="#3d3a35"/>
+          <text x="652" y="61" fill="#a09890" font-family="'IBM Plex Mono'" font-size="8.5" text-anchor="middle">useDateStore</text>
+          <text x="652" y="72" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="7.5" text-anchor="middle">year/month</text>
+          <line x1="600" y1="61" x2="588" y2="61" stroke="#3d3a35" stroke-width="1.5" stroke-dasharray="3 2" marker-end="url(#arrow)"/>
+
+          <!-- Row 2: create/update/delete -->
+          <rect x="10" y="110" width="100" height="32" rx="5" fill="#1c1a18" stroke="#3d3a35"/>
+          <text x="60" y="125" fill="#e8e4dc" font-family="'DM Sans'" font-size="10" text-anchor="middle">TagFormModal</text>
+          <text x="60" y="137" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="8" text-anchor="middle">(Slice 3)</text>
+
+          <rect x="158" y="110" width="106" height="32" rx="5" fill="#1c1a18" stroke="#e8a838" stroke-opacity=".4"/>
+          <text x="211" y="126" fill="#e8a838" font-family="'IBM Plex Mono'" font-size="9" text-anchor="middle">useCreateTag</text>
+          <text x="211" y="137" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="8" text-anchor="middle">useUpdateTag</text>
+
+          <rect x="316" y="110" width="112" height="32" rx="5" fill="#1c1a18" stroke="#3d3a35"/>
+          <text x="372" y="126" fill="#a09890" font-family="'IBM Plex Mono'" font-size="9" text-anchor="middle">createTag</text>
+          <text x="372" y="137" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="8" text-anchor="middle">updateTag / deleteTag</text>
+
+          <rect x="476" y="110" width="110" height="32" rx="5" fill="#1c1a18" stroke="#e8a838" stroke-opacity=".4"/>
+          <text x="531" y="126" fill="#e8a838" font-family="'IBM Plex Mono'" font-size="9" text-anchor="middle">POST/PATCH/DEL</text>
+          <text x="531" y="137" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="8" text-anchor="middle">/v1/tags · /v1/tags/:id</text>
+
+          <line x1="110" y1="126" x2="155" y2="126" stroke="#3d3a35" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="264" y1="126" x2="313" y2="126" stroke="#3d3a35" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="428" y1="126" x2="473" y2="126" stroke="#e8a838" stroke-width="1.5" stroke-opacity=".7" marker-end="url(#arrow-accent)"/>
+
+          <!-- invalidation arrow -->
+          <text x="652" y="120" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="8" text-anchor="middle">invalidate</text>
+          <text x="652" y="131" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="8" text-anchor="middle">tagsAll(uid)</text>
+          <rect x="614" y="110" width="76" height="32" rx="5" fill="#1c1a18" stroke="#3d3a35"/>
+          <line x1="590" y1="126" x2="611" y2="126" stroke="#3d3a35" stroke-width="1" stroke-dasharray="3 2" marker-end="url(#arrow)"/>
+
+          <!-- Row 3: tag transactions -->
+          <rect x="10" y="175" width="100" height="32" rx="5" fill="#1c1a18" stroke="#3d3a35"/>
+          <text x="60" y="191" fill="#e8e4dc" font-family="'DM Sans'" font-size="10" text-anchor="middle">tags/[id].tsx</text>
+          <text x="60" y="203" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="8" text-anchor="middle">(Slice 4)</text>
+
+          <rect x="158" y="175" width="106" height="32" rx="5" fill="#1c1a18" stroke="#5cbf8a" stroke-opacity=".5"/>
+          <text x="211" y="191" fill="#5cbf8a" font-family="'IBM Plex Mono'" font-size="9" text-anchor="middle">useTagTransactions</text>
+
+          <rect x="316" y="175" width="112" height="32" rx="5" fill="#1c1a18" stroke="#3d3a35"/>
+          <text x="372" y="191" fill="#a09890" font-family="'IBM Plex Mono'" font-size="9" text-anchor="middle">getTagTransactions</text>
+
+          <rect x="476" y="175" width="110" height="32" rx="5" fill="#1c1a18" stroke="#e8a838" stroke-opacity=".4"/>
+          <text x="531" y="191" fill="#e8a838" font-family="'IBM Plex Mono'" font-size="9" text-anchor="middle">GET /v1/tags/:id</text>
+          <text x="531" y="202" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="8" text-anchor="middle">/transactions</text>
+
+          <line x1="110" y1="191" x2="155" y2="191" stroke="#3d3a35" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="264" y1="191" x2="313" y2="191" stroke="#3d3a35" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="428" y1="191" x2="473" y2="191" stroke="#e8a838" stroke-width="1.5" stroke-opacity=".7" marker-end="url(#arrow-accent)"/>
+
+          <!-- Row 4: set transaction tags -->
+          <rect x="10" y="245" width="100" height="32" rx="5" fill="#1c1a18" stroke="#3d3a35"/>
+          <text x="60" y="261" fill="#e8e4dc" font-family="'DM Sans'" font-size="10" text-anchor="middle">transaction/[id]</text>
+          <text x="60" y="273" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="8" text-anchor="middle">TagPicker (S5)</text>
+
+          <rect x="158" y="245" width="106" height="32" rx="5" fill="#1c1a18" stroke="#60a8e0" stroke-opacity=".4"/>
+          <text x="211" y="261" fill="#60a8e0" font-family="'IBM Plex Mono'" font-size="9" text-anchor="middle">useSetTransactionTags</text>
+
+          <rect x="316" y="245" width="112" height="32" rx="5" fill="#1c1a18" stroke="#3d3a35"/>
+          <text x="372" y="261" fill="#a09890" font-family="'IBM Plex Mono'" font-size="9" text-anchor="middle">setTransactionTags</text>
+
+          <rect x="476" y="245" width="110" height="32" rx="5" fill="#1c1a18" stroke="#e8a838" stroke-opacity=".4"/>
+          <text x="531" y="261" fill="#e8a838" font-family="'IBM Plex Mono'" font-size="9" text-anchor="middle">PUT /v1/transactions</text>
+          <text x="531" y="272" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="8" text-anchor="middle">/:id/tags</text>
+
+          <line x1="110" y1="261" x2="155" y2="261" stroke="#3d3a35" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="264" y1="261" x2="313" y2="261" stroke="#3d3a35" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="428" y1="261" x2="473" y2="261" stroke="#e8a838" stroke-width="1.5" stroke-opacity=".7" marker-end="url(#arrow-accent)"/>
+
+          <!-- invalidate both -->
+          <text x="652" y="254" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="7.5" text-anchor="middle">invalidate</text>
+          <text x="652" y="265" fill="#6b6258" font-family="'IBM Plex Mono'" font-size="7.5" text-anchor="middle">tags + txns</text>
+          <rect x="614" y="245" width="76" height="32" rx="5" fill="#1c1a18" stroke="#60a8e0" stroke-opacity=".4"/>
+          <line x1="590" y1="261" x2="611" y2="261" stroke="#3d3a35" stroke-width="1" stroke-dasharray="3 2" marker-end="url(#arrow)"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Slices -->
+    <section id="slices">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <h2 class="section-title">5 Slices · PRs independentes</h2>
+      </div>
+
+      <div class="slices">
+
+        <!-- Slice 1 -->
+        <div class="slice-card open" id="slice-1">
+          <div class="slice-header" onclick="toggleSlice(this)">
+            <div class="slice-num">S1</div>
+            <div class="slice-info">
+              <div class="slice-name">Data Layer</div>
+              <div class="slice-desc">tipos · service · hooks · query keys — zero UI</div>
+            </div>
+            <span class="slice-badge badge-data">DATA</span>
+            <span class="slice-chevron">▶</span>
+          </div>
+          <div class="slice-body">
+            <div class="callout info">
+              <span class="callout-icon">ℹ</span>
+              <span>Nenhum componente visível neste slice. Merge seguro a qualquer hora — a app continua funcionando.</span>
+            </div>
+            <div class="files-grid">
+              <div>
+                <div class="files-col-title">✦ Criar</div>
+                <div class="file-item new"><span class="icon">+</span><div><div>src/features/tags/types/api.ts</div><div class="note">ApiTag, ApiTagWithTotal</div></div></div>
+                <div class="file-item new"><span class="icon">+</span><div><div>src/features/tags/types/domain.ts</div><div class="note">Tag, TagWithTotal (camelCase)</div></div></div>
+                <div class="file-item new"><span class="icon">+</span><div><div>src/features/tags/services/tags.service.ts</div><div class="note">6 funções de API</div></div></div>
+                <div class="file-item new"><span class="icon">+</span><div><div>src/features/tags/hooks/useTags.ts</div></div></div>
+                <div class="file-item new"><span class="icon">+</span><div><div>src/features/tags/hooks/useTagTransactions.ts</div></div></div>
+                <div class="file-item new"><span class="icon">+</span><div><div>src/features/tags/hooks/useCreateTag.ts</div></div></div>
+                <div class="file-item new"><span class="icon">+</span><div><div>src/features/tags/hooks/useUpdateTag.ts</div></div></div>
+                <div class="file-item new"><span class="icon">+</span><div><div>src/features/tags/hooks/useDeleteTag.ts</div></div></div>
+              </div>
+              <div>
+                <div class="files-col-title">✎ Modificar</div>
+                <div class="file-item mod"><span class="icon">~</span><div><div>src/features/transactions/types/api.ts</div><div class="note">+ tags?: ApiTag[]</div></div></div>
+                <div class="file-item mod"><span class="icon">~</span><div><div>src/features/transactions/types/domain.ts</div><div class="note">+ tags: Tag[]</div></div></div>
+                <div class="file-item mod"><span class="icon">~</span><div><div>src/lib/mappers.ts</div><div class="note">mapApiTransaction → mapeia tags</div></div></div>
+                <div class="file-item mod"><span class="icon">~</span><div><div>src/lib/queryKeys.ts</div><div class="note">tags(), tagsAll(), tagTransactions()</div></div></div>
+              </div>
+            </div>
+
+            <div class="code-block" style="margin-top:20px">
+              <div class="code-header">
+                <span class="code-lang">typescript</span>
+                <span class="code-file">src/lib/queryKeys.ts — additions</span>
+              </div>
+              <pre><span class="cm">// Adicionar ao objeto queryKeys existente</span>
+tags: (userId: <span class="ty">string</span> | <span class="kw">null</span>, year: <span class="ty">number</span>, month: <span class="ty">number</span>) <span class="op">=></span>
+  [<span class="str">"tags"</span>, <span class="fn">getScope</span>(userId), year, month] <span class="kw">as const</span>,
+
+tagsAll: (userId: <span class="ty">string</span> | <span class="kw">null</span>) <span class="op">=></span>
+  [<span class="str">"tags"</span>, <span class="fn">getScope</span>(userId)] <span class="kw">as const</span>,
+
+tagTransactions: (
+  userId: <span class="ty">string</span> | <span class="kw">null</span>,
+  tagId: <span class="ty">string</span>,
+  year: <span class="ty">number</span>,
+  month: <span class="ty">number</span>
+) <span class="op">=></span>
+  [<span class="str">"tags"</span>, <span class="fn">getScope</span>(userId), tagId, <span class="str">"transactions"</span>, year, month] <span class="kw">as const</span>,</pre>
+            </div>
+
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">typescript</span>
+                <span class="code-file">src/lib/mappers.ts — atualização</span>
+              </div>
+              <pre><span class="kw">export function</span> <span class="fn">mapApiTransaction</span>(raw: <span class="ty">ApiTransaction</span>): <span class="ty">Transaction</span> {
+  <span class="kw">return</span> {
+    <span class="cm">// ... campos existentes ...</span>
+    tags: (raw.tags <span class="op">??</span> []).<span class="fn">map</span>((t) <span class="op">=></span> ({
+      id: t.id,
+      name: t.name,
+      color: t.color,
+    })),
+  };
+}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slice 2 -->
+        <div class="slice-card" id="slice-2">
+          <div class="slice-header" onclick="toggleSlice(this)">
+            <div class="slice-num">S2</div>
+            <div class="slice-info">
+              <div class="slice-name">Tela principal — Tags Tab</div>
+              <div class="slice-desc">lista · busca local · empty state · MonthNavigator</div>
+            </div>
+            <span class="slice-badge badge-ui">UI</span>
+            <span class="slice-chevron">▶</span>
+          </div>
+          <div class="slice-body">
+            <div class="callout warn">
+              <span class="callout-icon">⚠</span>
+              <span><strong>Atenção:</strong> a tab Tags está com <code>href: null</code> no layout. Precisa ser habilitada e receber ícone/título antes deste slice aparecer para o usuário.</span>
+            </div>
+            <div class="files-grid">
+              <div>
+                <div class="files-col-title">✦ Criar / Substituir</div>
+                <div class="file-item new"><span class="icon">~</span><div><div>app/(tabs)/tags.tsx</div><div class="note">Substitui placeholder com tela real</div></div></div>
+              </div>
+              <div>
+                <div class="files-col-title">✎ Modificar</div>
+                <div class="file-item mod"><span class="icon">~</span><div><div>app/(tabs)/_layout.tsx</div><div class="note">Remover href:null · adicionar Tag icon · title</div></div></div>
+              </div>
+            </div>
+
+            <div class="code-block" style="margin-top:20px">
+              <div class="code-header">
+                <span class="code-lang">typescript</span>
+                <span class="code-file">app/(tabs)/_layout.tsx — tags tab</span>
+              </div>
+              <pre><span class="kw">import</span> { Tag } <span class="kw">from</span> <span class="str">'lucide-react-native'</span>;
+
+<span class="cm">// Substituir o Tabs.Screen name="tags":</span>
+&lt;<span class="ty">Tabs.Screen</span>
+  name=<span class="str">"tags"</span>
+  options={{
+    title: <span class="str">"Tags"</span>,
+    <span class="cm">// href: null  ← REMOVER esta linha</span>
+    tabBarIcon: ({ color, size }) <span class="op">=></span>
+      &lt;<span class="ty">Tag</span> color={color} size={size} /&gt;,
+  }}
+/&gt;</pre>
+            </div>
+
+            <p style="margin-top:16px; color: var(--text-2); font-size:13px; line-height:1.6">
+              A tela reutiliza <code style="font-family:var(--font-mono); font-size:11px; color:var(--accent)">MonthNavigator</code> + <code style="font-family:var(--font-mono); font-size:11px; color:var(--accent)">useDateStore</code> (exatamente como Saldos).
+              A busca é client-side com <code style="font-family:var(--font-mono); font-size:11px; color:var(--accent)">useState</code> filtrado sobre <code>useTags(year, month)</code>.
+              Empty state: quando <code>data.length === 0</code>, exibe card introdutório com botão "Criar minha primeira tag".
+            </p>
+          </div>
+        </div>
+
+        <!-- Slice 3 -->
+        <div class="slice-card" id="slice-3">
+          <div class="slice-header" onclick="toggleSlice(this)">
+            <div class="slice-num">S3</div>
+            <div class="slice-info">
+              <div class="slice-name">TagBadge + Formulários</div>
+              <div class="slice-desc">badge reutilizável · modal criar/editar · color picker · delete</div>
+            </div>
+            <span class="slice-badge badge-form">FORM</span>
+            <span class="slice-chevron">▶</span>
+          </div>
+          <div class="slice-body">
+            <div class="files-grid">
+              <div>
+                <div class="files-col-title">✦ Criar</div>
+                <div class="file-item new"><span class="icon">+</span><div><div>src/features/tags/components/TagBadge.tsx</div><div class="note">Pill colorido · usado em toda a app</div></div></div>
+                <div class="file-item new"><span class="icon">+</span><div><div>src/features/tags/components/TagFormModal.tsx</div><div class="note">Modal RN + slide reanimated · criar + editar</div></div></div>
+              </div>
+              <div>
+                <div class="files-col-title">Paleta fixa (9 cores)</div>
+                <div class="palette">
+                  <div class="color-swatch"><div class="swatch-circle" style="background:#CCCCCC"></div><div class="swatch-label">cinza</div></div>
+                  <div class="color-swatch"><div class="swatch-circle" style="background:#F4A4A4"></div><div class="swatch-label">salmão</div></div>
+                  <div class="color-swatch"><div class="swatch-circle" style="background:#F4C4A4"></div><div class="swatch-label">pêssego</div></div>
+                  <div class="color-swatch"><div class="swatch-circle" style="background:#F4F4A4"></div><div class="swatch-label">amarelo</div></div>
+                  <div class="color-swatch"><div class="swatch-circle" style="background:#A4F4A4"></div><div class="swatch-label">verde</div></div>
+                  <div class="color-swatch"><div class="swatch-circle" style="background:#A4E4F4"></div><div class="swatch-label">az.claro</div></div>
+                  <div class="color-swatch"><div class="swatch-circle" style="background:#7BB5F4"></div><div class="swatch-label">azul</div></div>
+                  <div class="color-swatch"><div class="swatch-circle" style="background:#C4A4F4"></div><div class="swatch-label">lilás</div></div>
+                  <div class="color-swatch"><div class="swatch-circle" style="background:#F4A4D4"></div><div class="swatch-label">rosa</div></div>
+                </div>
+                <p style="margin-top:8px; font-size:11px; color:var(--text-3); font-family:var(--font-mono)">Backend armazena TEXT livre. Constraint só no frontend.</p>
+              </div>
+            </div>
+
+            <div class="code-block" style="margin-top:20px">
+              <div class="code-header">
+                <span class="code-lang">typescript</span>
+                <span class="code-file">src/features/tags/components/TagBadge.tsx</span>
+              </div>
+              <pre><span class="kw">interface</span> <span class="ty">TagBadgeProps</span> {
+  name: <span class="ty">string</span>;
+  color: <span class="ty">string</span>;
+  size?: <span class="str">'sm'</span> | <span class="str">'md'</span>;
+}
+
+<span class="kw">export function</span> <span class="fn">TagBadge</span>({ name, color, size = <span class="str">'md'</span> }: <span class="ty">TagBadgeProps</span>) {
+  <span class="kw">const</span> isSmall = size === <span class="str">'sm'</span>;
+  <span class="kw">return</span> (
+    &lt;<span class="ty">View</span>
+      style={{ backgroundColor: color + <span class="str">'33'</span> }}  <span class="cm">// 20% opacity via hex</span>
+      className={<span class="str">`rounded-full flex-row items-center gap-1
+        ${isSmall ? 'px-2 py-0.5' : 'px-2.5 py-1'}`</span>}
+    &gt;
+      &lt;<span class="ty">View</span>
+        style={{ backgroundColor: color }}
+        className={isSmall ? <span class="str">'w-1.5 h-1.5 rounded-full'</span>
+                           : <span class="str">'w-2 h-2 rounded-full'</span>}
+      /&gt;
+      &lt;<span class="ty">Text</span>
+        className={<span class="str">`font-medium text-foreground
+          ${isSmall ? 'text-[10px]' : 'text-xs'}`</span>}
+      &gt;{name}&lt;/<span class="ty">Text</span>&gt;
+    &lt;/<span class="ty">View</span>&gt;
+  );
+}</pre>
+            </div>
+
+            <p style="margin-top:12px; color:var(--text-2); font-size:13px; line-height:1.6">
+              O <strong>TagFormModal</strong> usa <code style="font-family:var(--font-mono); font-size:11px; color:var(--accent)">Modal</code> nativo do RN com
+              <code style="font-family:var(--font-mono); font-size:11px; color:var(--accent)">animationType="slide"</code> e
+              <code style="font-family:var(--font-mono); font-size:11px; color:var(--accent)">transparent={true}</code>
+              para o efeito de bottom sheet — sem dependência externa.
+              O mesmo componente serve para criar e editar (prop <code style="font-family:var(--font-mono); font-size:11px">mode: 'create' | 'edit'</code>).
+              Delete: alerta de confirmação nativo via <code style="font-family:var(--font-mono); font-size:11px; color:var(--accent)">Alert.alert()</code>.
+            </p>
+          </div>
+        </div>
+
+        <!-- Slice 4 -->
+        <div class="slice-card" id="slice-4">
+          <div class="slice-header" onclick="toggleSlice(this)">
+            <div class="slice-num">S4</div>
+            <div class="slice-info">
+              <div class="slice-name">Tela de detalhe — /tags/[id]</div>
+              <div class="slice-desc">header colorido · lista de transações da tag no mês</div>
+            </div>
+            <span class="slice-badge badge-ui">UI</span>
+            <span class="slice-chevron">▶</span>
+          </div>
+          <div class="slice-body">
+            <div class="files-grid">
+              <div>
+                <div class="files-col-title">✦ Criar</div>
+                <div class="file-item new"><span class="icon">+</span><div><div>app/tags/_layout.tsx</div><div class="note">Stack layout para /tags/*</div></div></div>
+                <div class="file-item new"><span class="icon">+</span><div><div>app/tags/[id].tsx</div><div class="note">Tela de detalhe da tag</div></div></div>
+              </div>
+              <div>
+                <div class="files-col-title">Layout da tela</div>
+                <div style="background:var(--bg-3); border:1px solid var(--border); border-radius:8px; padding:14px; margin-top:8px; font-family:var(--font-mono); font-size:11px; color:var(--text-3); line-height:2">
+                  <div>┌─────────────────────────┐</div>
+                  <div>│ ← &nbsp;&nbsp; Mai/26 &nbsp;&nbsp; <span style="color:var(--accent)">+</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│ ← header</div>
+                  <div>│─────────────────────────│</div>
+                  <div>│ <span style="color:var(--text-2)">████ Assinatura ✏</span> &nbsp;&nbsp;&nbsp;&nbsp;│ ← bg=tag.color</div>
+                  <div>│─────────────────────────│</div>
+                  <div>│ C Netflix &nbsp;- R$ 55,90  │</div>
+                  <div>│ C Spotify &nbsp;- R$ 21,90  │</div>
+                  <div>│ ↗ Claude &nbsp;&nbsp;- R$ 113,85 │</div>
+                  <div>└─────────────────────────┘</div>
+                </div>
+              </div>
+            </div>
+
+            <p style="margin-top:16px; color:var(--text-2); font-size:13px; line-height:1.6">
+              O botão <strong>+</strong> no header navega para
+              <code style="font-family:var(--font-mono); font-size:11px; color:var(--accent)">/transaction/new?tagId=:id</code>
+              para pré-selecionar a tag na criação. O header colorido usa
+              <code style="font-family:var(--font-mono); font-size:11px; color:var(--accent)">style={{ backgroundColor: tag.color + '22' }}</code>
+              (8% opacity) para ser legível em ambos os temas.
+            </p>
+          </div>
+        </div>
+
+        <!-- Slice 5 -->
+        <div class="slice-card" id="slice-5">
+          <div class="slice-header" onclick="toggleSlice(this)">
+            <div class="slice-num">S5</div>
+            <div class="slice-info">
+              <div class="slice-name">Tag Picker nas Transações</div>
+              <div class="slice-desc">seletor colapsível · badges nos items · PUT tags</div>
+            </div>
+            <span class="slice-badge badge-form">FORM</span>
+            <span class="slice-chevron">▶</span>
+          </div>
+          <div class="slice-body">
+            <div class="files-grid">
+              <div>
+                <div class="files-col-title">✎ Modificar</div>
+                <div class="file-item mod"><span class="icon">~</span><div><div>src/components/transactions/TransactionItem.tsx</div><div class="note">Exibir TagBadges abaixo da descrição</div></div></div>
+                <div class="file-item mod"><span class="icon">~</span><div><div>app/transaction/new.tsx</div><div class="note">Adicionar tag selector colapsível</div></div></div>
+                <div class="file-item mod"><span class="icon">~</span><div><div>app/transaction/[id].tsx</div><div class="note">Tag selector + PUT /v1/transactions/:id/tags</div></div></div>
+              </div>
+              <div>
+                <div class="files-col-title">Fluxo de save</div>
+                <div style="background:var(--bg-3); border:1px solid var(--border); border-radius:8px; padding:14px; margin-top:8px; font-family:var(--font-mono); font-size:11px; color:var(--text-3); line-height:1.9">
+                  <div>1. Usuário seleciona tags no picker</div>
+                  <div>2. onSubmit → PATCH transaction</div>
+                  <div>3. await PUT /:id/tags (lista completa)</div>
+                  <div>4. invalidate tagsAll + transactionsAll</div>
+                  <div>5. router.back()</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-block" style="margin-top:20px">
+              <div class="code-header">
+                <span class="code-lang">typescript</span>
+                <span class="code-file">src/features/tags/hooks/useInvalidateTagData.ts — novo hook</span>
+              </div>
+              <pre><span class="kw">export function</span> <span class="fn">useInvalidateTagData</span>() {
+  <span class="kw">const</span> queryClient = <span class="fn">useQueryClient</span>();
+  <span class="kw">const</span> userId = <span class="fn">useAuthStore</span>((s) <span class="op">=></span> s.userId);
+
+  <span class="kw">return</span> () <span class="op">=></span>
+    <span class="ty">Promise</span>.<span class="fn">all</span>([
+      queryClient.<span class="fn">invalidateQueries</span>({
+        queryKey: queryKeys.<span class="fn">tagsAll</span>(userId),
+      }),
+      queryClient.<span class="fn">invalidateQueries</span>({
+        queryKey: queryKeys.<span class="fn">transactionsAll</span>(userId),
+        predicate: (q) <span class="op">=></span> !q.queryKey.<span class="fn">includes</span>(<span class="str">"detail"</span>),
+      }),
+      <span class="cm">// ⚠ NÃO invalida balance — tags não afetam saldo</span>
+    ]);
+}</pre>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /slices -->
+    </section>
+
+    <!-- Key Code -->
+    <section id="key-code">
+      <div class="section-header">
+        <span class="section-num">★</span>
+        <h2 class="section-title">Key Code — o que é mais fácil errar</h2>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">typescript</span>
+          <span class="code-file">Batch fetch de tags — evitar N+1</span>
+        </div>
+        <pre><span class="cm">// ✓ Uma query para M transações — batch por IDs</span>
+<span class="kw">export async function</span> <span class="fn">getTagsByTransactionIds</span>(
+  txIds: <span class="ty">string</span>[]
+): <span class="ty">Promise</span>&lt;<span class="ty">Record</span>&lt;<span class="ty">string</span>, <span class="ty">ApiTag</span>[]&gt;&gt; {
+  <span class="kw">if</span> (!txIds.length) <span class="kw">return</span> {};
+
+  <span class="cm">// Backend: SELECT ... WHERE tt.transaction_id = ANY($1::uuid[])</span>
+  <span class="kw">const</span> res = <span class="kw">await</span> apiClient.<span class="fn">post</span>&lt;<span class="ty">ApiResponse</span>&lt;<span class="ty">ApiTagsByTx</span>[]&gt;&gt;(
+    <span class="str">"/v1/tags/batch"</span>, { transaction_ids: txIds }
+  );
+  <span class="cm">// Agrupar por transaction_id no cliente</span>
+  <span class="kw">return</span> res.data.data.<span class="fn">reduce</span>((acc, row) <span class="op">=></span> {
+    (acc[row.transaction_id] <span class="op">??=</span> []).<span class="fn">push</span>(row);
+    <span class="kw">return</span> acc;
+  }, {} <span class="kw">as</span> <span class="ty">Record</span>&lt;<span class="ty">string</span>, <span class="ty">ApiTag</span>[]&gt;);
+}
+
+<span class="cm">// ✗ Padrão N+1 — NUNCA fazer isso</span>
+<span class="kw">for</span> (<span class="kw">const</span> tx <span class="kw">of</span> transactions) {
+  tx.tags = <span class="kw">await</span> <span class="fn">getTagsForTransaction</span>(tx.id); <span class="cm">// 1 query por transação</span>
+}</pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">typescript</span>
+          <span class="code-file">setTransactionTags — semântica replace-all</span>
+        </div>
+        <pre><span class="cm">// O backend faz DELETE + INSERT em uma SQL tx.</span>
+<span class="cm">// Enviar [] remove todas as tags. Enviar lista completa substitui tudo.</span>
+<span class="kw">export async function</span> <span class="fn">setTransactionTags</span>(
+  transactionId: <span class="ty">string</span>,
+  tagIds: <span class="ty">string</span>[]        <span class="cm">// lista COMPLETA desejada, não delta</span>
+): <span class="ty">Promise</span>&lt;<span class="kw">void</span>&gt; {
+  <span class="kw">await</span> apiClient.<span class="fn">put</span>(
+    <span class="str">`/v1/transactions/${transactionId}/tags`</span>,
+    { tags: tagIds }
+  );
+}</pre>
+      </div>
+    </section>
+
+    <!-- Risks -->
+    <section id="risks">
+      <div class="section-header">
+        <span class="section-num">!</span>
+        <h2 class="section-title">Riscos</h2>
+      </div>
+
+      <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:10px; overflow:hidden">
+        <table class="risk-table">
+          <thead>
+            <tr>
+              <th>Risco</th>
+              <th>Sev.</th>
+              <th>Mitigação</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Tags tab está <code style="font-family:var(--font-mono); font-size:11px">href:null</code> no layout — invisível para o usuário</td>
+              <td><span class="sev high">HIGH</span></td>
+              <td>Slice 2 deve começar pelo <code style="font-family:var(--font-mono); font-size:11px">_layout.tsx</code>. Habilitar a tab é pré-requisito do slice inteiro.</td>
+            </tr>
+            <tr>
+              <td>Cache stale após <code style="font-family:var(--font-mono); font-size:11px">setTransactionTags</code> — totais da tag não atualizam</td>
+              <td><span class="sev med">MED</span></td>
+              <td>Usar <code style="font-family:var(--font-mono); font-size:11px">useInvalidateTagData</code> que invalida ambos <code>tagsAll</code> + <code>transactionsAll</code>. <strong>Não</strong> invalidar balance.</td>
+            </tr>
+            <tr>
+              <td>Sem <code style="font-family:var(--font-mono); font-size:11px">@gorhom/bottom-sheet</code> — animação do modal pode parecer brusca</td>
+              <td><span class="sev med">MED</span></td>
+              <td>Usar <code style="font-family:var(--font-mono); font-size:11px">Modal animationType="slide"</code> do RN core. Suficiente para MVP. Instalar a lib em iteração futura se necessário.</td>
+            </tr>
+            <tr>
+              <td>Adicionar <code style="font-family:var(--font-mono); font-size:11px">tags: Tag[]</code> em <code>Transaction</code> quebra telas que desestruturavam o tipo</td>
+              <td><span class="sev med">MED</span></td>
+              <td>Adicionar como <code style="font-family:var(--font-mono); font-size:11px">tags: Tag[]</code> (não opcional) com default <code>[]</code> no mapper — nenhuma tela existente quebra.</td>
+            </tr>
+            <tr>
+              <td>Cor da tag no header do detalhe pode ser ilegível (depende do tema)</td>
+              <td><span class="sev low">LOW</span></td>
+              <td>Usar a cor com 8% de opacidade como background. Texto sempre em <code style="font-family:var(--font-mono); font-size:11px">text-foreground</code> (token do tema).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Open Questions -->
+    <section id="questions">
+      <div class="section-header">
+        <span class="section-num">?</span>
+        <h2 class="section-title">Perguntas abertas</h2>
+      </div>
+
+      <div class="q-list">
+        <div class="q-item">
+          <div class="q-num">Q1</div>
+          <div class="q-body">
+            <div class="q-text">Habilitar Tags como tab visível na barra de navegação?</div>
+            <div class="q-context">O mockup mostra a tab bar com ícone de tag. O layout atual tem <code style="font-family:var(--font-mono); font-size:11px">href:null</code>. Precisa decidir antes do Slice 2.</div>
+            <div class="q-options">
+              <span class="q-opt recommended">✓ Sim — habilitar em Slice 2</span>
+              <span class="q-opt">Não — acessar apenas por link interno</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="q-item">
+          <div class="q-num">Q2</div>
+          <div class="q-body">
+            <div class="q-text">Bottom sheet: usar Modal nativo ou instalar <code style="font-family:var(--font-mono); font-size:12px">@gorhom/bottom-sheet</code>?</div>
+            <div class="q-context">O app não tem a lib instalada. Modal nativo com <code style="font-family:var(--font-mono); font-size:11px">animationType="slide"</code> funciona bem para MVP, mas sem snap points nem gestos de drag.</div>
+            <div class="q-options">
+              <span class="q-opt recommended">Modal nativo — sem nova dep</span>
+              <span class="q-opt">Instalar @gorhom/bottom-sheet</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="q-item">
+          <div class="q-num">Q3</div>
+          <div class="q-body">
+            <div class="q-text">O <code style="font-family:var(--font-mono); font-size:12px">monthly_total</code> exibe "total movimentado" ou "total gasto"?</div>
+            <div class="q-context">O spec diz que inclui todos os tipos de transação (entradas, saídas, diário, economia). O mockup mostra só valores positivos (R$ 191,65). Confirmar se a UI deve exibir o rótulo "movimentado" para evitar confusão com "despesas".</div>
+            <div class="q-options">
+              <span class="q-opt recommended">"Total movimentado" (todos tipos)</span>
+              <span class="q-opt">Só saída + diário (despesas)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  function toggleSlice(header) {
+    const card = header.closest('.slice-card');
+    card.classList.toggle('open');
+  }
+
+  // Highlight active nav link on scroll
+  const sections = document.querySelectorAll('section[id], .hero[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '-60px 0px -60% 0px' });
+
+  sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

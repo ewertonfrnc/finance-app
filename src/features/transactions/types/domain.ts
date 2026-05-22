@@ -1,6 +1,12 @@
-import type { TransactionType } from './api';
+import type { TransactionType } from "./api";
 
 /** Tipos usados internamente pelo app — campos normalizados, datas sem timezone. */
+
+export interface TagRef {
+  id: string;
+  name: string;
+  color: string;
+}
 
 export interface Transaction {
   id: string;
@@ -11,6 +17,7 @@ export interface Transaction {
   createdAt: string;
   updatedAt: string;
   userId: string;
+  tags: TagRef[];
 }
 
 export interface DayBalance {
