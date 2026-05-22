@@ -6,6 +6,7 @@ interface DateState {
   selectedMonth: number; // 1-12
   goToPrevMonth: () => void;
   goToNextMonth: () => void;
+  goToCurrentMonth: () => void;
 }
 
 const now = new Date();
@@ -22,5 +23,9 @@ export const useDateStore = create<DateState>((set, get) => ({
     const { selectedYear, selectedMonth } = get();
     const next = addMonths(new Date(selectedYear, selectedMonth - 1), 1);
     set({ selectedYear: getYear(next), selectedMonth: getMonth(next) + 1 });
+  },
+  goToCurrentMonth: () => {
+    const today = new Date();
+    set({ selectedYear: getYear(today), selectedMonth: getMonth(today) + 1 });
   },
 }));

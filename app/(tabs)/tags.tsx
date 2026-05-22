@@ -105,7 +105,7 @@ export default function TagsScreen() {
 
   return (
     <Screen>
-      <MonthNavigator />
+      <MonthNavigator onCalendarPress={() => router.navigate("/")} />
 
       <View className="gap-2 px-4 pb-2">
         <View className="bg-surface-secondary flex-row items-center gap-2 rounded-xl px-3">

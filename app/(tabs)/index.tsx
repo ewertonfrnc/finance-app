@@ -3,9 +3,9 @@ import { useCallback, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
 } from "react-native-reanimated";
 
 import { DAY_FILTER_OPTIONS, DayList } from "@/src/components/balance/DayList";
@@ -19,8 +19,13 @@ import { SPRING } from "@/src/lib/animations";
 import { useDateStore } from "@/src/stores/useDateStore";
 
 export default function SaldosScreen() {
-  const { selectedYear, selectedMonth, goToPrevMonth, goToNextMonth } =
-    useDateStore();
+  const {
+    selectedYear,
+    selectedMonth,
+    goToPrevMonth,
+    goToNextMonth,
+    goToCurrentMonth,
+  } = useDateStore();
   const { data: dailyBalances } = useDailyBalances(selectedYear, selectedMonth);
   const { data: summary } = useMonthSummary(selectedYear, selectedMonth);
   usePrefetchAdjacentBalances(selectedYear, selectedMonth);
@@ -66,6 +71,10 @@ export default function SaldosScreen() {
     startTransition(goToNextMonth, "next");
   }
 
+  function handleCalendarPress() {
+    goToCurrentMonth();
+  }
+
   const handleDayPress = useCallback(
     (date: string) => {
       if (isTransitioning) return;
@@ -79,6 +88,7 @@ export default function SaldosScreen() {
       <MonthNavigator
         onPrev={navigateToPrevMonth}
         onNext={navigateToNextMonth}
+        onCalendarPress={handleCalendarPress}
         disabled={isTransitioning}
       />
       {/* <BalanceSummaryHeader summary={summary} /> */}

@@ -7,12 +7,14 @@ interface MonthNavigatorProps {
   onPrev?: () => void;
   onNext?: () => void;
   disabled?: boolean;
+  onCalendarPress?: () => void;
 }
 
 export function MonthNavigator({
   onPrev,
   onNext,
   disabled = false,
+  onCalendarPress,
 }: MonthNavigatorProps) {
   const { selectedYear, selectedMonth, goToPrevMonth, goToNextMonth } =
     useDateStore();
@@ -21,6 +23,41 @@ export function MonthNavigator({
 
   const handlePrev = onPrev ?? goToPrevMonth;
   const handleNext = onNext ?? goToNextMonth;
+
+  if (onCalendarPress) {
+    return (
+      <View className="flex-row items-center justify-between px-4 py-3">
+        <Pressable
+          onPress={onCalendarPress}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Calendar size={18} color={mutedColor} />
+        </Pressable>
+
+        <View className="flex-row items-center gap-1">
+          <Pressable
+            onPress={handlePrev}
+            disabled={disabled}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <ChevronLeft size={20} color={mutedColor} />
+          </Pressable>
+          <Text className="text-foreground px-2 text-base font-semibold">
+            {formatMonthHeader(selectedYear, selectedMonth)}
+          </Text>
+          <Pressable
+            onPress={handleNext}
+            disabled={disabled}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <ChevronRight size={20} color={mutedColor} />
+          </Pressable>
+        </View>
+
+        <View style={{ width: 18 }} />
+      </View>
+    );
+  }
 
   return (
     <View className="flex-row items-center justify-between px-4 py-3">
