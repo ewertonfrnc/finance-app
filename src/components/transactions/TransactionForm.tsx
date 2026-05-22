@@ -31,6 +31,7 @@ interface TransactionFormProps {
   onDelete?: () => void;
   isLoading?: boolean;
   isDeleting?: boolean;
+  children?: React.ReactNode;
 }
 
 const TITLE = { new: "Novo lançamento", edit: "Editar lançamento" } as const;
@@ -50,6 +51,7 @@ export function TransactionForm({
   onDelete,
   isLoading = false,
   isDeleting = false,
+  children,
 }: TransactionFormProps) {
   const router = useRouter();
   const { bottom } = useSafeAreaInsets();
@@ -143,6 +145,8 @@ export function TransactionForm({
           </Text>
           <DateField value={date} onChange={setDate} />
         </View>
+
+        {children}
       </ScrollView>
 
       {/* Footer */}

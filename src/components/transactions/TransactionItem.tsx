@@ -2,6 +2,7 @@ import { formatDayHeader } from "@/src/lib/date";
 import { Pressable, Text, View } from "react-native";
 
 import type { Transaction, TransactionType } from "@/src/features/transactions/types";
+import { TagBadge } from "@/src/features/tags/components/TagBadge";
 import { CurrencyText } from "../ui/CurrencyText";
 import { TypeBadge } from "../ui/TypeBadge";
 
@@ -33,6 +34,13 @@ export function TransactionItem({ transaction, onPress }: TransactionItemProps) 
         <View className="flex-row items-center gap-2 mt-0.5">
           <Text className="text-muted text-xs">{formatDayHeader(date)}</Text>
         </View>
+        {transaction.tags.length > 0 && (
+          <View className="flex-row flex-wrap gap-1 mt-1">
+            {transaction.tags.map((tag) => (
+              <TagBadge key={tag.id} name={tag.name} color={tag.color} size="sm" />
+            ))}
+          </View>
+        )}
       </View>
 
       <View className="items-end">
