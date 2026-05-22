@@ -11,16 +11,18 @@ export function TagBadge({ name, color, size = "md" }: TagBadgeProps) {
   return (
     <View
       style={{ backgroundColor: color + "33" }}
-      className={`rounded-full flex-row items-center gap-1 ${
+      className={`flex-row items-center gap-1 rounded-full ${
         isSmall ? "px-2 py-0.5" : "px-2.5 py-1"
       }`}
     >
       <View
         style={{ backgroundColor: color }}
-        className={isSmall ? "w-1.5 h-1.5 rounded-full" : "w-2 h-2 rounded-full"}
+        className={
+          isSmall ? "h-1.5 w-1.5 rounded-full" : "h-2 w-2 rounded-full"
+        }
       />
       <Text
-        className={`font-medium text-foreground ${
+        className={`text-foreground font-medium ${
           isSmall ? "text-[10px]" : "text-xs"
         }`}
       >

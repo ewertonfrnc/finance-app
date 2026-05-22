@@ -1,3 +1,5 @@
+import { useRouter } from "expo-router";
+import { Plus, Search } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
   FlatList,
@@ -7,16 +9,14 @@ import {
   View,
   useColorScheme,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { Plus, Search } from "lucide-react-native";
 
 import { MonthNavigator } from "@/src/components/navigation/MonthNavigator";
-import { Screen } from "@/src/components/ui/Screen";
 import { CurrencyText } from "@/src/components/ui/CurrencyText";
+import { Screen } from "@/src/components/ui/Screen";
 import { TagFormModal } from "@/src/features/tags/components/TagFormModal";
 import { useTags } from "@/src/features/tags/hooks/useTags";
-import { useDateStore } from "@/src/stores/useDateStore";
 import type { TagWithTotal } from "@/src/features/tags/types";
+import { useDateStore } from "@/src/stores/useDateStore";
 
 interface TagRowProps {
   tag: TagWithTotal;
@@ -25,17 +25,24 @@ interface TagRowProps {
 
 function TagRow({ tag, onPress }: TagRowProps) {
   return (
-    <Pressable onPress={onPress} className="flex-row items-center px-4 py-3 gap-3">
+    <Pressable
+      onPress={onPress}
+      className="flex-row items-center gap-3 px-4 py-3"
+    >
       <View
         style={{ backgroundColor: tag.color }}
-        className="w-3 h-3 rounded-full"
+        className="h-3 w-3 rounded-full"
       />
       <View className="flex-1">
-        <Text className="text-foreground text-base font-medium" numberOfLines={1}>
+        <Text
+          className="text-foreground text-base font-medium"
+          numberOfLines={1}
+        >
           {tag.name}
         </Text>
-        <Text className="text-muted text-xs mt-0.5">
-          {tag.transactionCount} lançamento{tag.transactionCount !== 1 ? "s" : ""}
+        <Text className="text-muted mt-0.5 text-xs">
+          {tag.transactionCount} lançamento
+          {tag.transactionCount !== 1 ? "s" : ""}
         </Text>
       </View>
       <CurrencyText value={tag.monthlyTotal} sign="neutral" variant="small" />
@@ -52,7 +59,7 @@ function EmptyState({ hasSearch, onCreatePress }: EmptyStateProps) {
   if (hasSearch) {
     return (
       <View className="flex-1 items-center justify-center px-8">
-        <Text className="text-muted text-base text-center">
+        <Text className="text-muted text-center text-base">
           Nenhuma tag encontrada
         </Text>
       </View>
@@ -60,18 +67,18 @@ function EmptyState({ hasSearch, onCreatePress }: EmptyStateProps) {
   }
 
   return (
-    <View className="flex-1 items-center justify-center px-8 gap-4">
-      <Text className="text-foreground text-lg font-semibold text-center">
+    <View className="flex-1 items-center justify-center gap-4 px-8">
+      <Text className="text-foreground text-center text-lg font-semibold">
         Organize seus lançamentos
       </Text>
-      <Text className="text-muted text-sm text-center">
+      <Text className="text-muted text-center text-sm">
         Crie tags para agrupar e visualizar seus lançamentos por categoria.
       </Text>
       <Pressable
-        className="bg-foreground rounded-xl px-6 py-3 mt-2"
+        className="bg-foreground mt-2 rounded-xl px-6 py-3"
         onPress={onCreatePress}
       >
-        <Text className="text-background font-semibold text-sm">
+        <Text className="text-background text-sm font-semibold">
           Criar minha primeira tag
         </Text>
       </Pressable>
@@ -100,11 +107,11 @@ export default function TagsScreen() {
     <Screen>
       <MonthNavigator />
 
-      <View className="px-4 pb-2 gap-2">
-        <View className="flex-row items-center bg-surface-secondary rounded-xl px-3 gap-2">
+      <View className="gap-2 px-4 pb-2">
+        <View className="bg-surface-secondary flex-row items-center gap-2 rounded-xl px-3">
           <Search size={16} color={iconColor} />
           <TextInput
-            className="flex-1 text-foreground py-2.5 text-sm"
+            className="text-foreground flex-1 py-2.5 text-sm"
             placeholder="Buscar tag..."
             placeholderTextColor={iconColor}
             value={search}
@@ -138,7 +145,7 @@ export default function TagsScreen() {
             />
           )}
           ItemSeparatorComponent={() => (
-            <View className="h-px bg-surface-secondary mx-4" />
+            <View className="bg-surface-secondary mx-4 h-px" />
           )}
         />
       )}

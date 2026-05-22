@@ -1,6 +1,6 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Alert, Modal, Pressable, Text, TextInput, View } from "react-native";
-import { useQueryClient } from "@tanstack/react-query";
 
 import { queryKeys } from "@/src/lib/queryKeys";
 import { useAuthStore } from "@/src/stores/useAuthStore";
@@ -28,7 +28,12 @@ interface TagFormModalProps {
   tag?: Tag;
 }
 
-export function TagFormModal({ visible, onClose, mode, tag }: TagFormModalProps) {
+export function TagFormModal({
+  visible,
+  onClose,
+  mode,
+  tag,
+}: TagFormModalProps) {
   const [name, setName] = useState("");
   const [color, setColor] = useState(TAG_COLORS[0]);
 
@@ -53,7 +58,9 @@ export function TagFormModal({ visible, onClose, mode, tag }: TagFormModalProps)
   }, [visible, mode, tag]);
 
   function invalidateTags() {
-    return queryClient.invalidateQueries({ queryKey: queryKeys.tagsAll(userId) });
+    return queryClient.invalidateQueries({
+      queryKey: queryKeys.tagsAll(userId),
+    });
   }
 
   function handleSubmit() {
@@ -116,17 +123,17 @@ export function TagFormModal({ visible, onClose, mode, tag }: TagFormModalProps)
       <View className="flex-1 justify-end">
         <Pressable className="absolute inset-0 bg-black/50" onPress={onClose} />
         <View className="bg-background rounded-t-2xl px-6 pt-4 pb-8">
-          <View className="w-10 h-1 bg-surface-secondary rounded-full self-center mb-5" />
+          <View className="bg-surface-secondary mb-5 h-1 w-10 self-center rounded-full" />
 
-          <Text className="text-foreground text-lg font-semibold mb-5">
+          <Text className="text-foreground mb-5 text-lg font-semibold">
             {mode === "create" ? "Criar tag" : "Editar tag"}
           </Text>
 
-          <Text className="text-muted text-xs uppercase tracking-wider mb-2">
+          <Text className="text-muted mb-2 text-xs tracking-wider uppercase">
             Nome
           </Text>
           <TextInput
-            className="bg-surface-secondary text-foreground rounded-xl px-4 py-3 text-base mb-5"
+            className="bg-surface-secondary text-foreground mb-5 rounded-xl px-4 py-3 text-base"
             placeholder="Ex: Assinatura"
             value={name}
             onChangeText={setName}
@@ -134,10 +141,10 @@ export function TagFormModal({ visible, onClose, mode, tag }: TagFormModalProps)
             maxLength={40}
           />
 
-          <Text className="text-muted text-xs uppercase tracking-wider mb-3">
+          <Text className="text-muted mb-3 text-xs tracking-wider uppercase">
             Cor
           </Text>
-          <View className="flex-row flex-wrap gap-3 mb-6">
+          <View className="mb-6 flex-row flex-wrap gap-3">
             {TAG_COLORS.map((c) => (
               <Pressable
                 key={c}
@@ -146,29 +153,31 @@ export function TagFormModal({ visible, onClose, mode, tag }: TagFormModalProps)
                   borderWidth: color === c ? 2.5 : 0,
                   borderColor: "#1e3d2b",
                 }}
-                className="w-9 h-9 rounded-full"
+                className="h-9 w-9 rounded-full"
                 onPress={() => setColor(c)}
               />
             ))}
           </View>
 
           <Pressable
-            className="bg-foreground rounded-xl py-3.5 items-center mb-3"
+            className="bg-foreground mb-3 items-center rounded-xl py-3.5"
             onPress={handleSubmit}
             disabled={isPending || !name.trim()}
           >
-            <Text className="text-background font-semibold text-sm">
+            <Text className="text-background text-sm font-semibold">
               {isPending ? "Salvando..." : "Salvar"}
             </Text>
           </Pressable>
 
           {mode === "edit" && (
             <Pressable
-              className="py-3 items-center"
+              className="items-center py-3"
               onPress={handleDelete}
               disabled={isPending}
             >
-              <Text className="text-red-500 text-sm font-medium">Excluir tag</Text>
+              <Text className="text-sm font-medium text-red-500">
+                Excluir tag
+              </Text>
             </Pressable>
           )}
         </View>

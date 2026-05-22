@@ -1,15 +1,21 @@
+import { useLocalSearchParams, useRouter } from "expo-router";
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Pencil,
+  Plus,
+} from "lucide-react-native";
 import { useState } from "react";
 import { FlatList, Pressable, Text, View, useColorScheme } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { ArrowLeft, ChevronLeft, ChevronRight, Pencil, Plus } from "lucide-react-native";
 
-import { Screen } from "@/src/components/ui/Screen";
 import { TransactionItem } from "@/src/components/transactions/TransactionItem";
+import { Screen } from "@/src/components/ui/Screen";
 import { TagFormModal } from "@/src/features/tags/components/TagFormModal";
 import { useTags } from "@/src/features/tags/hooks/useTags";
 import { useTagTransactions } from "@/src/features/tags/hooks/useTagTransactions";
-import { useDateStore } from "@/src/stores/useDateStore";
 import { formatMonthHeader } from "@/src/lib/date";
+import { useDateStore } from "@/src/stores/useDateStore";
 
 export default function TagDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -18,11 +24,16 @@ export default function TagDetailScreen() {
   const mutedColor = scheme === "dark" ? "#6b8c78" : "#7a9485";
   const accentColor = scheme === "dark" ? "#5ab87a" : "#1e3d2b";
 
-  const { selectedYear, selectedMonth, goToPrevMonth, goToNextMonth } = useDateStore();
+  const { selectedYear, selectedMonth, goToPrevMonth, goToNextMonth } =
+    useDateStore();
   const [showEdit, setShowEdit] = useState(false);
 
   const { data: tags = [] } = useTags(selectedYear, selectedMonth);
-  const { data: transactions = [] } = useTagTransactions(id, selectedYear, selectedMonth);
+  const { data: transactions = [] } = useTagTransactions(
+    id,
+    selectedYear,
+    selectedMonth,
+  );
 
   const tag = tags.find((t) => t.id === id);
 
@@ -44,7 +55,7 @@ export default function TagDetailScreen() {
           >
             <ChevronLeft size={20} color={mutedColor} />
           </Pressable>
-          <Text className="text-foreground text-base font-semibold px-2">
+          <Text className="text-foreground px-2 text-base font-semibold">
             {formatMonthHeader(selectedYear, selectedMonth)}
           </Text>
           <Pressable
@@ -56,7 +67,9 @@ export default function TagDetailScreen() {
         </View>
 
         <Pressable
-          onPress={() => router.push({ pathname: "/transaction/new", params: { tagId: id } })}
+          onPress={() =>
+            router.push({ pathname: "/transaction/new", params: { tagId: id } })
+          }
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           <Plus size={22} color={accentColor} strokeWidth={2.5} />
@@ -67,13 +80,16 @@ export default function TagDetailScreen() {
       {tag && (
         <View
           style={{ backgroundColor: tag.color + "22" }}
-          className="flex-row items-center px-4 py-4 gap-3"
+          className="flex-row items-center gap-3 px-4 py-4"
         >
           <View
             style={{ backgroundColor: tag.color }}
-            className="w-3 h-3 rounded-full"
+            className="h-3 w-3 rounded-full"
           />
-          <Text className="flex-1 text-foreground text-lg font-semibold" numberOfLines={1}>
+          <Text
+            className="text-foreground flex-1 text-lg font-semibold"
+            numberOfLines={1}
+          >
             {tag.name}
           </Text>
           <Pressable
@@ -85,7 +101,7 @@ export default function TagDetailScreen() {
         </View>
       )}
 
-      <View className="h-px bg-surface-secondary" />
+      <View className="bg-surface-secondary h-px" />
 
       {/* Transaction list */}
       <FlatList
@@ -98,11 +114,11 @@ export default function TagDetailScreen() {
           />
         )}
         ItemSeparatorComponent={() => (
-          <View className="h-px bg-surface-secondary mx-4" />
+          <View className="bg-surface-secondary mx-4 h-px" />
         )}
         ListEmptyComponent={() => (
           <View className="flex-1 items-center justify-center px-8 py-16">
-            <Text className="text-muted text-base text-center">
+            <Text className="text-muted text-center text-base">
               Nenhum lançamento com esta tag neste mês
             </Text>
           </View>
