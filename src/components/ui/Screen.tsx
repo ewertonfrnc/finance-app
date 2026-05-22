@@ -6,11 +6,11 @@ interface ScreenProps extends ViewProps {
 }
 
 export function Screen({ children, className, style, ...props }: ScreenProps) {
-  const { top } = useSafeAreaInsets();
+  const { top, bottom } = useSafeAreaInsets();
   return (
     <View
       className={`bg-background flex-1 ${className ?? ""}`}
-      style={[{ paddingTop: top }, style]}
+      style={[{ paddingTop: top, paddingBottom: bottom }, style]}
       {...props}
     >
       {children}
