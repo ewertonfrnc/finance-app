@@ -13,7 +13,7 @@ export default function TabsLayout() {
   const router = useRouter();
 
   return (
-    <View style={{ flex: 1 }}>
+    <View className="flex-1">
       <Tabs
         screenOptions={{
           headerShown: false,

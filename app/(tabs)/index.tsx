@@ -13,7 +13,6 @@ import { useHorizontalSwipe } from "@/src/components/gestures/useHorizontalSwipe
 import { MonthNavigator } from "@/src/components/navigation/MonthNavigator";
 import { Screen } from "@/src/components/ui/Screen";
 import { useDailyBalances } from "@/src/features/saldos/hooks/useDailyBalances";
-import { useMonthSummary } from "@/src/features/saldos/hooks/useMonthSummary";
 import { usePrefetchAdjacentBalances } from "@/src/features/saldos/hooks/usePrefetchAdjacentBalances";
 import { SPRING } from "@/src/lib/animations";
 import { useDateStore } from "@/src/stores/useDateStore";
@@ -27,7 +26,6 @@ export default function SaldosScreen() {
     goToCurrentMonth,
   } = useDateStore();
   const { data: dailyBalances } = useDailyBalances(selectedYear, selectedMonth);
-  const { data: summary } = useMonthSummary(selectedYear, selectedMonth);
   usePrefetchAdjacentBalances(selectedYear, selectedMonth);
   const router = useRouter();
   const [filterIndex, setFilterIndex] = useState(0);
@@ -63,18 +61,6 @@ export default function SaldosScreen() {
     onSwipeNext: goToNextMonth,
   });
 
-  function navigateToPrevMonth() {
-    startTransition(goToPrevMonth, "prev");
-  }
-
-  function navigateToNextMonth() {
-    startTransition(goToNextMonth, "next");
-  }
-
-  function handleCalendarPress() {
-    goToCurrentMonth();
-  }
-
   const handleDayPress = useCallback(
     (date: string) => {
       if (isTransitioning) return;
@@ -86,9 +72,9 @@ export default function SaldosScreen() {
   return (
     <Screen>
       <MonthNavigator
-        onPrev={navigateToPrevMonth}
-        onNext={navigateToNextMonth}
-        onCalendarPress={handleCalendarPress}
+        onPrev={() => startTransition(goToPrevMonth, "prev")}
+        onNext={() => startTransition(goToNextMonth, "next")}
+        onCalendarPress={goToCurrentMonth}
         disabled={isTransitioning}
       />
       {/* <BalanceSummaryHeader summary={summary} /> */}
