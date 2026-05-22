@@ -7,9 +7,11 @@ import {
   Plus,
 } from "lucide-react-native";
 import { FlatList, Pressable, Text, View, useColorScheme } from "react-native";
+import { useState } from "react";
 
 import { TransactionItem } from "@/src/components/transactions/TransactionItem";
 import { Screen } from "@/src/components/ui/Screen";
+import { TagFormModal } from "@/src/features/tags/components/TagFormModal";
 import { useTags } from "@/src/features/tags/hooks/useTags";
 import { useTagTransactions } from "@/src/features/tags/hooks/useTagTransactions";
 import { formatMonthHeader } from "@/src/lib/date";
@@ -17,6 +19,7 @@ import { useDateStore } from "@/src/stores/useDateStore";
 
 export default function TagDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const [showEdit, setShowEdit] = useState(false);
   const router = useRouter();
   const scheme = useColorScheme();
   const mutedColor = scheme === "dark" ? "#6b8c78" : "#7a9485";
@@ -88,12 +91,7 @@ export default function TagDetailScreen() {
             {tag.name}
           </Text>
           <Pressable
-            onPress={() =>
-              router.push({
-                pathname: "/tags/form",
-                params: { mode: "edit", id },
-              })
-            }
+            onPress={() => setShowEdit(true)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Pencil size={18} color={mutedColor} />
@@ -102,6 +100,15 @@ export default function TagDetailScreen() {
       )}
 
       <View className="bg-surface-secondary h-px" />
+
+      {showEdit && tag && (
+        <TagFormModal
+          mode="edit"
+          tag={tag}
+          currentCount={tags.length}
+          onClose={() => setShowEdit(false)}
+        />
+      )}
 
       <FlatList
         data={transactions}

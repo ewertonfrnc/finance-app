@@ -3,6 +3,7 @@ import {
   QueryClientProvider,
   useQueryClient,
 } from "@tanstack/react-query";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { useFonts } from "expo-font";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -120,30 +121,28 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView className="flex-1">
       <SafeAreaProvider>
-        <QueryClientProvider client={queryClient}>
-          <HeroUINativeProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="(onboarding)" />
-              <Stack.Screen name="(auth)" />
-              <Stack.Screen name="day/[date]" />
-              <Stack.Screen
-                name="transaction/new"
-                options={{ presentation: "modal" }}
+        <BottomSheetModalProvider>
+          <QueryClientProvider client={queryClient}>
+            <HeroUINativeProvider>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="(onboarding)" />
+                <Stack.Screen name="(auth)" />
+                <Stack.Screen name="day/[date]" />
+                <Stack.Screen
+                  name="transaction/new"
+                  options={{ presentation: "modal" }}
+                />
+                <Stack.Screen name="transaction/[id]" />
+              </Stack>
+              <QuerySessionSync />
+              <AuthGuard
+                hasHydrated={hasHydrated}
+                onResolvedChange={setAuthResolved}
               />
-              <Stack.Screen name="transaction/[id]" />
-              <Stack.Screen
-                name="tags/form"
-                options={{ presentation: "modal" }}
-              />
-            </Stack>
-            <QuerySessionSync />
-            <AuthGuard
-              hasHydrated={hasHydrated}
-              onResolvedChange={setAuthResolved}
-            />
-          </HeroUINativeProvider>
-        </QueryClientProvider>
+            </HeroUINativeProvider>
+          </QueryClientProvider>
+        </BottomSheetModalProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

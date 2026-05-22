@@ -1,8 +1,14 @@
+import {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetScrollView,
+  BottomSheetTextInput,
+  type BottomSheetBackdropProps,
+} from "@gorhom/bottom-sheet";
 import { useQueryClient } from "@tanstack/react-query";
-import { BottomSheet } from "heroui-native";
 import { Check, Trash2, X } from "lucide-react-native";
-import { useEffect, useState } from "react";
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Alert, Pressable, Text, View } from "react-native";
 
 import { queryKeys } from "@/src/lib/queryKeys";
 import { useAuthStore } from "@/src/stores/useAuthStore";
@@ -50,7 +56,9 @@ export function TagFormModal({
   const [name, setName] = useState("");
   const [color, setColor] = useState<string>(TAG_COLOR_PALETTE[0].hex);
   const [touched, setTouched] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+
+  const sheetRef = useRef<BottomSheetModal>(null);
+  const snapPoints = useMemo(() => ["88%"], []);
 
   const hasError = touched && !name.trim();
 
@@ -63,6 +71,17 @@ export function TagFormModal({
 
   const isPending = isCreating || isUpdating || isDeleting;
 
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+      />
+    ),
+    [],
+  );
+
   useEffect(() => {
     if (mode === "edit" && tag) {
       setName(tag.name);
@@ -72,7 +91,7 @@ export function TagFormModal({
       setColor(TAG_COLOR_PALETTE[0].hex);
       setTouched(false);
     }
-    requestAnimationFrame(() => setIsOpen(true));
+    sheetRef.current?.present();
   }, [mode, tag]);
 
   function invalidateTags() {
@@ -92,7 +111,7 @@ export function TagFormModal({
         {
           onSuccess: async () => {
             await invalidateTags();
-            onClose();
+            sheetRef.current?.dismiss();
           },
         },
       );
@@ -102,7 +121,7 @@ export function TagFormModal({
         {
           onSuccess: async () => {
             await invalidateTags();
-            onClose();
+            sheetRef.current?.dismiss();
           },
         },
       );
@@ -123,7 +142,7 @@ export function TagFormModal({
             remove(tag.id, {
               onSuccess: async () => {
                 await invalidateTags();
-                onClose();
+                sheetRef.current?.dismiss();
               },
             });
           },
@@ -133,120 +152,116 @@ export function TagFormModal({
   }
 
   return (
-    <BottomSheet
-      isOpen={isOpen}
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
+    <BottomSheetModal
+      ref={sheetRef}
+      snapPoints={snapPoints}
+      enablePanDownToClose
+      backdropComponent={renderBackdrop}
+      keyboardBehavior="extend"
+      onDismiss={onClose}
     >
-      <BottomSheet.Portal>
-        <BottomSheet.Overlay />
-        <BottomSheet.Content
-          keyboardBehavior="extend"
-          contentContainerClassName="px-6 pt-2 pb-8"
-        >
-          <View className="mb-5 flex-row items-center justify-between">
-            <Text className="text-foreground text-lg font-semibold">
-              {mode === "create" ? "Criar tag" : "Editar tag"}
-            </Text>
-            <View className="flex-row items-center gap-4">
-              {mode === "edit" && (
-                <Pressable onPress={handleDelete} disabled={isPending}>
-                  <Trash2 size={18} color="#ef4444" />
-                </Pressable>
-              )}
-              <Pressable onPress={onClose}>
-                <X size={18} color="#888888" />
-              </Pressable>
-            </View>
-          </View>
-
-          <Text className="text-muted mb-2 text-xs tracking-wider uppercase">
-            Nome
+      <BottomSheetScrollView contentContainerClassName="px-6 pt-2 pb-10">
+        <View className="mb-5 flex-row items-center justify-between">
+          <Text className="text-foreground text-lg font-semibold">
+            {mode === "create" ? "Criar tag" : "Editar tag"}
           </Text>
-          <TextInput
-            className="text-foreground py-2 text-base"
-            style={{
-              borderBottomWidth: 1.5,
-              borderBottomColor: hasError ? "#ef4444" : "#cccccc",
-            }}
-            placeholder="Como vamos chamar essa tag?"
-            value={name}
-            onChangeText={setName}
-            autoCorrect={false}
-            maxLength={38}
-          />
-          <View className="mt-1 mb-5 flex-row items-center justify-between">
-            {hasError ? (
-              <Text className="text-xs text-red-500">
-                Dê um nome pra continuar
-              </Text>
-            ) : (
-              <View />
+          <View className="flex-row items-center gap-4">
+            {mode === "edit" && (
+              <Pressable onPress={handleDelete} disabled={isPending}>
+                <Trash2 size={18} color="#ef4444" />
+              </Pressable>
             )}
-            <Text className="text-muted text-xs">{name.length}/38</Text>
+            <Pressable onPress={() => sheetRef.current?.dismiss()}>
+              <X size={18} color="#888888" />
+            </Pressable>
           </View>
+        </View>
 
-          <View className="mb-3 flex-row items-center justify-between">
-            <Text className="text-muted text-xs tracking-wider uppercase">
-              Cor de fundo
+        <Text className="text-muted mb-2 text-xs tracking-wider uppercase">
+          Nome
+        </Text>
+        <BottomSheetTextInput
+          className="text-foreground py-2 text-base"
+          style={{
+            borderBottomWidth: 1.5,
+            borderBottomColor: hasError ? "#ef4444" : "#cccccc",
+          }}
+          placeholder="Como vamos chamar essa tag?"
+          value={name}
+          onChangeText={setName}
+          autoCorrect={false}
+          maxLength={38}
+        />
+        <View className="mt-1 mb-5 flex-row items-center justify-between">
+          {hasError ? (
+            <Text className="text-xs text-red-500">
+              Dê um nome pra continuar
             </Text>
-            <Text className="text-muted text-xs">Toque pra escolher</Text>
-          </View>
-          <View className="mb-6 flex-row flex-wrap gap-2">
-            {TAG_COLOR_PALETTE.map((item) => (
-              <Pressable
-                key={item.hex}
-                style={{
-                  backgroundColor: item.hex,
-                  width: "48%",
-                  borderWidth: color === item.hex ? 2 : 0,
-                  borderColor: "rgba(0,0,0,0.25)",
-                }}
-                className="flex-row items-center justify-between rounded-xl px-3 py-3"
-                onPress={() => setColor(item.hex)}
-              >
-                <Text
-                  className="text-sm font-medium"
-                  style={{ color: getTextColor(item.hex) }}
-                >
-                  {item.label}
-                </Text>
-                {color === item.hex && <Check size={14} color="#333" />}
-              </Pressable>
-            ))}
-          </View>
+          ) : (
+            <View />
+          )}
+          <Text className="text-muted text-xs">{name.length}/38</Text>
+        </View>
 
-          <View className="bg-surface-secondary mb-6 flex-row items-center gap-3 rounded-xl px-4 py-3">
-            <Text className="text-muted text-xs tracking-wider uppercase">
-              Prévia
-            </Text>
-            <TagBadge
-              name={name.trim() || "Nome da tag"}
-              color={color}
-              size="sm"
-            />
-          </View>
-
-          <Pressable
-            className="bg-foreground mb-3 items-center rounded-xl py-3.5"
-            onPress={handleSubmit}
-            disabled={isPending}
-          >
-            <Text className="text-background text-sm font-semibold">
-              {isPending
-                ? "Salvando..."
-                : mode === "create"
-                  ? "Criar"
-                  : "Salvar"}
-            </Text>
-          </Pressable>
-
-          <Text className="text-muted text-center text-xs">
-            {currentCount} de {MAX_TAGS} tags disponíveis
+        <View className="mb-3 flex-row items-center justify-between">
+          <Text className="text-muted text-xs tracking-wider uppercase">
+            Cor de fundo
           </Text>
-        </BottomSheet.Content>
-      </BottomSheet.Portal>
-    </BottomSheet>
+          <Text className="text-muted text-xs">Toque pra escolher</Text>
+        </View>
+        <View className="mb-6 flex-row flex-wrap gap-2">
+          {TAG_COLOR_PALETTE.map((item) => (
+            <Pressable
+              key={item.hex}
+              style={{
+                backgroundColor: item.hex,
+                width: "48%",
+                borderWidth: color === item.hex ? 2 : 0,
+                borderColor: "rgba(0,0,0,0.25)",
+              }}
+              className="flex-row items-center justify-between rounded-xl px-3 py-3"
+              onPress={() => setColor(item.hex)}
+            >
+              <Text
+                className="text-sm font-medium"
+                style={{ color: getTextColor(item.hex) }}
+              >
+                {item.label}
+              </Text>
+              {color === item.hex && <Check size={14} color="#333" />}
+            </Pressable>
+          ))}
+        </View>
+
+        <View className="bg-surface-secondary mb-6 flex-row items-center gap-3 rounded-xl px-4 py-3">
+          <Text className="text-muted text-xs tracking-wider uppercase">
+            Prévia
+          </Text>
+          <TagBadge
+            name={name.trim() || "Nome da tag"}
+            color={color}
+            size="sm"
+          />
+        </View>
+
+        <Pressable
+          className="bg-foreground mb-3 items-center rounded-xl py-3.5"
+          onPress={handleSubmit}
+          disabled={isPending}
+        >
+          <Text className="text-background text-sm font-semibold">
+            {isPending
+              ? "Salvando..."
+              : mode === "create"
+                ? "Criar"
+                : "Salvar"}
+          </Text>
+        </Pressable>
+
+        <Text className="text-muted text-center text-xs">
+          {currentCount} de {MAX_TAGS} tags disponíveis
+        </Text>
+      </BottomSheetScrollView>
+    </BottomSheetModal>
   );
 }

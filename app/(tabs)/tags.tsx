@@ -15,6 +15,7 @@ import Svg, { Polygon } from "react-native-svg";
 import { MonthNavigator } from "@/src/components/navigation/MonthNavigator";
 import { CurrencyText } from "@/src/components/ui/CurrencyText";
 import { Screen } from "@/src/components/ui/Screen";
+import { TagFormModal } from "@/src/features/tags/components/TagFormModal";
 import { useTags } from "@/src/features/tags/hooks/useTags";
 import type { TagWithTotal } from "@/src/features/tags/types";
 import { useDateStore } from "@/src/stores/useDateStore";
@@ -90,6 +91,7 @@ export default function TagsScreen() {
   const { selectedYear, selectedMonth } = useDateStore();
   const { data: tags = [], isLoading } = useTags(selectedYear, selectedMonth);
   const [search, setSearch] = useState("");
+  const [formMode, setFormMode] = useState<"create" | "edit" | null>(null);
   const router = useRouter();
   const { toast } = useToast();
   const scheme = useColorScheme();
@@ -113,7 +115,7 @@ export default function TagsScreen() {
   }
 
   function openCreate() {
-    router.push({ pathname: "/tags/form", params: { mode: "create" } });
+    setFormMode("create");
   }
 
   return (
@@ -180,6 +182,14 @@ export default function TagsScreen() {
           ItemSeparatorComponent={() => (
             <View className="bg-surface-secondary mx-4 h-px" />
           )}
+        />
+      )}
+
+      {formMode !== null && (
+        <TagFormModal
+          mode={formMode}
+          currentCount={tags.length}
+          onClose={() => setFormMode(null)}
         />
       )}
     </Screen>

@@ -23,22 +23,27 @@ const CATEGORIES: { type: TransactionType; label: string }[] = [
 
 const TODAY = format(new Date(), "yyyy-MM-dd");
 
-type HealthLevel = "dark-green" | "light-green" | "yellow" | "light-red" | "dark-red";
+type HealthLevel =
+  | "dark-green"
+  | "light-green"
+  | "yellow"
+  | "light-red"
+  | "dark-red";
 
 const HEALTH_COLORS = {
   light: {
-    "dark-green":  { bg: "#b8ecd4", text: "#114d36" },
+    "dark-green": { bg: "#b8ecd4", text: "#114d36" },
     "light-green": { bg: "#dbf4e7", text: "#185b43" },
-    "yellow":      { bg: "#f8edc8", text: "#73580f" },
-    "light-red":   { bg: "#f8d9dd", text: "#852035" },
-    "dark-red":    { bg: "#efbcc5", text: "#701529" },
+    yellow: { bg: "#f8edc8", text: "#73580f" },
+    "light-red": { bg: "#f8d9dd", text: "#852035" },
+    "dark-red": { bg: "#efbcc5", text: "#701529" },
   },
   dark: {
-    "dark-green":  { bg: "#214f3c", text: "#baf5d7" },
+    "dark-green": { bg: "#214f3c", text: "#baf5d7" },
     "light-green": { bg: "#1a3f31", text: "#a6efca" },
-    "yellow":      { bg: "#493f25", text: "#f4d98e" },
-    "light-red":   { bg: "#4a2b31", text: "#f8b8c3" },
-    "dark-red":    { bg: "#5a2530", text: "#ffd2da" },
+    yellow: { bg: "#493f25", text: "#f4d98e" },
+    "light-red": { bg: "#4a2b31", text: "#f8b8c3" },
+    "dark-red": { bg: "#5a2530", text: "#ffd2da" },
   },
 } as const;
 
@@ -62,7 +67,11 @@ export function DayRow({ dayBalance, filter, onPress }: DayRowProps) {
     dayBalance.income === 0 &&
     dayBalance.expense === 0 &&
     dayBalance.savings === 0;
-  const futureOpacity = isProjectionOnly ? "opacity-50" : isFuture ? "opacity-80" : "";
+  const futureOpacity = isProjectionOnly
+    ? "opacity-50"
+    : isFuture
+      ? "opacity-80"
+      : "";
   const dayNum = format(parseISO(dayBalance.date), "dd");
   const weekday = formatWeekday(dayBalance.date);
 
@@ -79,7 +88,8 @@ export function DayRow({ dayBalance, filter, onPress }: DayRowProps) {
 
   const scheme = useColorScheme();
   const healthLevel = getHealthLevel(dayBalance.endBalance);
-  const colors = HEALTH_COLORS[scheme === "dark" ? "dark" : "light"][healthLevel];
+  const colors =
+    HEALTH_COLORS[scheme === "dark" ? "dark" : "light"][healthLevel];
 
   const weekendDayBg = weekend
     ? scheme === "dark"
@@ -102,7 +112,7 @@ export function DayRow({ dayBalance, filter, onPress }: DayRowProps) {
           {dayNum}
         </Text>
         {isToday && (
-          <View className="bg-success absolute -right-1 top-1 h-1.5 w-1.5 rounded-full" />
+          <View className="bg-success absolute top-1 -right-1 h-1.5 w-1.5 rounded-full" />
         )}
         <Text className="text-muted text-xs">{weekday}</Text>
       </View>
@@ -111,7 +121,7 @@ export function DayRow({ dayBalance, filter, onPress }: DayRowProps) {
         {visibleLines.length > 0 ? (
           visibleLines.map((cat) => (
             <View key={cat.type} className="flex-row items-center">
-              <Text className="text-muted text-xs flex-1">{cat.label}</Text>
+              <Text className="text-muted flex-1 text-xs">{cat.label}</Text>
               <CurrencyText
                 value={amounts[cat.type]}
                 variant="small"
@@ -127,7 +137,10 @@ export function DayRow({ dayBalance, filter, onPress }: DayRowProps) {
         )}
       </View>
 
-      <View style={{ backgroundColor: colors.bg, minWidth: 128 }} className={`items-end rounded-md px-2.5 py-1 ${futureOpacity}`}>
+      <View
+        style={{ backgroundColor: colors.bg, minWidth: 128 }}
+        className={`items-end rounded-md px-2.5 py-1 ${futureOpacity}`}
+      >
         <CurrencyText
           value={dayBalance.endBalance}
           variant="small"
