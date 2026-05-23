@@ -63,11 +63,11 @@ export default function EditTransactionScreen() {
   function handleDelete() {
     remove(id, {
       onSuccess: async () => {
+        router.back();
+        await invalidate();
         queryClient.removeQueries({
           queryKey: queryKeys.transaction(userId, id),
         });
-        await invalidate();
-        router.back();
       },
     });
   }
