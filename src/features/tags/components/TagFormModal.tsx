@@ -6,37 +6,16 @@ import {
   type BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
 import { Check, Trash2, X } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useCreateTag } from "../hooks/useCreateTag";
-import { useDeleteTag } from "../hooks/useDeleteTag";
-import { useInvalidateTagData } from "../hooks/useInvalidateTagData";
-import { useUpdateTag } from "../hooks/useUpdateTag";
+import { TAG_COLOR_PALETTE, getTextColor } from "../constants";
+import { useTagForm } from "../hooks/useTagForm";
 import type { Tag } from "../types";
 import { TagBadge } from "./TagBadge";
 
-const TAG_COLOR_PALETTE = [
-  { label: "Marrom", hex: "#D4A87A" }, // quente terroso
-  { label: "Laranja", hex: "#F4934A" }, // quente vibrante
-  { label: "Rosa", hex: "#E86FA8" }, // quente frio
-  { label: "Roxo", hex: "#C4A4F4" }, // frio escuro
-  { label: "Azul", hex: "#4A7CE0" }, // frio médio
-  { label: "Verde", hex: "#7EC8A0" }, // frio claro
-  { label: "Cinza", hex: "#9E9E9E" }, // neutro escuro
-  { label: "Marfim", hex: "#E8D5A3" }, // neutro quente — fora da lista original
-] as const;
-
 const MAX_TAGS = 100;
-
-function getTextColor(hex: string): string {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance > 0.5 ? "#333333" : "#FFFFFF";
-}
 
 interface TagFormModalProps {
   onClose: () => void;
@@ -51,22 +30,25 @@ export function TagFormModal({
   tag,
   currentCount,
 }: TagFormModalProps) {
-  const [name, setName] = useState("");
-  const [color, setColor] = useState<string>(TAG_COLOR_PALETTE[0].hex);
-  const [touched, setTouched] = useState(false);
-
   const sheetRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["88%"], []);
-
-  const hasError = touched && !name.trim();
-
-  const invalidate = useInvalidateTagData();
-  const { mutate: create, isPending: isCreating } = useCreateTag();
-  const { mutate: update, isPending: isUpdating } = useUpdateTag();
-  const { mutate: remove, isPending: isDeleting } = useDeleteTag();
-
-  const isPending = isCreating || isUpdating || isDeleting;
   const { bottom } = useSafeAreaInsets();
+
+  const {
+    name,
+    setName,
+    color,
+    setColor,
+    hasError,
+    isPending,
+    remove,
+    invalidate,
+    handleSubmit,
+  } = useTagForm({ mode, tag, onSuccess: () => sheetRef.current?.dismiss() });
+
+  useEffect(() => {
+    sheetRef.current?.present();
+  }, [mode, tag]);
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -78,46 +60,6 @@ export function TagFormModal({
     ),
     [],
   );
-
-  useEffect(() => {
-    if (mode === "edit" && tag) {
-      setName(tag.name);
-      setColor(tag.color);
-    } else {
-      setName("");
-      setColor(TAG_COLOR_PALETTE[0].hex);
-      setTouched(false);
-    }
-    sheetRef.current?.present();
-  }, [mode, tag]);
-
-  function handleSubmit() {
-    setTouched(true);
-    const trimmed = name.trim();
-    if (!trimmed) return;
-
-    if (mode === "create") {
-      create(
-        { name: trimmed, color },
-        {
-          onSuccess: async () => {
-            await invalidate();
-            sheetRef.current?.dismiss();
-          },
-        },
-      );
-    } else if (tag) {
-      update(
-        { id: tag.id, payload: { name: trimmed, color } },
-        {
-          onSuccess: async () => {
-            await invalidate();
-            sheetRef.current?.dismiss();
-          },
-        },
-      );
-    }
-  }
 
   function handleDelete() {
     if (!tag) return;

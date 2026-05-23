@@ -14,34 +14,12 @@ import {
 
 import { Screen } from "@/src/components/ui/Screen";
 import { TagBadge } from "@/src/features/tags/components/TagBadge";
-import { useCreateTag } from "@/src/features/tags/hooks/useCreateTag";
-import { useDeleteTag } from "@/src/features/tags/hooks/useDeleteTag";
-import { useInvalidateTagData } from "@/src/features/tags/hooks/useInvalidateTagData";
+import { TAG_COLOR_PALETTE, getTextColor } from "@/src/features/tags/constants";
+import { useTagForm } from "@/src/features/tags/hooks/useTagForm";
 import { useTags } from "@/src/features/tags/hooks/useTags";
-import { useUpdateTag } from "@/src/features/tags/hooks/useUpdateTag";
 import { useDateStore } from "@/src/stores/useDateStore";
 
-const TAG_COLOR_PALETTE = [
-  { label: "Cinza", hex: "#CCCCCC" },
-  { label: "Vermelho", hex: "#F4A4A4" },
-  { label: "Laranja", hex: "#F4C4A4" },
-  { label: "Amarelo", hex: "#F4F4A4" },
-  { label: "Verde", hex: "#A4F4A4" },
-  { label: "Azul claro", hex: "#A4E4F4" },
-  { label: "Azul", hex: "#7BB5F4" },
-  { label: "Roxo", hex: "#C4A4F4" },
-  { label: "Rosa", hex: "#F4A4D4" },
-] as const;
-
 const MAX_TAGS = 100;
-
-function getTextColor(hex: string): string {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance > 0.5 ? "#333333" : "#FFFFFF";
-}
 
 export default function TagFormScreen() {
   const { mode, id } = useLocalSearchParams<{
@@ -56,47 +34,22 @@ export default function TagFormScreen() {
   const { data: tags = [] } = useTags(selectedYear, selectedMonth);
   const tag = id ? tags.find((t) => t.id === id) : undefined;
 
-  const [name, setName] = useState(tag?.name ?? "");
-  const [color, setColor] = useState(tag?.color ?? TAG_COLOR_PALETTE[0].hex);
-  const [touched, setTouched] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const invalidate = useInvalidateTagData();
-  const { mutate: create, isPending: isCreating } = useCreateTag();
-  const { mutate: update, isPending: isUpdating } = useUpdateTag();
-  const { mutate: remove, isPending: isDeleting } = useDeleteTag();
-  const isPending = isCreating || isUpdating || isDeleting;
-
-  const hasError = touched && !name.trim();
   const isEdit = mode === "edit";
 
-  function handleSubmit() {
-    setTouched(true);
-    const trimmed = name.trim();
-    if (!trimmed) return;
-
-    if (isEdit && tag) {
-      update(
-        { id: tag.id, payload: { name: trimmed, color } },
-        {
-          onSuccess: async () => {
-            await invalidate();
-            router.back();
-          },
-        },
-      );
-    } else {
-      create(
-        { name: trimmed, color },
-        {
-          onSuccess: async () => {
-            await invalidate();
-            router.back();
-          },
-        },
-      );
-    }
-  }
+  const {
+    name,
+    setName,
+    color,
+    setColor,
+    hasError,
+    isPending,
+    isDeleting,
+    remove,
+    invalidate,
+    handleSubmit,
+  } = useTagForm({ mode, tag, onSuccess: () => router.back() });
 
   function handleDelete() {
     if (!tag) return;
@@ -181,8 +134,9 @@ export default function TagFormScreen() {
               style={{
                 backgroundColor: item.hex,
                 width: "48%",
-                borderWidth: color === item.hex ? 2 : 0,
-                borderColor: "rgba(0,0,0,0.25)",
+                borderWidth: 2,
+                borderColor:
+                  color === item.hex ? "rgba(0,0,0,0.25)" : "transparent",
               }}
               className="flex-row items-center justify-between rounded-xl px-3 py-3"
               onPress={() => setColor(item.hex)}
