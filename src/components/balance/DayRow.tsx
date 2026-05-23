@@ -1,5 +1,11 @@
 import { format, parseISO } from "date-fns";
 import { Pressable, Text, View, useColorScheme } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 
 import type {
   DayBalance,
@@ -8,16 +14,19 @@ import type {
 import { formatWeekday, isWeekend } from "@/src/lib/date";
 import { CurrencyText } from "../ui/CurrencyText";
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 interface DayRowProps {
   dayBalance: DayBalance;
   filter: TransactionType | null;
   onPress: () => void;
+  onLongPress?: () => void;
 }
 
 const CATEGORIES: { type: TransactionType; label: string }[] = [
-  { type: "entrada", label: "Entradas" },
-  { type: "saida", label: "Saídas" },
-  { type: "diario", label: "Diários" },
+  { type: "entrada", label: "Entrada" },
+  { type: "saida", label: "Saída" },
+  { type: "diario", label: "Diário" },
   { type: "economia", label: "Economia" },
 ];
 
@@ -87,7 +96,12 @@ function TransactionLines({ lines, amounts }: TransactionLinesProps) {
   );
 }
 
-export function DayRow({ dayBalance, filter, onPress }: DayRowProps) {
+export function DayRow({
+  dayBalance,
+  filter,
+  onPress,
+  onLongPress,
+}: DayRowProps) {
   const isToday = dayBalance.date === TODAY;
   const isFuture = dayBalance.date > TODAY;
   const weekend = isWeekend(dayBalance.date);
@@ -128,14 +142,35 @@ export function DayRow({ dayBalance, filter, onPress }: DayRowProps) {
       : "rgba(200, 160, 60, 0.13)"
     : undefined;
 
+  const scale = useSharedValue(1);
+  const opacity = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.98, { damping: 15, stiffness: 300 });
+    opacity.value = withTiming(0.8, { duration: 150 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 15, stiffness: 300 });
+    opacity.value = withTiming(1, { duration: 150 });
+  };
+
   return (
-    <Pressable
+    <AnimatedPressable
       onPress={onPress}
-      className="flex-row items-center gap-3 rounded-lg px-4 py-2"
+      onLongPress={onLongPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={animatedStyle}
+      className="flex-row items-stretch gap-3 rounded-lg pl-4"
     >
       <View
         style={weekendDayBg ? { backgroundColor: weekendDayBg } : undefined}
-        className="w-8 items-center rounded-md py-0.5"
+        className="my-2 w-8 items-center justify-center rounded-md py-0.5"
       >
         <Text
           className={`font-mono-medium text-sm ${isToday ? "text-success" : "text-foreground"}`}
@@ -148,13 +183,18 @@ export function DayRow({ dayBalance, filter, onPress }: DayRowProps) {
         <Text className="text-muted text-xs">{weekday}</Text>
       </View>
 
-      <View className={`flex-1 gap-1 ${futureOpacity}`}>
+      <View className={`flex-1 justify-center gap-1 py-2 ${futureOpacity}`}>
         <TransactionLines lines={visibleLines} amounts={amounts} />
       </View>
 
       <View
-        style={{ backgroundColor: colors.bg, minWidth: 128 }}
-        className={`items-end rounded-md px-2.5 py-3 ${futureOpacity}`}
+        style={{
+          backgroundColor: colors.bg,
+          minWidth: 128,
+          borderBottomWidth: 2,
+          borderBottomColor: scheme === "dark" ? "#131c14" : "#f7faf8",
+        }}
+        className={`items-end justify-center px-2.5 ${futureOpacity}`}
       >
         <CurrencyText
           value={dayBalance.endBalance}
@@ -163,6 +203,6 @@ export function DayRow({ dayBalance, filter, onPress }: DayRowProps) {
           style={{ color: colors.text }}
         />
       </View>
-    </Pressable>
+    </AnimatedPressable>
   );
 }

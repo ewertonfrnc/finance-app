@@ -13,6 +13,7 @@ interface DayListProps {
   days: DayBalance[];
   filter: TransactionType | null;
   onDayPress: (date: string) => void;
+  onDayLongPress?: (date: string) => void;
   isTransitioning?: boolean;
 }
 
@@ -22,6 +23,7 @@ export function DayList({
   days,
   filter,
   onDayPress,
+  onDayLongPress,
   isTransitioning = false,
 }: DayListProps) {
   const listRef = useRef<FlatList<DayBalance>>(null);
@@ -60,9 +62,12 @@ export function DayList({
         dayBalance={item}
         filter={filter}
         onPress={() => onDayPress(item.date)}
+        onLongPress={
+          onDayLongPress ? () => onDayLongPress(item.date) : undefined
+        }
       />
     ),
-    [onDayPress, filter],
+    [onDayPress, onDayLongPress, filter],
   );
 
   return (

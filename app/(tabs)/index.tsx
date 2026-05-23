@@ -1,3 +1,4 @@
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -53,6 +54,15 @@ export default function SaldosScreen() {
     [isTransitioning, router],
   );
 
+  const handleDayLongPress = useCallback(
+    (date: string) => {
+      if (isTransitioning) return;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      router.push({ pathname: "/transaction/new", params: { date } });
+    },
+    [isTransitioning, router],
+  );
+
   return (
     <Screen>
       <MonthNavigator
@@ -92,6 +102,7 @@ export default function SaldosScreen() {
             days={dailyBalances}
             filter={filter.value}
             onDayPress={handleDayPress}
+            onDayLongPress={handleDayLongPress}
             isTransitioning={isTransitioning}
           />
         </Animated.View>
