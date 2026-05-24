@@ -1,4 +1,5 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { getMonth, getYear } from "date-fns";
 
 import { getMonthBalance } from "@/src/features/transactions/services/transactions.service";
 import type { ApiDayBalance } from "@/src/features/transactions/types";
@@ -29,13 +30,15 @@ export function balanceQueryOptions(
   year: number,
   month: number,
 ) {
+  const now = new Date();
+  const isCurrentMonth = year === getYear(now) && month === getMonth(now) + 1;
   return {
     queryKey: queryKeys.balance(userId, year, month),
     queryFn: async () => {
       const raw = await getMonthBalance(year, month);
       return raw.map(mapApiDayBalance(year, month));
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: isCurrentMonth ? 60_000 : 10 * 60_000,
   };
 }
 
@@ -45,6 +48,5 @@ export function useBalanceQuery(year: number, month: number) {
   return useQuery({
     ...balanceQueryOptions(userId, year, month),
     enabled: !!userId,
-    placeholderData: keepPreviousData,
   });
 }

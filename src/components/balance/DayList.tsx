@@ -1,6 +1,13 @@
 import { format } from "date-fns";
 import { useCallback, useEffect, useRef } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Text, View, useWindowDimensions } from "react-native";
+import Animated, {
+  cancelAnimation,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 
 import type {
   DayBalance,
@@ -14,29 +21,52 @@ interface DayListProps {
   filter: TransactionType | null;
   onDayPress: (date: string) => void;
   onDayLongPress?: (date: string) => void;
-  isTransitioning?: boolean;
+  isFetching?: boolean;
 }
 
 const TODAY = format(new Date(), "yyyy-MM-dd");
+
+function LoadingBar() {
+  const { width } = useWindowDimensions();
+  const barWidth = Math.round(width * 0.35);
+  const tx = useSharedValue(-barWidth);
+
+  useEffect(() => {
+    tx.value = withRepeat(withTiming(width, { duration: 900 }), -1, false);
+    return () => cancelAnimation(tx);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [width]);
+
+  const style = useAnimatedStyle(() => ({
+    transform: [{ translateX: tx.value }],
+  }));
+
+  return (
+    <View style={{ height: 2, overflow: "hidden" }}>
+      <Animated.View
+        className="bg-success h-full"
+        style={[{ width: barWidth }, style]}
+      />
+    </View>
+  );
+}
 
 export function DayList({
   days,
   filter,
   onDayPress,
   onDayLongPress,
-  isTransitioning = false,
+  isFetching = false,
 }: DayListProps) {
   const listRef = useRef<FlatList<DayBalance>>(null);
   const lastScrolledMonthKey = useRef<string>("");
 
   // Re-anchora ao trocar de mês: dia atual quando o mês contém TODAY, topo caso contrário.
   // Refetches do mesmo mês mantêm o scroll do usuário porque monthKey não muda.
-  // Aguarda isTransitioning=false para não competir com a animação de entrada do swipe.
   const monthKey = days[0]?.date.slice(0, 7) ?? "";
 
   useEffect(() => {
     if (!monthKey) return;
-    if (isTransitioning) return;
     if (lastScrolledMonthKey.current === monthKey) return;
     lastScrolledMonthKey.current = monthKey;
 
@@ -45,26 +75,25 @@ export function DayList({
       if (idx > 0) {
         listRef.current?.scrollToIndex({
           index: idx,
-          animated: true,
+          animated: false,
           viewPosition: 0.3,
         });
       } else {
-        listRef.current?.scrollToOffset({ offset: 0, animated: true });
+        listRef.current?.scrollToOffset({ offset: 0, animated: false });
       }
     });
     return () => cancelAnimationFrame(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [monthKey, isTransitioning]);
+  }, [monthKey]);
 
   const renderItem = useCallback(
     ({ item }: { item: DayBalance }) => (
       <DayRow
         dayBalance={item}
+        date={item.date}
         filter={filter}
-        onPress={() => onDayPress(item.date)}
-        onLongPress={
-          onDayLongPress ? () => onDayLongPress(item.date) : undefined
-        }
+        onPress={onDayPress}
+        onLongPress={onDayLongPress}
       />
     ),
     [onDayPress, onDayLongPress, filter],
@@ -77,6 +106,8 @@ export function DayList({
         <View className="flex-1" />
         <Text className="text-muted text-xs">SALDO</Text>
       </View>
+
+      {isFetching && <LoadingBar />}
 
       <FlatList
         ref={listRef}

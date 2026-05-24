@@ -1,4 +1,5 @@
 import { format, parseISO } from "date-fns";
+import { memo, useCallback } from "react";
 import { Pressable, Text, View, useColorScheme } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -18,9 +19,10 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface DayRowProps {
   dayBalance: DayBalance;
+  date: string;
   filter: TransactionType | null;
-  onPress: () => void;
-  onLongPress?: () => void;
+  onPress: (date: string) => void;
+  onLongPress?: (date: string) => void;
 }
 
 const CATEGORIES: { type: TransactionType; label: string }[] = [
@@ -96,12 +98,18 @@ function TransactionLines({ lines, amounts }: TransactionLinesProps) {
   );
 }
 
-export function DayRow({
+export const DayRow = memo(function DayRow({
   dayBalance,
+  date,
   filter,
   onPress,
   onLongPress,
 }: DayRowProps) {
+  const handlePress = useCallback(() => onPress(date), [onPress, date]);
+  const handleLongPress = useCallback(
+    () => onLongPress?.(date),
+    [onLongPress, date],
+  );
   const isToday = dayBalance.date === TODAY;
   const isFuture = dayBalance.date > TODAY;
   const weekend = isWeekend(dayBalance.date);
@@ -161,8 +169,8 @@ export function DayRow({
 
   return (
     <AnimatedPressable
-      onPress={onPress}
-      onLongPress={onLongPress}
+      onPress={handlePress}
+      onLongPress={handleLongPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       style={animatedStyle}
@@ -205,4 +213,4 @@ export function DayRow({
       </View>
     </AnimatedPressable>
   );
-}
+});

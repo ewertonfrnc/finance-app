@@ -1,12 +1,15 @@
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { GestureDetector } from "react-native-gesture-handler";
-import Animated from "react-native-reanimated";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
 import { DayList } from "@/src/components/balance/DayList";
-import { useHorizontalSwipe } from "@/src/components/gestures/useHorizontalSwipe";
 import { MonthNavigator } from "@/src/components/navigation/MonthNavigator";
 import { Screen } from "@/src/components/ui/Screen";
 import { useDailyBalances } from "@/src/features/saldos/hooks/useDailyBalances";
@@ -14,6 +17,24 @@ import { usePrefetchAdjacentBalances } from "@/src/features/saldos/hooks/usePref
 import { useTabIndicator } from "@/src/features/saldos/hooks/useTabIndicator";
 import { DAY_FILTER_OPTIONS } from "@/src/features/transactions/constants";
 import { useDateStore } from "@/src/stores/useDateStore";
+
+function useMonthFade(resetKey: string) {
+  const opacity = useSharedValue(1);
+  const [blocked, setBlocked] = useState(false);
+
+  useEffect(() => {
+    setBlocked(true);
+    opacity.value = 0;
+    opacity.value = withTiming(1, { duration: 120 }, () => {
+      scheduleOnRN(setBlocked, false);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetKey]);
+
+  const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  const pointerEvents: "none" | "auto" = blocked ? "none" : "auto";
+  return { style, pointerEvents, blocked };
+}
 
 export default function SaldosScreen() {
   const {
@@ -23,7 +44,10 @@ export default function SaldosScreen() {
     goToNextMonth,
     goToCurrentMonth,
   } = useDateStore();
-  const { data: dailyBalances } = useDailyBalances(selectedYear, selectedMonth);
+  const { data: dailyBalances, isFetching } = useDailyBalances(
+    selectedYear,
+    selectedMonth,
+  );
   usePrefetchAdjacentBalances(selectedYear, selectedMonth);
   const router = useRouter();
   const {
@@ -35,41 +59,33 @@ export default function SaldosScreen() {
   const filter = DAY_FILTER_OPTIONS[filterIndex];
 
   const {
-    animatedContentStyle,
-    isTransitioning,
+    style: fadeStyle,
     pointerEvents,
-    startTransition,
-    swipeGesture,
-  } = useHorizontalSwipe({
-    resetKey: `${selectedYear}-${selectedMonth}`,
-    onSwipePrev: goToPrevMonth,
-    onSwipeNext: goToNextMonth,
-  });
+    blocked,
+  } = useMonthFade(`${selectedYear}-${selectedMonth}`);
 
   const handleDayPress = useCallback(
     (date: string) => {
-      if (isTransitioning) return;
       router.push(`/day/${date}`);
     },
-    [isTransitioning, router],
+    [router],
   );
 
   const handleDayLongPress = useCallback(
     (date: string) => {
-      if (isTransitioning) return;
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       router.push({ pathname: "/transaction/new", params: { date } });
     },
-    [isTransitioning, router],
+    [router],
   );
 
   return (
     <Screen>
       <MonthNavigator
-        onPrev={() => startTransition(goToPrevMonth, "prev")}
-        onNext={() => startTransition(goToNextMonth, "next")}
+        onPrev={goToPrevMonth}
+        onNext={goToNextMonth}
         onCalendarPress={goToCurrentMonth}
-        disabled={isTransitioning}
+        disabled={blocked}
       />
       <View className="border-surface-secondary flex-row justify-between border-b px-4 pt-2">
         <Animated.View
@@ -92,21 +108,19 @@ export default function SaldosScreen() {
         ))}
       </View>
 
-      <GestureDetector gesture={swipeGesture}>
-        <Animated.View
-          className="flex-1"
-          style={animatedContentStyle}
-          pointerEvents={pointerEvents}
-        >
-          <DayList
-            days={dailyBalances}
-            filter={filter.value}
-            onDayPress={handleDayPress}
-            onDayLongPress={handleDayLongPress}
-            isTransitioning={isTransitioning}
-          />
-        </Animated.View>
-      </GestureDetector>
+      <Animated.View
+        className="flex-1"
+        style={fadeStyle}
+        pointerEvents={pointerEvents}
+      >
+        <DayList
+          days={dailyBalances}
+          filter={filter.value}
+          onDayPress={handleDayPress}
+          onDayLongPress={handleDayLongPress}
+          isFetching={isFetching}
+        />
+      </Animated.View>
     </Screen>
   );
 }
