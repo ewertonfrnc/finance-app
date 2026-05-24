@@ -1,7 +1,6 @@
-import { FABButton } from "@/src/components/ui/FABButton";
 import { Tabs, useRouter } from "expo-router";
-import { Activity, Menu, Tag } from "lucide-react-native";
-import { StyleSheet, View } from "react-native";
+import { Activity, Menu, Plus, Tag } from "lucide-react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ACTIVE_COLOR = "#1e3d2b";
@@ -45,7 +44,17 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="totais"
           options={{
-            href: null,
+            tabBarButton: () => (
+              <TouchableOpacity
+                style={styles.fabTab}
+                onPress={() => router.push("/transaction/new")}
+                activeOpacity={0.85}
+              >
+                <View style={styles.fabCircle}>
+                  <Plus color="#fff" size={24} strokeWidth={2.5} />
+                </View>
+              </TouchableOpacity>
+            ),
           }}
         />
         <Tabs.Screen
@@ -63,10 +72,27 @@ export default function TabsLayout() {
           }}
         />
       </Tabs>
-      <FABButton
-        onPress={() => router.push("/transaction/new")}
-        bottom={56 + bottom + 12}
-      />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  fabTab: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  fabCircle: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: "#1e3d2b",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+  },
+});
