@@ -13,9 +13,8 @@ export function useInvalidateTransactionData() {
         queryKey: queryKeys.transactionsAll(userId),
         predicate: (query) => !query.queryKey.includes("detail"),
       }),
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: queryKeys.balanceAll(userId),
-        refetchType: "all",
       }),
     ]);
 }

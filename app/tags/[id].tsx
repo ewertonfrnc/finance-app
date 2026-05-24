@@ -115,6 +115,7 @@ export default function TagDetailScreen() {
           tag={tag}
           currentCount={tags.length}
           onClose={() => setShowEdit(false)}
+          onDelete={() => router.back()}
         />
       )}
 

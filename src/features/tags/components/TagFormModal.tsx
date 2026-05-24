@@ -19,6 +19,7 @@ const MAX_TAGS = 100;
 
 interface TagFormModalProps {
   onClose: () => void;
+  onDelete?: () => void;
   mode: "create" | "edit";
   tag?: Tag;
   currentCount: number;
@@ -26,6 +27,7 @@ interface TagFormModalProps {
 
 export function TagFormModal({
   onClose,
+  onDelete,
   mode,
   tag,
   currentCount,
@@ -74,8 +76,9 @@ export function TagFormModal({
           onPress: () => {
             remove(tag.id, {
               onSuccess: async () => {
-                await invalidate();
+                onDelete?.();
                 sheetRef.current?.dismiss();
+                await invalidate(tag.id);
               },
             });
           },

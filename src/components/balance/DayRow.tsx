@@ -190,7 +190,7 @@ export function DayRow({
       <View
         style={{
           backgroundColor: colors.bg,
-          minWidth: 128,
+          width: 144,
           borderBottomWidth: 2,
           borderBottomColor: scheme === "dark" ? "#131c14" : "#f7faf8",
         }}

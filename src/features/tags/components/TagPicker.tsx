@@ -1,10 +1,12 @@
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
+  BottomSheetScrollView,
   BottomSheetTextInput,
   BottomSheetView,
   type BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
+import { useRouter } from "expo-router";
 import { Check, ChevronRight, Plus, Search, X } from "lucide-react-native";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
@@ -14,7 +16,6 @@ import {
   View,
   useColorScheme,
 } from "react-native";
-import { useRouter } from "expo-router";
 
 import { useDateStore } from "@/src/stores/useDateStore";
 import { useTags } from "../hooks/useTags";
@@ -91,7 +92,6 @@ export function TagPicker({ selectedTagIds, onChangeTagIds }: TagPickerProps) {
     <>
       {/* ── Field ── */}
       <View className="gap-2">
-
         {/* Label + value stacked */}
         <View className="gap-1">
           <View className="flex-row items-center gap-1.5">
@@ -210,7 +210,7 @@ export function TagPicker({ selectedTagIds, onChangeTagIds }: TagPickerProps) {
             )}
           </View>
 
-          <ScrollView
+          <BottomSheetScrollView
             style={{ maxHeight: 240 }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
@@ -240,7 +240,7 @@ export function TagPicker({ selectedTagIds, onChangeTagIds }: TagPickerProps) {
                 );
               })
             )}
-          </ScrollView>
+          </BottomSheetScrollView>
 
           <View className="mt-4 flex-row items-center gap-3 border-t border-gray-100 px-6 pt-4">
             <Pressable

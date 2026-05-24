@@ -7,15 +7,30 @@ export function useInvalidateTagData() {
   const queryClient = useQueryClient();
   const userId = useAuthStore((s) => s.userId);
 
-  return () =>
-    Promise.all([
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.tagsAll(userId),
+  return (deletedTagId?: string) => {
+    if (deletedTagId) {
+      queryClient.removeQueries({
+        predicate: (q) =>
+          q.queryKey.includes(deletedTagId) &&
+          q.queryKey.includes("transactions"),
+      });
+    }
+
+    return Promise.all([
+      queryClient.refetchQueries({
+        predicate: (q) => {
+          const key = q.queryKey;
+          return (
+            key[0] === "tags" &&
+            key[1] === (userId ?? "anonymous") &&
+            !key.includes("transactions")
+          );
+        },
       }),
       queryClient.invalidateQueries({
         queryKey: queryKeys.transactionsAll(userId),
         predicate: (q) => !q.queryKey.includes("detail"),
       }),
-      // tags do not affect balance — do NOT invalidate balanceAll here
     ]);
+  };
 }
