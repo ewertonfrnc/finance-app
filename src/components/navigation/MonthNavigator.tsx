@@ -1,6 +1,6 @@
 import { formatMonthHeader } from "@/src/lib/date";
 import { useDateStore } from "@/src/stores/useDateStore";
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react-native";
+import { Calendar, ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react-native";
 import { Pressable, Text, View, useColorScheme } from "react-native";
 
 interface MonthNavigatorProps {
@@ -8,6 +8,8 @@ interface MonthNavigatorProps {
   onNext?: () => void;
   disabled?: boolean;
   onCalendarPress?: () => void;
+  isHidden?: boolean;
+  onToggleHide?: () => void;
 }
 
 export function MonthNavigator({
@@ -15,6 +17,8 @@ export function MonthNavigator({
   onNext,
   disabled = false,
   onCalendarPress,
+  isHidden = false,
+  onToggleHide,
 }: MonthNavigatorProps) {
   const { selectedYear, selectedMonth, goToPrevMonth, goToNextMonth } =
     useDateStore();
@@ -54,7 +58,20 @@ export function MonthNavigator({
           </Pressable>
         </View>
 
-        <View style={{ width: 18 }} />
+        {onToggleHide ? (
+          <Pressable
+            onPress={onToggleHide}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            {isHidden ? (
+              <EyeOff size={18} color={mutedColor} />
+            ) : (
+              <Eye size={18} color={mutedColor} />
+            )}
+          </Pressable>
+        ) : (
+          <View style={{ width: 18 }} />
+        )}
       </View>
     );
   }

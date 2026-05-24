@@ -1,18 +1,28 @@
 import { format, parseISO } from "date-fns";
-import { memo, useCallback } from "react";
-import { Pressable, Text, View, useColorScheme } from "react-native";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
+import {
+  type ViewStyle,
+  Pressable,
+  Text,
+  View,
+  useColorScheme,
+} from "react-native";
 import Animated, {
+  type AnimatedStyle,
+  cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
 import type {
   DayBalance,
   TransactionType,
 } from "@/src/features/transactions/types";
 import { formatWeekday, isWeekend } from "@/src/lib/date";
+import { usePrivacyStore } from "@/src/stores/usePrivacyStore";
 import { CurrencyText } from "../ui/CurrencyText";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -33,6 +43,7 @@ const CATEGORIES: { type: TransactionType; label: string }[] = [
 ];
 
 const TODAY = format(new Date(), "yyyy-MM-dd");
+const PRIVACY_MASK = "••••";
 
 type HealthLevel =
   | "dark-green"
@@ -70,9 +81,16 @@ function getHealthLevel(balance: number): HealthLevel {
 interface TransactionLinesProps {
   lines: { type: TransactionType; label: string }[];
   amounts: Record<TransactionType, number>;
+  hideEntrada?: boolean;
+  entradaFadeStyle?: AnimatedStyle<ViewStyle>;
 }
 
-function TransactionLines({ lines, amounts }: TransactionLinesProps) {
+function TransactionLines({
+  lines,
+  amounts,
+  hideEntrada = false,
+  entradaFadeStyle,
+}: TransactionLinesProps) {
   if (lines.length === 0) {
     return (
       <View className="flex-row items-center justify-between opacity-35">
@@ -87,11 +105,27 @@ function TransactionLines({ lines, amounts }: TransactionLinesProps) {
       {lines.map((cat) => (
         <View key={cat.type} className="flex-row items-center">
           <Text className="text-muted flex-1 text-xs">{cat.label}</Text>
-          <CurrencyText
-            value={amounts[cat.type]}
-            variant="small"
-            sign="neutral"
-          />
+          {cat.type === "entrada" ? (
+            <Animated.View style={entradaFadeStyle}>
+              {hideEntrada ? (
+                <Text className="font-mono-medium text-foreground text-base">
+                  {PRIVACY_MASK}
+                </Text>
+              ) : (
+                <CurrencyText
+                  value={amounts[cat.type]}
+                  variant="small"
+                  sign="neutral"
+                />
+              )}
+            </Animated.View>
+          ) : (
+            <CurrencyText
+              value={amounts[cat.type]}
+              variant="small"
+              sign="neutral"
+            />
+          )}
         </View>
       ))}
     </>
@@ -105,6 +139,34 @@ export const DayRow = memo(function DayRow({
   onPress,
   onLongPress,
 }: DayRowProps) {
+  const { hideValues } = usePrivacyStore();
+
+  const fadeOpacity = useSharedValue(1);
+  const [displayHidden, setDisplayHidden] = useState(hideValues);
+  const isMountedRef = useRef(false);
+
+  const fadeStyle = useAnimatedStyle(() => ({ opacity: fadeOpacity.value }));
+
+  useEffect(() => {
+    if (!isMountedRef.current) {
+      isMountedRef.current = true;
+      return;
+    }
+    cancelAnimation(fadeOpacity);
+    fadeOpacity.value = withTiming(0, { duration: 10 }, (finished) => {
+      if (!finished) return;
+      scheduleOnRN(setDisplayHidden, hideValues);
+      // fade-in is started by the [displayHidden] effect below, after React commits the new content
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hideValues]);
+
+  // Starts fade-in only after React has committed the swapped content to the view tree
+  useEffect(() => {
+    fadeOpacity.value = withTiming(1, { duration: 80 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayHidden]);
+
   const handlePress = useCallback(() => onPress(date), [onPress, date]);
   const handleLongPress = useCallback(
     () => onLongPress?.(date),
@@ -192,7 +254,12 @@ export const DayRow = memo(function DayRow({
       </View>
 
       <View className={`flex-1 justify-center gap-1 py-2 ${futureOpacity}`}>
-        <TransactionLines lines={visibleLines} amounts={amounts} />
+        <TransactionLines
+          lines={visibleLines}
+          amounts={amounts}
+          hideEntrada={displayHidden}
+          entradaFadeStyle={fadeStyle}
+        />
       </View>
 
       <View
@@ -204,12 +271,23 @@ export const DayRow = memo(function DayRow({
         }}
         className={`items-end justify-center px-2.5 ${futureOpacity}`}
       >
-        <CurrencyText
-          value={dayBalance.endBalance}
-          variant="small"
-          sign="neutral"
-          style={{ color: colors.text }}
-        />
+        <Animated.View style={fadeStyle}>
+          {displayHidden ? (
+            <Text
+              style={{ color: colors.text }}
+              className="font-mono-medium text-base"
+            >
+              {PRIVACY_MASK}
+            </Text>
+          ) : (
+            <CurrencyText
+              value={dayBalance.endBalance}
+              variant="small"
+              sign="neutral"
+              style={{ color: colors.text }}
+            />
+          )}
+        </Animated.View>
       </View>
     </AnimatedPressable>
   );

@@ -17,6 +17,7 @@ import { usePrefetchAdjacentBalances } from "@/src/features/saldos/hooks/usePref
 import { useTabIndicator } from "@/src/features/saldos/hooks/useTabIndicator";
 import { DAY_FILTER_OPTIONS } from "@/src/features/transactions/constants";
 import { useDateStore } from "@/src/stores/useDateStore";
+import { usePrivacyStore } from "@/src/stores/usePrivacyStore";
 
 function useMonthFade(resetKey: string) {
   const opacity = useSharedValue(1);
@@ -58,6 +59,8 @@ export default function SaldosScreen() {
   } = useTabIndicator();
   const filter = DAY_FILTER_OPTIONS[filterIndex];
 
+  const { hideValues, toggleHideValues } = usePrivacyStore();
+
   const {
     style: fadeStyle,
     pointerEvents,
@@ -86,6 +89,8 @@ export default function SaldosScreen() {
         onNext={goToNextMonth}
         onCalendarPress={goToCurrentMonth}
         disabled={blocked}
+        isHidden={hideValues}
+        onToggleHide={toggleHideValues}
       />
       <View className="border-surface-secondary flex-row justify-between border-b px-4 pt-2">
         <Animated.View
