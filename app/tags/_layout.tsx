@@ -5,6 +5,7 @@ export default function TagsLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="[id]" />
       <Stack.Screen name="form" options={{ presentation: "modal" }} />
+      <Stack.Screen name="pick" />
     </Stack>
   );
 }

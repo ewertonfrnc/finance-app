@@ -5,9 +5,10 @@ import { ActivityIndicator, View } from "react-native";
 
 import { TransactionForm } from "@/src/components/transactions/TransactionForm";
 import { Screen } from "@/src/components/ui/Screen";
-import { TagPicker } from "@/src/features/tags/components/TagPicker";
+import { TagField } from "@/src/features/tags/components/TagField";
 import { useInvalidateTagData } from "@/src/features/tags/hooks/useInvalidateTagData";
 import { useSetTransactionTags } from "@/src/features/tags/hooks/useSetTransactionTags";
+import { useTagPickerSync } from "@/src/features/tags/hooks/useTagPickerSync";
 import { useDeleteTransaction } from "@/src/features/transactions/hooks/useDeleteTransaction";
 import { useInvalidateTransactionData } from "@/src/features/transactions/hooks/useInvalidateTransactionData";
 import { useTransaction } from "@/src/features/transactions/hooks/useTransaction";
@@ -15,6 +16,7 @@ import { useUpdateTransaction } from "@/src/features/transactions/hooks/useUpdat
 import type { FormValues } from "@/src/features/transactions/types";
 import { queryKeys } from "@/src/lib/queryKeys";
 import { useAuthStore } from "@/src/stores/useAuthStore";
+import { useTagPickerStore } from "@/src/stores/useTagPickerStore";
 
 export default function EditTransactionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -34,10 +36,14 @@ export default function EditTransactionScreen() {
 
   useEffect(() => {
     if (transaction && !tagsInitialized.current) {
-      setSelectedTagIds(transaction.tags.map((t) => t.id));
+      const ids = transaction.tags.map((t) => t.id);
+      setSelectedTagIds(ids);
+      useTagPickerStore.getState().set(ids);
       tagsInitialized.current = true;
     }
   }, [transaction]);
+
+  useTagPickerSync(tagsInitialized, setSelectedTagIds);
 
   function handleSubmit(values: FormValues) {
     update(
@@ -97,7 +103,7 @@ export default function EditTransactionScreen() {
         isLoading={isUpdating}
         isDeleting={isDeleting}
       >
-        <TagPicker
+        <TagField
           selectedTagIds={selectedTagIds}
           onChangeTagIds={setSelectedTagIds}
         />

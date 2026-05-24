@@ -10,11 +10,10 @@ import {
   View,
   useColorScheme,
 } from "react-native";
-import Svg, { Polygon } from "react-native-svg";
-
 import { MonthNavigator } from "@/src/components/navigation/MonthNavigator";
 import { CurrencyText } from "@/src/components/ui/CurrencyText";
 import { Screen } from "@/src/components/ui/Screen";
+import { TagFlag } from "@/src/features/tags/components/TagFlag";
 import { TagFormModal } from "@/src/features/tags/components/TagFormModal";
 import { useTags } from "@/src/features/tags/hooks/useTags";
 import type { TagWithTotal } from "@/src/features/tags/types";
@@ -23,15 +22,6 @@ import { useDateStore } from "@/src/stores/useDateStore";
 interface TagRowProps {
   tag: TagWithTotal;
   onPress: () => void;
-}
-
-function TagFlag({ color }: { color: string }) {
-  // Flag/chevron shape: straight left, pointed right — mirrors CSS polygon(0 0, 78% 0, 100% 50%, 78% 100%, 0 100%)
-  return (
-    <Svg width={12} height={16} viewBox="0 0 12 16">
-      <Polygon points="0,0 9.36,0 12,8 9.36,16 0,16" fill={color} />
-    </Svg>
-  );
 }
 
 function TagRow({ tag, onPress }: TagRowProps) {

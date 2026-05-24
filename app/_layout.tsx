@@ -129,10 +129,7 @@ export default function RootLayout() {
                 <Stack.Screen name="(onboarding)" />
                 <Stack.Screen name="(auth)" />
                 <Stack.Screen name="day/[date]" />
-                <Stack.Screen
-                  name="transaction/new"
-                  options={{ presentation: "modal" }}
-                />
+                <Stack.Screen name="transaction/new" />
                 <Stack.Screen name="transaction/[id]" />
               </Stack>
               <QuerySessionSync />

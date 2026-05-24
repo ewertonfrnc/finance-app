@@ -1,15 +1,17 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { TransactionForm } from "@/src/components/transactions/TransactionForm";
 import { Screen } from "@/src/components/ui/Screen";
-import { TagPicker } from "@/src/features/tags/components/TagPicker";
+import { TagField } from "@/src/features/tags/components/TagField";
 import { useInvalidateTagData } from "@/src/features/tags/hooks/useInvalidateTagData";
 import { useSetTransactionTags } from "@/src/features/tags/hooks/useSetTransactionTags";
+import { useTagPickerSync } from "@/src/features/tags/hooks/useTagPickerSync";
 import { useCreateTransaction } from "@/src/features/transactions/hooks/useCreateTransaction";
 import { useInvalidateTransactionData } from "@/src/features/transactions/hooks/useInvalidateTransactionData";
 import type { FormValues } from "@/src/features/transactions/types";
 import { isIsoDate } from "@/src/lib/date";
+import { useTagPickerStore } from "@/src/stores/useTagPickerStore";
 
 export default function NewTransactionScreen() {
   const { date, tagId } = useLocalSearchParams<{
@@ -23,9 +25,20 @@ export default function NewTransactionScreen() {
   const invalidateTags = useInvalidateTagData();
   const initialDate =
     typeof date === "string" && isIsoDate(date) ? date : undefined;
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
-    typeof tagId === "string" ? [tagId] : [],
-  );
+
+  const initialTagIds = typeof tagId === "string" ? [tagId] : [];
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(initialTagIds);
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    if (!initialized.current) {
+      useTagPickerStore.getState().set(initialTagIds);
+      initialized.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useTagPickerSync(initialized, setSelectedTagIds);
 
   function handleSubmit(values: FormValues) {
     create(
@@ -55,7 +68,7 @@ export default function NewTransactionScreen() {
         onSubmit={handleSubmit}
         isLoading={isPending}
       >
-        <TagPicker
+        <TagField
           selectedTagIds={selectedTagIds}
           onChangeTagIds={setSelectedTagIds}
         />
