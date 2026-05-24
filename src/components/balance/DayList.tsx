@@ -22,6 +22,7 @@ interface DayListProps {
   onDayPress: (date: string) => void;
   onDayLongPress?: (date: string) => void;
   isFetching?: boolean;
+  isPlaceholder?: boolean;
 }
 
 const TODAY = format(new Date(), "yyyy-MM-dd");
@@ -57,16 +58,18 @@ export function DayList({
   onDayPress,
   onDayLongPress,
   isFetching = false,
+  isPlaceholder = false,
 }: DayListProps) {
   const listRef = useRef<FlatList<DayBalance>>(null);
   const lastScrolledMonthKey = useRef<string>("");
 
   // Re-anchora ao trocar de mês: dia atual quando o mês contém TODAY, topo caso contrário.
   // Refetches do mesmo mês mantêm o scroll do usuário porque monthKey não muda.
+  // isPlaceholder: aguarda dados reais para não consumir o guard antes que a FlatList esteja pronta.
   const monthKey = days[0]?.date.slice(0, 7) ?? "";
 
   useEffect(() => {
-    if (!monthKey) return;
+    if (!monthKey || isPlaceholder) return;
     if (lastScrolledMonthKey.current === monthKey) return;
     lastScrolledMonthKey.current = monthKey;
 
@@ -84,7 +87,7 @@ export function DayList({
     });
     return () => cancelAnimationFrame(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [monthKey]);
+  }, [monthKey, isPlaceholder]);
 
   const renderItem = useCallback(
     ({ item }: { item: DayBalance }) => (

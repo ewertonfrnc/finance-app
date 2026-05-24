@@ -44,7 +44,7 @@ export default function SaldosScreen() {
     goToNextMonth,
     goToCurrentMonth,
   } = useDateStore();
-  const { data: dailyBalances, isFetching } = useDailyBalances(
+  const { data: dailyBalances, isFetching, isPlaceholder } = useDailyBalances(
     selectedYear,
     selectedMonth,
   );
@@ -119,6 +119,7 @@ export default function SaldosScreen() {
           onDayPress={handleDayPress}
           onDayLongPress={handleDayLongPress}
           isFetching={isFetching}
+          isPlaceholder={isPlaceholder}
         />
       </Animated.View>
     </Screen>

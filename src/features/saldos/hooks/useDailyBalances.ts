@@ -24,5 +24,5 @@ function buildEmptyDays(year: number, month: number): DayBalance[] {
 
 export function useDailyBalances(year: number, month: number) {
   const { data, ...queryResult } = useBalanceQuery(year, month);
-  return { data: data ?? buildEmptyDays(year, month), ...queryResult };
+  return { data: data ?? buildEmptyDays(year, month), isPlaceholder: !data, ...queryResult };
 }
