@@ -1,6 +1,7 @@
 import type {
   ApiCreateTransactionPayload,
   ApiDayBalance,
+  ApiDeleteScopeParams,
   ApiListTransactionsParams,
   ApiResponse,
   ApiTransaction,
@@ -54,8 +55,11 @@ export async function updateTransaction(
   return mapApiTransaction(response.data.data);
 }
 
-export async function deleteTransaction(id: string): Promise<void> {
-  await apiClient.delete(`/v1/transactions/${id}`);
+export async function deleteTransaction(
+  id: string,
+  params?: ApiDeleteScopeParams,
+): Promise<void> {
+  await apiClient.delete(`/v1/transactions/${id}`, { params });
 }
 
 export async function getMonthBalance(

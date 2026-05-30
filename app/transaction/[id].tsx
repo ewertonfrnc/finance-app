@@ -67,15 +67,18 @@ export default function EditTransactionScreen() {
   }
 
   function handleDelete() {
-    remove(id, {
-      onSuccess: async () => {
-        router.back();
-        await invalidate();
-        queryClient.removeQueries({
-          queryKey: queryKeys.transaction(userId, id),
-        });
+    remove(
+      { id },
+      {
+        onSuccess: async () => {
+          router.back();
+          await invalidate();
+          queryClient.removeQueries({
+            queryKey: queryKeys.transaction(userId, id),
+          });
+        },
       },
-    });
+    );
   }
 
   if (isLoading || !transaction) {
