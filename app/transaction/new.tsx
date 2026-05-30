@@ -47,6 +47,8 @@ export default function NewTransactionScreen() {
         amount: values.amountCents,
         description: values.description,
         date: values.date,
+        recurrence: values.recurrence,
+        recurrence_end_date: values.recurrenceEndDate,
       },
       {
         onSuccess: async (data) => {

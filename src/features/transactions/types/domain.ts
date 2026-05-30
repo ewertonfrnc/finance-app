@@ -50,4 +50,5 @@ export interface FormValues {
   description: string;
   date: string; // "YYYY-MM-DD"
   recurrence?: RecurrenceType; // default "none" — coletado no form a partir do Slice 2
+  recurrenceEndDate?: string; // "YYYY-MM-DD" — data da última ocorrência (opcional)
 }

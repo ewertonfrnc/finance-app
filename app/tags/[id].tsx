@@ -16,6 +16,7 @@ import { useTags } from "@/src/features/tags/hooks/useTags";
 import { useTagTransactions } from "@/src/features/tags/hooks/useTagTransactions";
 import { formatBRL } from "@/src/lib/currency";
 import { formatMonthHeader } from "@/src/lib/date";
+import { transactionDetailHref } from "@/src/lib/transactionHref";
 import { useDateStore } from "@/src/stores/useDateStore";
 
 export default function TagDetailScreen() {
@@ -121,11 +122,11 @@ export default function TagDetailScreen() {
 
       <FlatList
         data={transactions}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.occurrenceKey}
         renderItem={({ item }) => (
           <TransactionItem
             transaction={item}
-            onPress={() => router.push(`/transaction/${item.id}`)}
+            onPress={() => router.push(transactionDetailHref(item))}
             showDate
           />
         )}
