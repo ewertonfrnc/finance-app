@@ -1,4 +1,6 @@
 import { useRouter } from "expo-router";
+import { Button } from "heroui-native";
+import { LoaderCircle } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import Animated, {
@@ -11,9 +13,14 @@ import { Screen } from "@/src/components/ui/Screen";
 import { useRegister } from "@/src/features/auth/hooks/useRegister";
 import { useSpinAnimation } from "@/src/lib/animations";
 import { formatBRL } from "@/src/lib/currency";
+import { DS_COLORS } from "@/src/lib/designTokens";
 import { useOnboardingStore } from "@/src/stores/useOnboardingStore";
-import { Button } from "heroui-native";
-import { LoaderCircle } from "lucide-react-native";
+
+// This screen always uses the dark greenDeep palette regardless of device theme.
+const G = DS_COLORS.light;
+const BG = G.greenDeep;
+const INK = "#ffffff";
+const INK_MUTED = "rgba(255,255,255,0.55)";
 
 export default function SaldoScreen() {
   const router = useRouter();
@@ -62,29 +69,41 @@ export default function SaldoScreen() {
   }
 
   return (
-    <Screen className="bg-accent px-6">
+    <Screen style={{ backgroundColor: BG }} className="px-6">
       <View className="flex-1 pt-10">
-        <Text className="text-accent-foreground/60 mb-2 text-xs font-medium tracking-widest uppercase">
+        <Text
+          style={{ color: INK_MUTED }}
+          className="mb-2 text-xs font-medium tracking-widest uppercase"
+        >
           Oi, {firstName}
         </Text>
 
-        <Text className="text-accent-foreground mb-10 text-2xl leading-snug font-semibold">
+        <Text
+          style={{ color: INK }}
+          className="mb-10 text-2xl font-semibold leading-snug"
+        >
           E aí, quanto tem na conta nesse exato momento?
         </Text>
 
-        <Text className="text-accent-foreground/60 mb-4 text-xs font-medium tracking-widest uppercase">
+        <Text
+          style={{ color: INK_MUTED }}
+          className="mb-4 text-xs font-medium tracking-widest uppercase"
+        >
           Saldo Atual
         </Text>
 
         {/* Currency input manual para fundo escuro */}
         <Pressable onPress={() => inputRef.current?.focus()}>
           <Animated.Text
-            style={animatedStyle}
-            className="text-accent-foreground font-mono-semibold text-balance-highlight"
+            style={[animatedStyle, { color: INK }]}
+            className="font-mono-semibold text-balance-highlight"
           >
             {formatBRL(initialBalance)}
           </Animated.Text>
-          <View className="bg-accent-foreground/30 mt-2 h-0.5" />
+          <View
+            style={{ backgroundColor: "rgba(255,255,255,0.30)" }}
+            className="mt-2 h-0.5"
+          />
           <TextInput
             ref={inputRef}
             value={String(initialBalance)}
@@ -95,7 +114,10 @@ export default function SaldoScreen() {
           />
         </Pressable>
 
-        <Text className="text-accent-foreground mt-8 text-sm leading-relaxed">
+        <Text
+          style={{ color: INK_MUTED }}
+          className="mt-8 text-sm leading-relaxed"
+        >
           Olha pra sua conta corrente do dia a dia. Aquela onde caem salários,
           sai aluguel, mercado, gasolina.
           {"\n\n"}
@@ -106,8 +128,13 @@ export default function SaldoScreen() {
         </Text>
 
         {error && (
-          <View className="bg-danger/20 mt-5 rounded-xl px-4 py-3">
-            <Text className="text-danger text-sm">{error.message}</Text>
+          <View
+            style={{ backgroundColor: G.redSoftBg }}
+            className="mt-5 rounded-xl px-4 py-3"
+          >
+            <Text style={{ color: G.redSoftText }} className="text-sm">
+              {error.message}
+            </Text>
           </View>
         )}
       </View>
@@ -117,15 +144,18 @@ export default function SaldoScreen() {
           onPress={handleConcluir}
           isIconOnly={isPending}
           isDisabled={isPending}
-          className="bg-accent-foreground h-14 rounded-4xl"
+          style={{ backgroundColor: INK }}
+          className="h-14 rounded-4xl"
         >
           <Button.Label>
             {isPending ? (
               <Animated.View style={spinStyle}>
-                <LoaderCircle color="#000" size={20} />
+                <LoaderCircle color={BG} size={20} />
               </Animated.View>
             ) : (
-              <Text className="text-foreground font-semibold">Concluir</Text>
+              <Text style={{ color: BG }} className="font-semibold">
+                Concluir
+              </Text>
             )}
           </Button.Label>
         </Button>

@@ -1,20 +1,22 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Button, useToast } from "heroui-native";
+import { ChevronLeft } from "lucide-react-native";
 import { useState } from "react";
 import {
   KeyboardAvoidingView,
   Text,
   TouchableOpacity,
   View,
+  useColorScheme,
 } from "react-native";
 
 import { CurrencyInput } from "@/src/components/ui/CurrencyInput";
 import { Screen } from "@/src/components/ui/Screen";
+import { colorsForScheme } from "@/src/lib/designTokens";
 import {
   type CategorySlug,
   useOnboardingStore,
 } from "@/src/stores/useOnboardingStore";
-import { ChevronLeft } from "lucide-react-native";
 
 type Step = {
   slug: CategorySlug;
@@ -70,6 +72,8 @@ const STEPS: Step[] = [
 export default function CategoryStepScreen() {
   const { step } = useLocalSearchParams<{ step: string }>();
   const router = useRouter();
+  const scheme = useColorScheme();
+  const c = colorsForScheme(scheme);
   const { categories, setCategory } = useOnboardingStore();
   const { toast } = useToast();
 
@@ -117,20 +121,24 @@ export default function CategoryStepScreen() {
             hitSlop={12}
             activeOpacity={0.7}
           >
-            <ChevronLeft size={22} color="#13251a" strokeWidth={2} />
+            <ChevronLeft size={22} color={c.green} strokeWidth={2} />
           </TouchableOpacity>
 
           <View className="flex-row items-center gap-1.5">
             {STEPS.map((_, i) => (
               <View
                 key={i}
-                className={
-                  i < currentIndex
-                    ? "bg-foreground h-1.5 w-4 rounded-full opacity-30"
-                    : i === currentIndex
-                      ? "bg-foreground h-1.5 w-4 rounded-full"
-                      : "bg-surface-tertiary h-1.5 w-1.5 rounded-full"
-                }
+                style={{
+                  backgroundColor:
+                    i === currentIndex
+                      ? c.green
+                      : i < currentIndex
+                        ? c.hairStrong
+                        : c.hair,
+                  height: 6,
+                  width: i === currentIndex ? 16 : 6,
+                  borderRadius: 99,
+                }}
               />
             ))}
           </View>

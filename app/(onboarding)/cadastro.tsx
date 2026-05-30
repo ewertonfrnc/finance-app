@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import { Button } from "heroui-native";
 import { Eye, EyeOff } from "lucide-react-native";
 import { useRef, useState } from "react";
 import {
@@ -8,15 +9,18 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useColorScheme,
 } from "react-native";
 
 import { Screen } from "@/src/components/ui/Screen";
 import { registerSchema } from "@/src/features/auth/schemas";
+import { colorsForScheme } from "@/src/lib/designTokens";
 import { useOnboardingStore } from "@/src/stores/useOnboardingStore";
-import { Button } from "heroui-native";
 
 export default function CadastroScreen() {
   const router = useRouter();
+  const scheme = useColorScheme();
+  const c = colorsForScheme(scheme);
   const setCredentials = useOnboardingStore((s) => s.setCredentials);
 
   const [name, setName] = useState("");
@@ -86,7 +90,7 @@ export default function CadastroScreen() {
                 value={name}
                 onChangeText={setName}
                 placeholder="Seu nome aqui"
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor={c.faint}
                 autoCapitalize="words"
                 returnKeyType="next"
                 onSubmitEditing={() => emailRef.current?.focus()}
@@ -108,7 +112,7 @@ export default function CadastroScreen() {
                 value={email}
                 onChangeText={setEmail}
                 placeholder="seu@email.com"
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor={c.faint}
                 autoCapitalize="none"
                 keyboardType="email-address"
                 returnKeyType="next"
@@ -136,7 +140,7 @@ export default function CadastroScreen() {
                   value={password}
                   onChangeText={setPassword}
                   placeholder="Mínimo 8 caracteres"
-                  placeholderTextColor="#9ca3af"
+                  placeholderTextColor={c.faint}
                   secureTextEntry={!showPassword}
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit}
@@ -148,9 +152,9 @@ export default function CadastroScreen() {
                   activeOpacity={0.7}
                 >
                   {showPassword ? (
-                    <EyeOff size={18} color="#9ca3af" />
+                    <EyeOff size={18} color={c.faint} />
                   ) : (
-                    <Eye size={18} color="#9ca3af" />
+                    <Eye size={18} color={c.faint} />
                   )}
                 </TouchableOpacity>
               </View>
@@ -176,9 +180,7 @@ export default function CadastroScreen() {
           <Button variant="ghost" onPress={() => router.push("/(auth)/login")}>
             <Button.Label className="text-muted text-sm">
               Já tem cadastro?{" "}
-              <Text className="text-foreground font-medium underline">
-                Entrar
-              </Text>
+              <Text className="text-link font-medium underline">Entrar</Text>
             </Button.Label>
           </Button>
         </View>

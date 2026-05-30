@@ -7,8 +7,10 @@ import {
 } from "@gorhom/bottom-sheet";
 import { Check, Trash2, X } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Alert, Pressable, Text, View, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { colorsForScheme } from "@/src/lib/designTokens";
 
 import { TAG_COLOR_PALETTE } from "../constants";
 import { useTagForm } from "../hooks/useTagForm";
@@ -35,6 +37,9 @@ export function TagFormModal({
   const sheetRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ["88%"], []);
   const { bottom } = useSafeAreaInsets();
+
+  const scheme = useColorScheme();
+  const c = colorsForScheme(scheme);
 
   const {
     name,
@@ -105,7 +110,7 @@ export function TagFormModal({
           <View className="flex-row items-center gap-4">
             {mode === "edit" && (
               <Pressable onPress={handleDelete} disabled={isPending}>
-                <Trash2 size={18} color="#ef4444" />
+                <Trash2 size={18} color={c.red} />
               </Pressable>
             )}
             <Pressable onPress={() => sheetRef.current?.dismiss()}>
@@ -121,7 +126,7 @@ export function TagFormModal({
           className="text-foreground text-input py-2 font-medium"
           style={{
             borderBottomWidth: 1.5,
-            borderBottomColor: hasError ? "#ef4444" : "#cccccc",
+            borderBottomColor: hasError ? c.red : c.hairStrong,
           }}
           placeholder="Como vamos chamar essa tag?"
           value={name}

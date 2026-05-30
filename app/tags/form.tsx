@@ -14,9 +14,10 @@ import {
 
 import { Screen } from "@/src/components/ui/Screen";
 import { TagBadge } from "@/src/features/tags/components/TagBadge";
-import { TAG_COLOR_PALETTE } from "@/src/features/tags/constants";
+import { TAG_COLOR_PALETTE, getTagColors } from "@/src/features/tags/constants";
 import { useTagForm } from "@/src/features/tags/hooks/useTagForm";
 import { useTags } from "@/src/features/tags/hooks/useTags";
+import { colorsForScheme } from "@/src/lib/designTokens";
 import { useDateStore } from "@/src/stores/useDateStore";
 
 const MAX_TAGS = 100;
@@ -28,7 +29,8 @@ export default function TagFormScreen() {
   }>();
   const router = useRouter();
   const scheme = useColorScheme();
-  const mutedColor = scheme === "dark" ? "#6b8c78" : "#7a9485";
+  const c = colorsForScheme(scheme);
+  const mutedColor = c.mute;
 
   const { selectedYear, selectedMonth } = useDateStore();
   const { data: tags = [] } = useTags(selectedYear, selectedMonth);
@@ -79,7 +81,7 @@ export default function TagFormScreen() {
               disabled={isPending}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Trash2 size={18} color="#ef4444" />
+              <Trash2 size={18} color={c.red} />
             </Pressable>
           )}
           <Pressable
@@ -101,7 +103,7 @@ export default function TagFormScreen() {
           className="text-foreground text-input py-2 font-medium"
           style={{
             borderBottomWidth: 1.5,
-            borderBottomColor: hasError ? "#ef4444" : "#cccccc",
+            borderBottomColor: hasError ? c.red : c.hairStrong,
           }}
           placeholder="Como vamos chamar essa tag?"
           value={name}
@@ -180,7 +182,7 @@ export default function TagFormScreen() {
         animationType="fade"
         onRequestClose={() => setShowDeleteConfirm(false)}
       >
-        <View style={styles.modalContainer}>
+        <View style={[styles.modalContainer, { backgroundColor: c.overlayDelete }]}>
           <Pressable
             style={StyleSheet.absoluteFillObject}
             onPress={() => setShowDeleteConfirm(false)}
@@ -197,7 +199,11 @@ export default function TagFormScreen() {
             {(tag?.transactionCount ?? 0) > 0 && (
               <View className="bg-surface-secondary mb-6 flex-row items-center gap-2 rounded-xl px-4 py-3">
                 <View
-                  style={{ backgroundColor: tag?.color }}
+                  style={{
+                    backgroundColor: tag?.color
+                      ? getTagColors(tag.color).dot
+                      : c.hair,
+                  }}
                   className="h-1.5 w-1.5 rounded-full"
                 />
                 <Text className="text-muted text-sm">
@@ -219,7 +225,8 @@ export default function TagFormScreen() {
                 <Text className="text-foreground font-semibold">Cancelar</Text>
               </Pressable>
               <Pressable
-                className="flex-1 items-center rounded-full bg-red-600 py-3.5"
+                style={{ backgroundColor: c.red }}
+                className="flex-1 items-center rounded-full py-3.5"
                 onPress={confirmDelete}
                 disabled={isDeleting}
               >
@@ -235,10 +242,10 @@ export default function TagFormScreen() {
   );
 }
 
+// overlay color is scheme-dependent; see modalOverlayColor below
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.45)",
   },
 });

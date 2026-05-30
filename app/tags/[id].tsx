@@ -9,6 +9,8 @@ import {
 import { useState } from "react";
 import { FlatList, Pressable, Text, View, useColorScheme } from "react-native";
 
+import { colorsForScheme } from "@/src/lib/designTokens";
+
 import { TransactionItem } from "@/src/components/transactions/TransactionItem";
 import { Screen } from "@/src/components/ui/Screen";
 import { TagFormModal } from "@/src/features/tags/components/TagFormModal";
@@ -25,8 +27,9 @@ export default function TagDetailScreen() {
   const [showEdit, setShowEdit] = useState(false);
   const router = useRouter();
   const scheme = useColorScheme();
-  const mutedColor = scheme === "dark" ? "#6b8c78" : "#7a9485";
-  const accentColor = scheme === "dark" ? "#5ab87a" : "#1e3d2b";
+  const c = colorsForScheme(scheme);
+  const mutedColor = c.mute;
+  const accentColor = c.green;
 
   const { selectedYear, selectedMonth, goToPrevMonth, goToNextMonth } =
     useDateStore();
@@ -96,7 +99,10 @@ export default function TagDetailScreen() {
             >
               {tag.name}
             </Text>
-            <Text className="text-muted text-xs">
+            <Text
+              className="text-xs"
+              style={{ color: tagColors?.ink, opacity: 0.65 }}
+            >
               {transactions.length} lançamento
               {transactions.length !== 1 ? "s" : ""} ·{" "}
               {formatBRL(tag.monthlyTotal)}
