@@ -23,6 +23,7 @@ interface EditScopeSheetProps {
   isPending: boolean;
   onClose: () => void;
   onConfirm: (scope: RecurrenceScope) => void;
+  recurrenceLabel?: string;
 }
 
 export function EditScopeSheet(props: EditScopeSheetProps) {

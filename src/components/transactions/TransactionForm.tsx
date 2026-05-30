@@ -31,6 +31,7 @@ interface TransactionFormProps {
   isLoading?: boolean;
   isDeleting?: boolean;
   tagField?: React.ReactNode;
+  header?: React.ReactNode;
   children?: React.ReactNode;
 }
 
@@ -52,6 +53,7 @@ export function TransactionForm({
   isLoading = false,
   isDeleting = false,
   tagField,
+  header,
   children,
 }: TransactionFormProps) {
   const router = useRouter();
@@ -117,6 +119,8 @@ export function TransactionForm({
         showsVerticalScrollIndicator={false}
         contentContainerClassName="gap-6 pb-8"
       >
+        {header}
+
         {/* Tipo */}
         <View className="gap-2">
           <Text className="text-muted text-xs font-semibold tracking-widest">

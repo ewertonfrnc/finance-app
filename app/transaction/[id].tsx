@@ -10,7 +10,9 @@ import { useInvalidateTagData } from "@/src/features/tags/hooks/useInvalidateTag
 import { useTagPickerSync } from "@/src/features/tags/hooks/useTagPickerSync";
 import { DeleteScopeSheet } from "@/src/features/transactions/components/DeleteScopeSheet";
 import { EditScopeSheet } from "@/src/features/transactions/components/EditScopeSheet";
+import { SeriesBadge } from "@/src/features/transactions/components/SeriesBadge";
 import { SeriesOriginNotice } from "@/src/features/transactions/components/SeriesOriginNotice";
+import { formatRecurrenceLabel } from "@/src/features/transactions/constants";
 import { useDeleteTransaction } from "@/src/features/transactions/hooks/useDeleteTransaction";
 import { useInvalidateTransactionData } from "@/src/features/transactions/hooks/useInvalidateTransactionData";
 import { useTransaction } from "@/src/features/transactions/hooks/useTransaction";
@@ -160,6 +162,14 @@ export default function EditTransactionScreen() {
         onDelete={handleDelete}
         isLoading={isUpdating}
         isDeleting={isDeleting}
+        header={
+          isRecurring ? (
+            <SeriesBadge
+              recurrence={transaction.recurrence}
+              endDate={transaction.recurrenceEndDate}
+            />
+          ) : null
+        }
         tagField={
           <TagField
             selectedTagIds={selectedTagIds}
@@ -173,6 +183,7 @@ export default function EditTransactionScreen() {
       {showDeleteSheet ? (
         <DeleteScopeSheet
           isPending={isDeleting}
+          recurrenceLabel={formatRecurrenceLabel(transaction.recurrence)}
           onClose={() => setShowDeleteSheet(false)}
           onConfirm={handleDeleteWithScope}
         />
@@ -180,6 +191,7 @@ export default function EditTransactionScreen() {
       {showEditSheet ? (
         <EditScopeSheet
           isPending={isUpdating}
+          recurrenceLabel={formatRecurrenceLabel(transaction.recurrence)}
           onClose={() => setShowEditSheet(false)}
           onConfirm={handleUpdateWithScope}
         />

@@ -1,5 +1,5 @@
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
-import { ChevronRight } from "lucide-react-native";
+import { AlertTriangle, ChevronRight, Repeat } from "lucide-react-native";
 import { useEffect, useRef } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -7,13 +7,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { renderSheetBackdrop } from "@/src/components/ui/SheetBackdrop";
 import type { RecurrenceScope } from "@/src/features/transactions/types";
 
-const SNAP_POINTS = ["42%"];
+const SNAP_POINTS = ["46%"];
 
 export interface ScopeOption {
   scope: RecurrenceScope;
   label: string;
   desc: string;
-  tone?: "default" | "danger";
+  tone?: "default" | "danger" | "warn";
 }
 
 interface ScopeSheetProps {
@@ -22,6 +22,8 @@ interface ScopeSheetProps {
   isPending: boolean;
   onClose: () => void;
   onConfirm: (scope: RecurrenceScope) => void;
+  /** Rótulo da recorrência da série (ex.: "todo mês"). Exibe o chip de contexto no topo. */
+  recurrenceLabel?: string;
 }
 
 /**
@@ -35,6 +37,7 @@ export function ScopeSheet({
   isPending,
   onClose,
   onConfirm,
+  recurrenceLabel,
 }: ScopeSheetProps) {
   const sheetRef = useRef<BottomSheetModal>(null);
   const { bottom } = useSafeAreaInsets();
@@ -53,6 +56,15 @@ export function ScopeSheet({
       onDismiss={onClose}
     >
       <BottomSheetView className="px-5 pt-1 pb-6">
+        {recurrenceLabel ? (
+          <View className="bg-success/15 mb-3 flex-row items-center gap-1.5 self-start rounded-full px-2.5 py-1">
+            <Repeat size={12} className="text-success" />
+            <Text className="text-success text-xs font-semibold">
+              {recurrenceLabel}
+            </Text>
+          </View>
+        ) : null}
+
         <Text className="text-foreground mb-4 text-lg font-semibold">
           {title}
         </Text>
@@ -60,6 +72,7 @@ export function ScopeSheet({
         <View className="gap-2">
           {options.map((option, index) => {
             const danger = option.tone === "danger";
+            const warn = option.tone === "warn";
             return (
               <Pressable
                 key={option.scope}
@@ -68,26 +81,40 @@ export function ScopeSheet({
                 className={`flex-row items-center gap-3 rounded-2xl border px-4 py-3 ${
                   danger
                     ? "border-danger/30 bg-danger/5"
-                    : "border-surface-tertiary"
+                    : warn
+                      ? "border-accent/40 bg-accent/10"
+                      : "border-surface-tertiary"
                 } ${isPending ? "opacity-50" : ""}`}
               >
                 <View
                   className={`h-6 w-6 items-center justify-center rounded-full ${
-                    danger ? "bg-danger/15" : "bg-surface-secondary"
+                    danger
+                      ? "bg-danger/15"
+                      : warn
+                        ? "bg-accent/20"
+                        : "bg-surface-secondary"
                   }`}
                 >
-                  <Text
-                    className={`text-xs font-semibold ${
-                      danger ? "text-danger" : "text-muted"
-                    }`}
-                  >
-                    {index + 1}
-                  </Text>
+                  {warn ? (
+                    <AlertTriangle size={13} className="text-accent" />
+                  ) : (
+                    <Text
+                      className={`text-xs font-semibold ${
+                        danger ? "text-danger" : "text-muted"
+                      }`}
+                    >
+                      {index + 1}
+                    </Text>
+                  )}
                 </View>
                 <View className="flex-1">
                   <Text
                     className={`text-base font-semibold ${
-                      danger ? "text-danger" : "text-foreground"
+                      danger
+                        ? "text-danger"
+                        : warn
+                          ? "text-accent"
+                          : "text-foreground"
                     }`}
                   >
                     {option.label}
@@ -96,7 +123,13 @@ export function ScopeSheet({
                 </View>
                 <ChevronRight
                   size={18}
-                  className={danger ? "text-danger" : "text-muted"}
+                  className={
+                    danger
+                      ? "text-danger"
+                      : warn
+                        ? "text-accent"
+                        : "text-muted"
+                  }
                 />
               </Pressable>
             );

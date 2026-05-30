@@ -10,7 +10,8 @@ const OPTIONS: ScopeOption[] = [
   {
     scope: "following",
     label: "Este e os próximos",
-    desc: "Remove este e todos os próximos lançamentos.",
+    desc: "Remove este e todos os próximos lançamentos. Não dá pra desfazer em massa.",
+    tone: "warn",
   },
   {
     scope: "all",
@@ -24,6 +25,7 @@ interface DeleteScopeSheetProps {
   isPending: boolean;
   onClose: () => void;
   onConfirm: (scope: RecurrenceScope) => void;
+  recurrenceLabel?: string;
 }
 
 export function DeleteScopeSheet(props: DeleteScopeSheetProps) {
