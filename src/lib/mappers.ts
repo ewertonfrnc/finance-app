@@ -21,6 +21,8 @@ export function mapApiTransaction(raw: ApiTransaction): Transaction {
     recurrence: raw.recurrence ?? "none", // fallback p/ respostas antigas em cache
     seriesId: raw.series_id,
     recurrenceEndDate: raw.recurrence_end_date,
+    sourceSeriesId: raw.source_series_id,
+    sourceOccurrenceDate: raw.source_occurrence_date,
     // Ocorrências de uma série compartilham o mesmo id; a chave precisa da data.
     occurrenceKey: raw.series_id ? `${raw.series_id}:${date}` : raw.id,
   };

@@ -21,6 +21,8 @@ export interface Transaction {
   recurrence: RecurrenceType;
   seriesId?: string; // id da série recorrente (ausente em avulsas)
   recurrenceEndDate?: string; // "YYYY-MM-DD" ou ausente
+  sourceSeriesId?: string; // série de origem, se for avulsa editada via "single"
+  sourceOccurrenceDate?: string; // "YYYY-MM-DD" — data original da ocorrência substituída
   occurrenceKey: string; // chave única por ocorrência p/ keyExtractor
 }
 

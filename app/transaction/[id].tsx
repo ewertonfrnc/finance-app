@@ -7,10 +7,10 @@ import { TransactionForm } from "@/src/components/transactions/TransactionForm";
 import { Screen } from "@/src/components/ui/Screen";
 import { TagField } from "@/src/features/tags/components/TagField";
 import { useInvalidateTagData } from "@/src/features/tags/hooks/useInvalidateTagData";
-import { useSetTransactionTags } from "@/src/features/tags/hooks/useSetTransactionTags";
 import { useTagPickerSync } from "@/src/features/tags/hooks/useTagPickerSync";
 import { DeleteScopeSheet } from "@/src/features/transactions/components/DeleteScopeSheet";
 import { EditScopeSheet } from "@/src/features/transactions/components/EditScopeSheet";
+import { SeriesOriginNotice } from "@/src/features/transactions/components/SeriesOriginNotice";
 import { useDeleteTransaction } from "@/src/features/transactions/hooks/useDeleteTransaction";
 import { useInvalidateTransactionData } from "@/src/features/transactions/hooks/useInvalidateTransactionData";
 import { useTransaction } from "@/src/features/transactions/hooks/useTransaction";
@@ -35,7 +35,6 @@ export default function EditTransactionScreen() {
   const { data: transaction, isLoading } = useTransaction(id);
   const { mutate: update, isPending: isUpdating } = useUpdateTransaction();
   const { mutate: remove, isPending: isDeleting } = useDeleteTransaction();
-  const { mutateAsync: setTags } = useSetTransactionTags();
   const invalidate = useInvalidateTransactionData();
   const invalidateTags = useInvalidateTagData();
 
@@ -69,6 +68,10 @@ export default function EditTransactionScreen() {
           amount: values.amountCents,
           description: values.description,
           date: values.date,
+          // Tags viajam no próprio PATCH: o backend decide o row alvo conforme o
+          // scope (single/following criam novo row e tagueiam ele; "all" e avulsa
+          // tagueiam o que permanece). Evita taguear o template antigo.
+          tags: selectedTagIds,
           // Escopo viaja no CORPO do PATCH (≠ delete, que usa query).
           // instance_date = data da ocorrência da rota, não a do template.
           ...(scope ? { scope, instance_date: effectiveOccurrenceDate } : {}),
@@ -76,13 +79,14 @@ export default function EditTransactionScreen() {
       },
       {
         onSuccess: async () => {
-          // Tags só fazem sentido no row que permanece: avulsa ou template
-          // (scope "all"). "single"/"following" criam novos rows cujos IDs o
-          // app não recebe — setá-las no template corromperia a série.
-          if (!scope || scope === "all") {
-            await setTags({ transactionId: id, tagIds: selectedTagIds });
-          }
-          await Promise.all([invalidate(), invalidateTags()]);
+          await Promise.all([
+            invalidate(),
+            invalidateTags(),
+            // Detalhe do row editado (avulsa/"all") pode ter tags stale.
+            queryClient.invalidateQueries({
+              queryKey: queryKeys.transaction(userId, id),
+            }),
+          ]);
           setShowEditSheet(false);
           router.back();
         },
@@ -157,6 +161,7 @@ export default function EditTransactionScreen() {
         isLoading={isUpdating}
         isDeleting={isDeleting}
       >
+        {transaction.sourceSeriesId ? <SeriesOriginNotice /> : null}
         <TagField
           selectedTagIds={selectedTagIds}
           onChangeTagIds={setSelectedTagIds}

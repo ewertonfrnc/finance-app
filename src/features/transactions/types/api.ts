@@ -27,6 +27,9 @@ export interface ApiTransaction {
   recurrence: RecurrenceType;
   series_id?: string;
   recurrence_end_date?: string;
+  // Origem de uma avulsa criada por edição "single": vínculo com a série original.
+  source_series_id?: string;
+  source_occurrence_date?: string;
 }
 
 export interface ApiListTransactionsParams {
@@ -41,6 +44,7 @@ export interface ApiCreateTransactionPayload {
   amount: number;
   description: string;
   date: string;
+  tags?: string[];
   recurrence?: RecurrenceType;
   recurrence_end_date?: string;
 }
@@ -50,6 +54,7 @@ export interface ApiUpdateTransactionPayload {
   amount?: number;
   description?: string;
   date?: string;
+  tags?: string[];
   scope?: RecurrenceScope;
   instance_date?: string;
 }
