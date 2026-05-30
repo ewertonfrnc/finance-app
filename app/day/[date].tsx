@@ -1,7 +1,14 @@
 import { format, parseISO } from "date-fns";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { FlatList, Pressable, ScrollView, Text, View, useColorScheme } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+  useColorScheme,
+} from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { useToast } from "heroui-native";
@@ -21,11 +28,27 @@ import { transactionDetailHref } from "@/src/lib/transactionHref";
 const TODAY = format(new Date(), "yyyy-MM-dd");
 
 const PROJECTION_CARD_COLORS = {
-  light: { bg: "#dbf4e7", title: "#185b43", badge: "#b8ecd4", badgeText: "#114d36", bullet: "#2d6b4e" },
-  dark:  { bg: "#1a3f31", title: "#a6efca", badge: "#214f3c", badgeText: "#baf5d7", bullet: "#7edcb0" },
+  light: {
+    bg: "#dbf4e7",
+    title: "#185b43",
+    badge: "#b8ecd4",
+    badgeText: "#114d36",
+    bullet: "#2d6b4e",
+  },
+  dark: {
+    bg: "#1a3f31",
+    title: "#a6efca",
+    badge: "#214f3c",
+    badgeText: "#baf5d7",
+    bullet: "#7edcb0",
+  },
 } as const;
 
-function DailyProjectionCard({ date, amount, onAdjustPress }: {
+function DailyProjectionCard({
+  date,
+  amount,
+  onAdjustPress,
+}: {
   date: string;
   amount: number;
   onAdjustPress: () => void;
@@ -35,40 +58,74 @@ function DailyProjectionCard({ date, amount, onAdjustPress }: {
   const dayLabel = format(parseISO(date), "dd/MM");
 
   return (
-    <View style={{ backgroundColor: c.bg }} className="mx-4 mb-2 mt-3 rounded-xl px-4 py-3 gap-2">
+    <View
+      style={{ backgroundColor: c.bg }}
+      className="mx-4 mt-3 mb-2 gap-2 rounded-xl px-4 py-3"
+    >
       <View className="flex-row items-center gap-2">
-        <Text style={{ color: c.title }} className="flex-1 font-medium text-sm">
+        <Text style={{ color: c.title }} className="flex-1 text-sm font-medium">
           Diário previsto
         </Text>
-        <View style={{ backgroundColor: c.badge }} className="rounded px-1.5 py-0.5">
-          <Text style={{ color: c.badgeText }} className="text-xs font-medium tracking-wide">
+        <View
+          style={{ backgroundColor: c.badge }}
+          className="rounded px-1.5 py-0.5"
+        >
+          <Text
+            style={{ color: c.badgeText }}
+            className="text-xs font-medium tracking-wide"
+          >
             PREVISÃO
           </Text>
         </View>
-        <CurrencyText value={amount} variant="small" sign="negative" style={{ color: c.title }} />
+        <CurrencyText
+          value={amount}
+          variant="small"
+          sign="negative"
+          style={{ color: c.title }}
+        />
       </View>
 
       <View className="gap-1.5">
         <View className="flex-row gap-1.5">
-          <Text style={{ color: c.bullet }} className="text-xs leading-5">•</Text>
-          <Text style={{ color: c.bullet }} className="flex-1 text-xs leading-5">
-            No dia <Text className="font-semibold">{dayLabel}</Text> será descontado este previsto{" "}
+          <Text style={{ color: c.bullet }} className="text-xs leading-5">
+            •
+          </Text>
+          <Text
+            style={{ color: c.bullet }}
+            className="flex-1 text-xs leading-5"
+          >
+            No dia <Text className="font-semibold">{dayLabel}</Text> será
+            descontado este previsto{" "}
             <Text className="font-semibold">somado</Text> ao que você lançar.
           </Text>
         </View>
         <View className="flex-row gap-1.5">
-          <Text style={{ color: c.bullet }} className="text-xs leading-5">•</Text>
-          <Text style={{ color: c.bullet }} className="flex-1 text-xs leading-5">
+          <Text style={{ color: c.bullet }} className="text-xs leading-5">
+            •
+          </Text>
+          <Text
+            style={{ color: c.bullet }}
+            className="flex-1 text-xs leading-5"
+          >
             Quando o dia chegar, o previsto{" "}
-            <Text className="font-semibold">zera à meia-noite</Text> — fica só o que foi lançado.
+            <Text className="font-semibold">zera à meia-noite</Text> — fica só o
+            que foi lançado.
           </Text>
         </View>
         <View className="flex-row gap-1.5">
-          <Text style={{ color: c.bullet }} className="text-xs leading-5">•</Text>
-          <Text style={{ color: c.bullet }} className="flex-1 text-xs leading-5">
+          <Text style={{ color: c.bullet }} className="text-xs leading-5">
+            •
+          </Text>
+          <Text
+            style={{ color: c.bullet }}
+            className="flex-1 text-xs leading-5"
+          >
             Vem da sua previsão mensal de diários.{" "}
             <Pressable onPress={onAdjustPress} hitSlop={8}>
-              <Text style={{ color: c.title }} className="text-xs font-semibold underline">
+              <Text
+                style={{ color: c.title }}
+                className="text-xs font-semibold underline"
+              >
                 Toque para ajustar.
               </Text>
             </Pressable>
@@ -157,10 +214,7 @@ export default function DayScreen() {
     externalGestureToFail: filterScrollGesture,
   });
 
-  function navigateToDay(
-    targetDate: string,
-    direction: "prev" | "next",
-  ) {
+  function navigateToDay(targetDate: string, direction: "prev" | "next") {
     startTransition(() => router.replace(`/day/${targetDate}`), direction);
   }
 
@@ -195,7 +249,7 @@ export default function DayScreen() {
       {/* Saldo fim do dia */}
       <View className="flex-row justify-between px-4 py-4">
         <View className="items-center">
-          <Text className="text-muted mb-1 text-xs">
+          <Text className="text-muted text-body-small mb-1">
             Ontem · {formatDayHeader(prevDate)}
           </Text>
           {yesterdayBalance !== null ? (
@@ -206,7 +260,7 @@ export default function DayScreen() {
         </View>
 
         <View className="items-center">
-          <Text className="text-muted mb-1 text-xs tracking-widest uppercase">
+          <Text className="text-muted text-label mb-1 font-semibold tracking-widest uppercase">
             Saldo · Fim do dia
           </Text>
           {todayBalance !== null ? (
@@ -217,7 +271,7 @@ export default function DayScreen() {
         </View>
 
         <View className="items-center">
-          <Text className="text-muted mb-1 text-xs">
+          <Text className="text-muted text-body-small mb-1">
             Amanhã · {formatDayHeader(nextDate)}
           </Text>
           {tomorrowBalance !== null ? (
@@ -233,15 +287,21 @@ export default function DayScreen() {
       {/* Resumo de fluxo */}
       <View className="flex-row px-4 py-4">
         <View className="flex-1">
-          <Text className="text-muted mb-1 text-xs">ENTRADAS</Text>
+          <Text className="text-muted text-label mb-1 font-semibold tracking-widest">
+            ENTRADAS
+          </Text>
           <CurrencyText value={income} variant="small" sign="positive" />
         </View>
         <View className="flex-1 items-center">
-          <Text className="text-muted mb-1 text-xs">SAÍDAS</Text>
+          <Text className="text-muted text-label mb-1 font-semibold tracking-widest">
+            SAÍDAS
+          </Text>
           <CurrencyText value={expenses} variant="small" sign="negative" />
         </View>
         <View className="flex-1 items-end">
-          <Text className="text-muted mb-1 text-xs">LÍQUIDO</Text>
+          <Text className="text-muted text-label mb-1 font-semibold tracking-widest">
+            LÍQUIDO
+          </Text>
           <CurrencyText value={net} variant="small" />
         </View>
       </View>
@@ -297,7 +357,8 @@ export default function DayScreen() {
                       placement: "top",
                       duration: 3500,
                       label: "Em breve",
-                      description: "A tela de ajuste do diário será adicionada em breve.",
+                      description:
+                        "A tela de ajuste do diário será adicionada em breve.",
                     });
                   }}
                 />

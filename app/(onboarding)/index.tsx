@@ -24,16 +24,16 @@ export default function WelcomeScreen() {
       <View className="flex-1 justify-center">
         <View className="mb-8 flex-row items-center gap-2">
           <View className="bg-success h-2.5 w-2.5 rounded-full" />
-          <Text className="text-foreground text-xs font-medium tracking-widest uppercase">
+          <Text className="text-foreground text-step font-semibold tracking-widest uppercase">
             diário
           </Text>
         </View>
 
-        <Text className="text-foreground mb-5 text-4xl leading-tight font-semibold">
+        <Text className="text-foreground text-hero mb-5 font-bold">
           O quanto{"\n"}você pode{"\n"}gastar hoje?
         </Text>
 
-        <Text className="text-muted text-base leading-relaxed">
+        <Text className="text-muted text-[15px] leading-relaxed">
           Sem categorias intermináveis. Sem planilha.{"\n"}Um número simples por
           dia, e o saldo do{"\n"}mês cuidando de você.
         </Text>

@@ -94,7 +94,7 @@ function TransactionLines({
   if (lines.length === 0) {
     return (
       <View className="flex-row items-center justify-between opacity-35">
-        <Text className="text-muted text-xs">Sem lançamento</Text>
+        <Text className="text-muted text-body-small">Sem lançamento</Text>
         <CurrencyText value={0} variant="small" sign="neutral" />
       </View>
     );
@@ -104,7 +104,7 @@ function TransactionLines({
     <>
       {lines.map((cat) => (
         <View key={cat.type} className="flex-row items-center">
-          <Text className="text-muted flex-1 text-xs">{cat.label}</Text>
+          <Text className="text-muted text-body-small flex-1">{cat.label}</Text>
           {cat.type === "entrada" ? (
             <Animated.View style={entradaFadeStyle}>
               {hideEntrada ? (
@@ -250,7 +250,9 @@ export const DayRow = memo(function DayRow({
         {isToday && (
           <View className="bg-success absolute top-1 -right-1 h-1.5 w-1.5 rounded-full" />
         )}
-        <Text className="text-muted text-xs">{weekday}</Text>
+        <Text className="text-muted text-weekday font-medium tracking-wide uppercase">
+          {weekday}
+        </Text>
       </View>
 
       <View className={`flex-1 justify-center gap-1 py-2 ${futureOpacity}`}>

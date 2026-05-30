@@ -69,7 +69,7 @@ export default function TagFormScreen() {
   return (
     <Screen>
       <View className="flex-row items-center justify-between px-4 py-4">
-        <Text className="text-foreground text-lg font-semibold">
+        <Text className="text-foreground text-sheet-title font-bold">
           {isEdit ? "Editar tag" : "Criar tag"}
         </Text>
         <View className="flex-row items-center gap-4">
@@ -94,11 +94,11 @@ export default function TagFormScreen() {
       <View className="bg-surface-secondary h-px" />
 
       <ScrollView contentContainerClassName="px-6 pt-6 pb-10">
-        <Text className="text-muted mb-2 text-xs tracking-wider uppercase">
+        <Text className="text-muted text-label mb-2 font-semibold tracking-wider uppercase">
           Nome
         </Text>
         <TextInput
-          className="text-foreground py-2 text-base"
+          className="text-foreground text-input py-2 font-medium"
           style={{
             borderBottomWidth: 1.5,
             borderBottomColor: hasError ? "#ef4444" : "#cccccc",
@@ -122,7 +122,7 @@ export default function TagFormScreen() {
         </View>
 
         <View className="mb-3 flex-row items-center justify-between">
-          <Text className="text-muted text-xs tracking-wider uppercase">
+          <Text className="text-muted text-label font-semibold tracking-wider uppercase">
             Cor de fundo
           </Text>
           <Text className="text-muted text-xs">Toque pra escolher</Text>
@@ -153,7 +153,7 @@ export default function TagFormScreen() {
         </View>
 
         <View className="bg-surface-secondary mb-6 flex-row items-center gap-3 rounded-xl px-4 py-3">
-          <Text className="text-muted text-xs tracking-wider uppercase">
+          <Text className="text-muted text-label font-semibold tracking-wider uppercase">
             Prévia
           </Text>
           <TagBadge
@@ -193,7 +193,7 @@ export default function TagFormScreen() {
               <TagBadge name={tag?.name ?? ""} color={tag?.color ?? "#ccc"} />
             </View>
 
-            <Text className="text-foreground mb-2 text-xl font-bold">
+            <Text className="text-foreground text-sheet-title mb-2 font-bold">
               {`Excluir "${tag?.name}"?`}
             </Text>
 

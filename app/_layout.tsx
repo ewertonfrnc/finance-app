@@ -103,8 +103,10 @@ export default function RootLayout() {
     "Inter-Medium": require("../assets/fonts/inter/Inter_18pt-Medium.ttf"),
     "Inter-SemiBold": require("../assets/fonts/inter/Inter_18pt-SemiBold.ttf"),
     "Inter-Bold": require("../assets/fonts/inter/Inter_18pt-Bold.ttf"),
+    "Inter-ExtraBold": require("../assets/fonts/inter/Inter_18pt-ExtraBold.ttf"),
     "JetBrainsMono-Regular": require("../assets/fonts/jetbrains/JetBrainsMono-Regular.ttf"),
     "JetBrainsMono-Medium": require("../assets/fonts/jetbrains/JetBrainsMono-Medium.ttf"),
+    "JetBrainsMono-SemiBold": require("../assets/fonts/jetbrains/JetBrainsMono-SemiBold.ttf"),
   });
   const assetsReady = hasHydrated && (loaded || error);
 

@@ -64,10 +64,10 @@ export default function CadastroScreen() {
         >
           {/* Header */}
           <View className="mb-10">
-            <Text className="text-muted mb-2 text-xs font-medium tracking-widest uppercase">
+            <Text className="text-muted text-label mb-2 font-semibold tracking-widest uppercase">
               Crie sua conta
             </Text>
-            <Text className="text-foreground mb-3 text-2xl font-semibold">
+            <Text className="text-foreground text-heading mb-3 font-bold">
               Pra salvar tudo no seu nome.
             </Text>
             <Text className="text-muted text-sm leading-relaxed">
@@ -79,7 +79,7 @@ export default function CadastroScreen() {
           {/* Campos */}
           <View className="gap-8">
             <View className="gap-2">
-              <Text className="text-muted text-xs font-semibold tracking-widest uppercase">
+              <Text className="text-muted text-label font-semibold tracking-widest uppercase">
                 Nome
               </Text>
               <TextInput
@@ -90,7 +90,7 @@ export default function CadastroScreen() {
                 autoCapitalize="words"
                 returnKeyType="next"
                 onSubmitEditing={() => emailRef.current?.focus()}
-                className={`text-foreground border-b-2 py-2 text-base ${
+                className={`text-foreground text-input border-b-2 py-2 font-medium ${
                   nameError ? "border-danger" : "border-surface-tertiary"
                 }`}
               />
@@ -100,7 +100,7 @@ export default function CadastroScreen() {
             </View>
 
             <View className="gap-2">
-              <Text className="text-muted text-xs font-semibold tracking-widest uppercase">
+              <Text className="text-muted text-label font-semibold tracking-widest uppercase">
                 E-mail
               </Text>
               <TextInput
@@ -113,7 +113,7 @@ export default function CadastroScreen() {
                 keyboardType="email-address"
                 returnKeyType="next"
                 onSubmitEditing={() => passwordRef.current?.focus()}
-                className={`text-foreground border-b-2 py-2 text-base ${
+                className={`text-foreground text-input border-b-2 py-2 font-medium ${
                   emailError ? "border-danger" : "border-surface-tertiary"
                 }`}
               />
@@ -123,7 +123,7 @@ export default function CadastroScreen() {
             </View>
 
             <View className="gap-2">
-              <Text className="text-muted text-xs font-semibold tracking-widest uppercase">
+              <Text className="text-muted text-label font-semibold tracking-widest uppercase">
                 Senha
               </Text>
               <View
@@ -140,7 +140,7 @@ export default function CadastroScreen() {
                   secureTextEntry={!showPassword}
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit}
-                  className="text-foreground flex-1 py-2 text-base"
+                  className="text-foreground text-input flex-1 py-2 font-medium"
                 />
                 <TouchableOpacity
                   onPress={() => setShowPassword((v) => !v)}

@@ -87,7 +87,7 @@ export function CurrencyInput({
     <Pressable onPress={() => inputRef.current?.focus()}>
       <Animated.Text
         style={animatedTextStyle}
-        className="font-mono-medium text-5xl"
+        className="font-mono-semibold text-balance-highlight"
       >
         {formatBRL(value)}
       </Animated.Text>

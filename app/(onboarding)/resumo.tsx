@@ -29,11 +29,11 @@ export default function ResumoScreen() {
   return (
     <Screen className="px-6">
       <View className="flex-1 pt-10">
-        <Text className="text-muted mb-2 text-xs font-medium tracking-widest uppercase">
+        <Text className="text-muted text-step mb-2 font-semibold tracking-widest uppercase">
           Pronto
         </Text>
 
-        <Text className="text-foreground mb-10 text-2xl font-semibold">
+        <Text className="text-foreground text-heading mb-10 font-bold">
           Seu diário:
         </Text>
 
@@ -41,7 +41,7 @@ export default function ResumoScreen() {
         <View className="border-separator rounded-xl border p-4">
           <View className="mb-8 gap-5">
             <View className="flex-row items-center justify-between">
-              <Text className="text-muted text-xs font-medium tracking-widest uppercase">
+              <Text className="text-muted text-label font-semibold tracking-widest uppercase">
                 Total Mensal
               </Text>
               <CurrencyText
@@ -55,14 +55,14 @@ export default function ResumoScreen() {
 
             <View className="flex-row items-center justify-between gap-1">
               <View>
-                <Text className="text-link text-xs font-bold tracking-widest uppercase">
+                <Text className="text-link text-label font-bold tracking-widest uppercase">
                   Diário Previsto
                 </Text>
                 <Text className="text-muted text-xs">
                   ÷ {daysPerMonth} dias
                 </Text>
               </View>
-              <Text className="text-foreground font-mono-medium text-4xl">
+              <Text className="text-foreground font-mono-semibold text-balance-highlight">
                 {formatBRL(dailyBudget)}
               </Text>
             </View>

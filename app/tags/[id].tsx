@@ -56,7 +56,7 @@ export default function TagDetailScreen() {
           >
             <ChevronLeft size={20} color={mutedColor} />
           </Pressable>
-          <Text className="text-foreground px-2 text-base font-semibold">
+          <Text className="text-foreground text-month px-2 font-semibold">
             {formatMonthHeader(selectedYear, selectedMonth)}
           </Text>
           <Pressable
@@ -88,7 +88,7 @@ export default function TagDetailScreen() {
           />
           <View className="flex-1">
             <Text
-              className="text-foreground text-lg font-semibold"
+              className="text-foreground text-sheet-title font-bold"
               numberOfLines={1}
             >
               {tag.name}

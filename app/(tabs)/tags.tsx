@@ -32,7 +32,10 @@ function TagRow({ tag, onPress }: TagRowProps) {
     >
       <TagFlag color={tag.color} />
       <View className="flex-1">
-        <Text className="text-foreground text-base" numberOfLines={1}>
+        <Text
+          className="text-foreground text-transaction font-semibold"
+          numberOfLines={1}
+        >
           {tag.name}
         </Text>
       </View>
@@ -59,7 +62,7 @@ function EmptyState({ hasSearch, onCreatePress }: EmptyStateProps) {
 
   return (
     <View className="flex-1 items-center justify-center gap-4 px-8">
-      <Text className="text-foreground text-center text-lg font-semibold">
+      <Text className="text-foreground text-sheet-title text-center font-bold">
         Organize seus lançamentos
       </Text>
       <Text className="text-muted text-center text-sm">
@@ -115,7 +118,7 @@ export default function TagsScreen() {
       <View className="gap-2 px-4 pb-2">
         <View className="flex-row items-center justify-between pt-1">
           <View className="flex-row items-baseline gap-2">
-            <Text className="text-foreground text-xs font-semibold tracking-[2px]">
+            <Text className="text-foreground text-label font-semibold tracking-[2px]">
               TAGS
             </Text>
             <Text className="text-muted text-sm font-medium">

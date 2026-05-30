@@ -140,21 +140,23 @@ export default function CategoryStepScreen() {
             hitSlop={12}
             activeOpacity={0.7}
           >
-            <Text className="text-muted text-sm font-medium">Pular</Text>
+            <Text className="text-muted text-body-small font-medium">
+              Pular
+            </Text>
           </TouchableOpacity>
         </View>
 
         {/* Conteúdo */}
         <View className="flex-1 pt-6">
-          <Text className="text-muted mb-3 text-xs font-medium tracking-widest uppercase">
+          <Text className="text-muted text-step mb-3 font-semibold tracking-widest uppercase">
             {current.number} · {current.label}
           </Text>
 
-          <Text className="text-foreground mb-10 text-2xl leading-snug font-semibold">
+          <Text className="text-foreground text-heading mb-10 font-bold">
             {current.heading}
           </Text>
 
-          <Text className="text-muted mb-4 text-xs font-medium tracking-widest uppercase">
+          <Text className="text-muted text-label mb-4 font-semibold tracking-widest uppercase">
             Valor Mensal
           </Text>
 

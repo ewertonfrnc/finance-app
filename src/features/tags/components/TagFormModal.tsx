@@ -99,7 +99,7 @@ export function TagFormModal({
     >
       <BottomSheetScrollView contentContainerClassName="px-6 pt-2 pb-6">
         <View className="mb-5 flex-row items-center justify-between">
-          <Text className="text-foreground text-lg font-semibold">
+          <Text className="text-foreground text-sheet-title font-bold">
             {mode === "create" ? "Criar tag" : "Editar tag"}
           </Text>
           <View className="flex-row items-center gap-4">
@@ -114,11 +114,11 @@ export function TagFormModal({
           </View>
         </View>
 
-        <Text className="text-muted mb-2 text-xs tracking-wider uppercase">
+        <Text className="text-muted text-label mb-2 font-semibold tracking-wider uppercase">
           Nome
         </Text>
         <BottomSheetTextInput
-          className="text-foreground py-2 text-base"
+          className="text-foreground text-input py-2 font-medium"
           style={{
             borderBottomWidth: 1.5,
             borderBottomColor: hasError ? "#ef4444" : "#cccccc",
@@ -141,7 +141,7 @@ export function TagFormModal({
         </View>
 
         <View className="mb-3 flex-row items-center justify-between">
-          <Text className="text-muted text-xs tracking-wider uppercase">
+          <Text className="text-muted text-label font-semibold tracking-wider uppercase">
             Cor de fundo
           </Text>
           <Text className="text-muted text-xs">Toque pra escolher</Text>
@@ -172,7 +172,7 @@ export function TagFormModal({
         </View>
 
         <View className="bg-surface-secondary border-foreground/30 mb-6 flex-row items-center gap-3 rounded-xl border border-dotted px-4 py-3">
-          <Text className="text-muted text-xs tracking-wider uppercase">
+          <Text className="text-muted text-label font-semibold tracking-wider uppercase">
             Prévia
           </Text>
           <TagBadge

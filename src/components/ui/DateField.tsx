@@ -22,7 +22,7 @@ export function DateField({ value, onChange }: DateFieldProps) {
         onPress={() => sheetRef.current?.open()}
         className="border-surface-tertiary flex-row items-center justify-between border-b-2 pb-2"
       >
-        <Text className="font-mono-medium text-foreground text-xl">
+        <Text className="font-mono-medium text-foreground text-input">
           {formatFullDate(value)}
         </Text>
         <Calendar size={18} className="text-success" />

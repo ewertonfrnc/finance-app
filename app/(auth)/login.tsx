@@ -65,10 +65,10 @@ export default function LoginScreen() {
         >
           {/* Header */}
           <View className="mb-10">
-            <Text className="text-muted mb-2 text-xs font-medium tracking-widest uppercase">
+            <Text className="text-muted text-label mb-2 font-semibold tracking-widest uppercase">
               Bem-vindo de volta
             </Text>
-            <Text className="text-foreground text-2xl font-semibold">
+            <Text className="text-foreground text-heading font-bold">
               Entra na sua conta.
             </Text>
           </View>
@@ -76,7 +76,7 @@ export default function LoginScreen() {
           {/* Campos */}
           <View className="gap-8">
             <View className="gap-2">
-              <Text className="text-muted text-xs font-semibold tracking-widest uppercase">
+              <Text className="text-muted text-label font-semibold tracking-widest uppercase">
                 E-mail
               </Text>
               <TextInput
@@ -88,7 +88,7 @@ export default function LoginScreen() {
                 keyboardType="email-address"
                 returnKeyType="next"
                 onSubmitEditing={() => passwordRef.current?.focus()}
-                className={`text-foreground border-b-2 py-2 text-base ${
+                className={`text-foreground text-input border-b-2 py-2 font-medium ${
                   emailError ? "border-danger" : "border-surface-tertiary"
                 }`}
               />
@@ -98,7 +98,7 @@ export default function LoginScreen() {
             </View>
 
             <View className="gap-2">
-              <Text className="text-muted text-xs font-semibold tracking-widest uppercase">
+              <Text className="text-muted text-label font-semibold tracking-widest uppercase">
                 Senha
               </Text>
               <View
@@ -115,7 +115,7 @@ export default function LoginScreen() {
                   secureTextEntry={!showPassword}
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit}
-                  className="text-foreground flex-1 py-2 text-base"
+                  className="text-foreground text-input flex-1 py-2 font-medium"
                 />
                 <TouchableOpacity
                   onPress={() => setShowPassword((v) => !v)}

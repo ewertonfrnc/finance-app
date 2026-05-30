@@ -80,7 +80,7 @@ export default function SaldoScreen() {
         <Pressable onPress={() => inputRef.current?.focus()}>
           <Animated.Text
             style={animatedStyle}
-            className="text-accent-foreground font-mono-medium text-5xl"
+            className="text-accent-foreground font-mono-semibold text-balance-highlight"
           >
             {formatBRL(initialBalance)}
           </Animated.Text>

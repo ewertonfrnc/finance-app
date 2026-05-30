@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Finanças — Design System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:    #f7f8f6;
+  --card:  #ffffff;
+  --text:  oklch(0.18 0.01 160);
+  --mute:  oklch(0.50 0.005 160);
+  --faint: oklch(0.72 0.005 160);
+  --hair:  oklch(0.92 0.005 160);
+  --green: oklch(0.32 0.06 160);
+  --font:  Inter, system-ui, sans-serif;
+  --mono:  'JetBrains Mono', ui-monospace, monospace;
+}
+body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+
+/* layout */
+.wrap { max-width: 980px; margin: 0 auto; padding: 48px 32px 80px; }
+.page-title { font-size: 13px; font-weight: 600; color: var(--mute); letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 8px; }
+h1 { font-size: 36px; font-weight: 800; letter-spacing: -0.8px; line-height: 1.05; margin-bottom: 6px; }
+.subtitle { font-size: 15px; color: var(--mute); margin-bottom: 48px; }
+
+/* sections */
+section { margin-bottom: 56px; }
+.section-label { font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--mute); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--hair); }
+
+/* cards */
+.card { background: var(--card); border: 1px solid var(--hair); border-radius: 16px; padding: 20px 22px; }
+.card + .card { margin-top: 12px; }
+
+/* grids */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 640px) { .grid2, .grid3, .grid4 { grid-template-columns: 1fr 1fr; } }
+
+/* token row */
+.token-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--hair); }
+.token-row:last-child { border-bottom: none; }
+.token-swatch { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.06); }
+.token-name { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--text); min-width: 90px; }
+.token-value { font-family: var(--mono); font-size: 11px; color: var(--mute); flex: 1; }
+.token-label { font-size: 12px; color: var(--mute); }
+
+/* type specimen */
+.type-row { padding: 12px 0; border-bottom: 1px solid var(--hair); display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.type-row:last-child { border-bottom: none; }
+.type-meta { font-size: 11px; font-family: var(--mono); color: var(--faint); white-space: nowrap; }
+
+/* saldo tier table */
+.tier-row { display: grid; grid-template-columns: 120px 1fr 1fr 1fr 1fr; gap: 0; align-items: center; border-bottom: 1px solid var(--hair); }
+.tier-row:last-child { border-bottom: none; }
+.tier-cell { padding: 10px 12px; font-size: 12px; }
+.tier-label { font-size: 11px; color: var(--mute); font-weight: 600; letter-spacing: 0.4px; }
+.tier-name { font-weight: 600; font-size: 13px; }
+.tier-pill { height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 11px; font-weight: 600; }
+
+/* cat chips row */
+.cat-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.cat-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px 8px 8px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+.cat-dot { width: 18px; height: 18px; border-radius: 9px; display: grid; place-items: center; color: #fff; font-size: 9px; font-weight: 700; flex-shrink: 0; }
+
+/* tag palette grid */
+.tag-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.tag-card { border-radius: 12px; padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 6px; border: 1.5px solid transparent; }
+.tag-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 3px 10px 3px 8px; border-radius: 10px; }
+.tag-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.tag-meta { font-family: var(--mono); font-size: 10px; color: var(--mute); margin-top: 6px; line-height: 1.6; }
+
+/* radius table */
+.shape-row { display: flex; align-items: center; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--hair); }
+.shape-row:last-child { border-bottom: none; }
+.shape-demo { flex-shrink: 0; width: 56px; height: 32px; background: oklch(0.94 0.04 158); }
+.shape-name { font-family: var(--mono); font-size: 12px; color: var(--text); min-width: 110px; }
+.shape-use  { font-size: 12px; color: var(--mute); }
+
+/* shadow demos */
+.shadow-demo { padding: 14px 18px; background: #fff; display: flex; align-items: center; justify-content: space-between; }
+.shadow-name { font-family: var(--mono); font-size: 11px; color: var(--mute); }
+
+/* screen table */
+.screen-table { width: 100%; border-collapse: collapse; }
+.screen-table th { text-align: left; font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--mute); font-weight: 600; padding: 0 12px 10px; }
+.screen-table td { padding: 10px 12px; border-top: 1px solid var(--hair); font-size: 13px; vertical-align: top; }
+.screen-table td:first-child { font-weight: 600; white-space: nowrap; }
+.screen-table .swatch-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+.mini-swatch { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.06); flex-shrink: 0; }
+code { font-family: var(--mono); font-size: 11px; background: oklch(0.96 0.005 160); padding: 1px 5px; border-radius: 4px; }
+
+.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; }
+.toc a { font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 14px; background: #fff; border: 1px solid var(--hair); color: var(--mute); transition: color .12s; }
+.toc a:hover { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="page-title">Finanças · Design System</div>
+  <h1>Design System<br>Reference</h1>
+  <p class="subtitle">Mai/2026 · Tokens, tipografia, cores, componentes e uso por tela</p>
+
+  <nav class="toc">
+    <a href="#foundations">Fundamentos</a>
+    <a href="#typography">Tipografia</a>
+    <a href="#base-tokens">Tokens base</a>
+    <a href="#categories">Categorias</a>
+    <a href="#saldo-tiers">Tiers de saldo</a>
+    <a href="#tags">Paleta de tags</a>
+    <a href="#shapes">Formas & sombras</a>
+    <a href="#by-screen">Cores por tela</a>
+  </nav>
+
+  <!-- FUNDAMENTOS -->
+  <section id="foundations">
+    <div class="section-label">Fundamentos</div>
+    <div class="grid2">
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Fontes</div>
+        <div class="token-row">
+          <div class="token-name">UI</div>
+          <div style="font-family:Inter,sans-serif;font-size:15px;font-weight:500;flex:1;">Inter</div>
+          <div class="token-value">weights 400 500 600 700 800</div>
+        </div>
+        <div class="token-row">
+          <div class="token-name">Números</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:14px;flex:1;">JetBrains Mono</div>
+          <div class="token-value">weights 400 500 600</div>
+        </div>
+        <div class="token-row">
+          <div class="token-name">Branding</div>
+          <div style="font-size:14px;flex:1;opacity:.6;">Fraunces</div>
+          <div class="token-value">splash / onboarding</div>
+        </div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--hair);font-size:12px;color:var(--mute);line-height:1.6;">
+          JetBrains Mono é usado exclusivamente em valores monetários e dados numéricos. Inter cobre toda a UI. Fraunces aparece apenas no splash de entrada.
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Princípios de cor</div>
+        <div style="font-size:13px;color:var(--mute);line-height:1.65;">
+          <p style="margin-bottom:10px;">Todo o sistema usa <strong style="color:var(--text);">oklch</strong> — hue fixo em <code>155–165</code> (verde frio) para superfícies e UI neutros. Acréscimos de chroma sinalizam ativação.</p>
+          <p style="margin-bottom:10px;">O eixo semântico de saldo (verde→amarelo→vermelho) usa hues <code>158 → 95 → 25</code>, chroma crescente à medida que a situação piora.</p>
+          <p>Não há cor "nova" inventada para componentes: qualquer bg novo deve vir de um token existente ou de uma mistura via <code>color-mix()</code>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIPOGRAFIA -->
+  <section id="typography">
+    <div class="section-label">Tipografia</div>
+    <div class="card">
+      <div class="type-row">
+        <div style="font-size:40px;font-weight:600;letter-spacing:-1px;font-family:'JetBrains Mono',monospace;">R$ 2.089,30</div>
+        <div class="type-meta">Mono · 40px · w600 · ls -1 · saldo destaque</div>
+      </div>
+      <div class="type-row">
+        <div style="font-size:32px;font-weight:700;letter-spacing:-0.8px;line-height:1.1;">O quanto você pode<br>gastar hoje.</div>
+        <div class="type-meta">32px · w700 · ls -0.8 · hero onboarding</div>
+      </div>
+      <div class="type-row">
+        <div style="font-size:26px;font-weight:700;letter-spacing:-0.5px;">Seu diário sai de:</div>
+        <div class="type-meta">26px · w700 · ls -0.5 · heading</div>
+      </div>
+      <div class="type-row">
+        <div style="font-size:22px;font-weight:700;letter-spacing:-0.3px;">Criar tag</div>
+        <div class="type-meta">22px · w700 · ls -0.3 · sheet title</div>
+      </div>
+      <div class="type-row">
+        <div style="font-size:19px;font-weight:600;letter-spacing:-0.2px;">Mai <span style="color:var(--faint);font-weight:400;">/ 26</span></div>
+        <div class="type-meta">19px · w600 · ls -0.2 · month header</div>
+      </div>
+      <div class="type-row">
+        <div style="font-size:17px;font-weight:500;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="43352c202603262e222a2f6d202c2e">[email&#160;protected]</a></div>
+        <div class="type-meta">17px · w500 · input field</div>
+      </div>
+      <div class="type-row">
+        <div style="font-size:15px;font-weight:600;letter-spacing:-0.1px;">Padaria São José</div>
+        <div class="type-meta">15px · w600 · ls -0.1 · transaction name</div>
+      </div>
+      <div class="type-row">
+        <div style="font-size:13px;font-weight:500;color:var(--mute);">Sem lançamento</div>
+        <div class="type-meta">13px · w500 · body / hint</div>
+      </div>
+      <div class="type-row">
+        <div style="font-size:11px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--mute);">Saldo · trajetória</div>
+        <div class="type-meta">11px · w600 · ls 0.8 · uppercase · label</div>
+      </div>
+      <div class="type-row">
+        <div style="font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:oklch(0.32 0.06 160);">01 · comida</div>
+        <div class="type-meta">10px · w600 · ls 1.2 · uppercase · step badge</div>
+      </div>
+      <div class="type-row" style="border-bottom:none;">
+        <div style="font-size:9px;font-weight:500;letter-spacing:0.4px;text-transform:uppercase;color:var(--faint);">sex</div>
+        <div class="type-meta">9px · w500 · ls 0.4 · uppercase · weekday</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOKENS BASE -->
+  <section id="base-tokens">
+    <div class="section-label">Tokens base — compartilhado por V4 / V7 / V8</div>
+    <div class="grid2">
+      <div class="card">
+        <div style="font-size:12px;font-weight:600;color:var(--mute);margin-bottom:10px;">Superfícies</div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:#ffffff;"></div>
+          <div class="token-name">bg</div>
+          <div class="token-value">#ffffff</div>
+          <div class="token-label">Fundo da tela</div>
+        </div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.985 0.005 160);"></div>
+          <div class="token-name">surface</div>
+          <div class="token-value">oklch(0.985 0.005 160)</div>
+          <div class="token-label">Card / detalhe header</div>
+        </div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.95 0.03 158);"></div>
+          <div class="token-name">greenTint</div>
+          <div class="token-value">oklch(0.95 0.03 158)</div>
+          <div class="token-label">Linha selecionada, badge</div>
+        </div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.96 0.005 160);"></div>
+          <div class="token-name">canvas bg</div>
+          <div class="token-value">oklch(0.96 0.005 160)</div>
+          <div class="token-label">Fundo do canvas/body</div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:12px;font-weight:600;color:var(--mute);margin-bottom:10px;">Texto</div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.18 0.01 160);"></div>
+          <div class="token-name">text</div>
+          <div class="token-value">oklch(0.18 0.01 160)</div>
+          <div class="token-label">Texto principal</div>
+        </div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.50 0.005 160);"></div>
+          <div class="token-name">mute</div>
+          <div class="token-value">oklch(0.50 0.005 160)</div>
+          <div class="token-label">Label, hint</div>
+        </div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.72 0.005 160);"></div>
+          <div class="token-name">faint</div>
+          <div class="token-value">oklch(0.72 0.005 160)</div>
+          <div class="token-label">Placeholder, vazio</div>
+        </div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.62 0.01 160);"></div>
+          <div class="token-name">future</div>
+          <div class="token-value">oklch(0.62 0.01 160)</div>
+          <div class="token-label">Dias futuros (V7/V8)</div>
+        </div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.78 0.005 160);"></div>
+          <div class="token-name">futureMute</div>
+          <div class="token-value">oklch(0.78 0.005 160)</div>
+          <div class="token-label">Labels futuros (V7/V8)</div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:12px;font-weight:600;color:var(--mute);margin-bottom:10px;">Divisórias</div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.93 0.005 160);"></div>
+          <div class="token-name">hair</div>
+          <div class="token-value">oklch(0.93 0.005 160)</div>
+          <div class="token-label">Divisória leve entre linhas</div>
+        </div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.86 0.005 160);"></div>
+          <div class="token-name">hairStrong</div>
+          <div class="token-value">oklch(0.86 0.005 160)</div>
+          <div class="token-label">Divisória reforçada (nav, abas)</div>
+        </div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.88 0 0);"></div>
+          <div class="token-name">drag-handle</div>
+          <div class="token-value">oklch(0.88 0 0)</div>
+          <div class="token-label">Alça em bottom sheets</div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:12px;font-weight:600;color:var(--mute);margin-bottom:10px;">Escala de verde</div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.22 0.04 162);"></div>
+          <div class="token-name">greenDeep</div>
+          <div class="token-value">oklch(0.22 0.04 162)</div>
+          <div class="token-label">Bg da tela dark (saldo onboarding)</div>
+        </div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.32 0.06 160);"></div>
+          <div class="token-name">green ★</div>
+          <div class="token-value">oklch(0.32 0.06 160)</div>
+          <div class="token-label">Acento primário · FAB · ativo</div>
+        </div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.55 0.10 158);"></div>
+          <div class="token-name">greenMid</div>
+          <div class="token-value">oklch(0.55 0.10 158)</div>
+          <div class="token-label">Entradas · sparkline fill</div>
+        </div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.78 0.07 158);"></div>
+          <div class="token-name">greenSoft</div>
+          <div class="token-value">oklch(0.78 0.07 158)</div>
+          <div class="token-label">Linha dashed do sparkline</div>
+        </div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:oklch(0.95 0.03 158);"></div>
+          <div class="token-name">greenTint</div>
+          <div class="token-value">oklch(0.95 0.03 158)</div>
+          <div class="token-label">Row selecionada · badge background</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIAS -->
+  <section id="categories">
+    <div class="section-label">Cores de categoria</div>
+    <div class="card">
+      <div style="margin-bottom:16px;font-size:12px;color:var(--mute);">Usadas nos dots das fórmulas, nos chips da transação e no sparkline dos Totais.</div>
+      <div class="cat-row" style="margin-bottom:20px;">
+        <div class="cat-chip" style="background:oklch(0.95 0.03 158);color:oklch(0.32 0.06 160);">
+          <div class="cat-dot" style="background:oklch(0.55 0.13 155);">↙</div>
+          Entradas
+        </div>
+        <div class="cat-chip" style="background:oklch(0.95 0.025 30);color:oklch(0.42 0.10 30);">
+          <div class="cat-dot" style="background:oklch(0.55 0.16 35);">↗</div>
+          Saídas
+        </div>
+        <div class="cat-chip" style="background:oklch(0.95 0.02 85);color:oklch(0.40 0.08 85);">
+          <div class="cat-dot" style="background:oklch(0.62 0.13 80);">D</div>
+          Diários
+        </div>
+        <div class="cat-chip" style="background:oklch(0.95 0.03 230);color:oklch(0.40 0.08 235);">
+          <div class="cat-dot" style="background:oklch(0.60 0.12 235);">E</div>
+          Economia
+        </div>
+        <div class="cat-chip" style="background:oklch(0.96 0.025 160);color:oklch(0.32 0.06 160);">
+          <div class="cat-dot" style="background:oklch(0.55 0.18 290);">C</div>
+          Cartão
+        </div>
+      </div>
+
+      <table class="screen-table" style="font-size:12px;">
+        <thead>
+          <tr>
+            <th>Categoria</th>
+            <th>Dot (ícone)</th>
+            <th>Chip bg</th>
+            <th>Chip ink</th>
+            <th>CATS.color (dot no shared.jsx)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Entradas</td>
+            <td><code>oklch(0.55 0.13 155)</code></td>
+            <td><code>oklch(0.95 0.03 158)</code></td>
+            <td><code>oklch(0.32 0.06 160)</code></td>
+            <td><code>oklch(0.55 0.13 155)</code></td>
+          </tr>
+          <tr>
+            <td>Saídas</td>
+            <td><code>oklch(0.55 0.16 35)</code></td>
+            <td><code>oklch(0.95 0.025 30)</code></td>
+            <td><code>oklch(0.42 0.10 30)</code></td>
+            <td><code>oklch(0.55 0.16 35)</code></td>
+          </tr>
+          <tr>
+            <td>Diários</td>
+            <td><code>oklch(0.62 0.13 80)</code></td>
+            <td><code>oklch(0.95 0.02 85)</code></td>
+            <td><code>oklch(0.40 0.08 85)</code></td>
+            <td><code>oklch(0.55 0.16 0)</code></td>
+          </tr>
+          <tr>
+            <td>Economias</td>
+            <td><code>oklch(0.60 0.12 235)</code></td>
+            <td><code>oklch(0.95 0.03 230)</code></td>
+            <td><code>oklch(0.40 0.08 235)</code></td>
+            <td><code>oklch(0.65 0.18 130)</code></td>
+          </tr>
+          <tr>
+            <td>Cartão</td>
+            <td><code>oklch(0.55 0.18 290)</code></td>
+            <td><code>oklch(0.96 0.025 160)</code></td>
+            <td><code>oklch(0.32 0.06 160)</code></td>
+            <td><code>oklch(0.55 0.18 290)</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SALDO TIERS -->
+  <section id="saldo-tiers">
+    <div class="section-label">Tiers de saldo (V4 / V7) · Gradiente contínuo (V8)</div>
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-size:12px;color:var(--mute);margin-bottom:16px;">V4/V7 usam 5 faixas absolutas. V8 interpola continuamente com base em <em>runway = saldo ÷ R$ 60/dia</em>.</div>
+      <div class="tier-row" style="border-bottom:2px solid var(--hair);">
+        <div class="tier-cell tier-label">Tier</div>
+        <div class="tier-cell tier-label">Faixa de saldo</div>
+        <div class="tier-cell tier-label">Fill</div>
+        <div class="tier-cell tier-label">Ink</div>
+        <div class="tier-cell tier-label">Preview</div>
+      </div>
+      <div class="tier-row">
+        <div class="tier-cell"><span class="tier-name">darkGreen</span></div>
+        <div class="tier-cell" style="font-family:var(--mono);font-size:12px;">≥ R$ 2.000</div>
+        <div class="tier-cell"><code>#b8ecd4</code></div>
+        <div class="tier-cell"><code>#114d36</code></div>
+        <div class="tier-cell"><div class="tier-pill" style="background:#b8ecd4;color:#114d36;">R$ 2.506,26</div></div>
+      </div>
+      <div class="tier-row">
+        <div class="tier-cell"><span class="tier-name">lightGreen</span></div>
+        <div class="tier-cell" style="font-family:var(--mono);font-size:12px;">R$ 1.000 – 1.999</div>
+        <div class="tier-cell"><code>#dbf4e7</code></div>
+        <div class="tier-cell"><code>#185b43</code></div>
+        <div class="tier-cell"><div class="tier-pill" style="background:#dbf4e7;color:#185b43;">R$ 1.267,00</div></div>
+      </div>
+      <div class="tier-row">
+        <div class="tier-cell"><span class="tier-name">yellow</span></div>
+        <div class="tier-cell" style="font-family:var(--mono);font-size:12px;">R$ 0 – 999</div>
+        <div class="tier-cell"><code>#f8edc8</code></div>
+        <div class="tier-cell"><code>#73580f</code></div>
+        <div class="tier-cell"><div class="tier-pill" style="background:#f8edc8;color:#73580f;">R$ 567,80</div></div>
+      </div>
+      <div class="tier-row">
+        <div class="tier-cell"><span class="tier-name">lightRed</span></div>
+        <div class="tier-cell" style="font-family:var(--mono);font-size:12px;">R$ −500 a −1</div>
+        <div class="tier-cell"><code>#f8d9dd</code></div>
+        <div class="tier-cell"><code>#852035</code></div>
+        <div class="tier-cell"><div class="tier-pill" style="background:#f8d9dd;color:#852035;">− R$ 120,00</div></div>
+      </div>
+      <div class="tier-row">
+        <div class="tier-cell"><span class="tier-name">darkRed</span></div>
+        <div class="tier-cell" style="font-family:var(--mono);font-size:12px;">< − R$ 500</div>
+        <div class="tier-cell"><code>#efbcc5</code></div>
+        <div class="tier-cell"><code>#701529</code></div>
+        <div class="tier-cell"><div class="tier-pill" style="background:#efbcc5;color:#701529;">− R$ 820,00</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:12px;font-weight:600;margin-bottom:10px;">V8 — Stops de interpolação RGB (runway = dias de gasto restante)</div>
+      <div style="height:24px;border-radius:8px;margin-bottom:14px;background:linear-gradient(to right,rgb(239,188,197),rgb(248,217,221),rgb(248,237,200),rgb(219,244,231),rgb(184,236,212));"></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--mute);">
+        <span>runway ≤ −10</span>
+        <span>0 dias</span>
+        <span>10 dias</span>
+        <span>22 dias</span>
+        <span>≥ 40 dias</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);margin-top:4px;">
+        <span style="color:rgb(112,21,41);">darkRed</span>
+        <span style="color:rgb(133,32,53);">lightRed</span>
+        <span style="color:rgb(115,88,15);">yellow</span>
+        <span style="color:rgb(24,91,67);">lightGreen</span>
+        <span style="color:rgb(17,77,54);">darkGreen</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAGS -->
+  <section id="tags">
+    <div class="section-label">Paleta de tags — 8 cores</div>
+    <div class="card">
+      <div style="font-size:12px;color:var(--mute);margin-bottom:16px;">Cada cor tem 3 valores: <code>bg</code> (fundo da pílula/card), <code>ink</code> (texto), <code>dot</code> (bolinha de acento).</div>
+      <div class="tag-grid">
+        <div class="tag-card" style="background:oklch(0.92 0.005 160);border-color:oklch(0.36 0.005 160);">
+          <div class="tag-pill" style="background:oklch(0.92 0.005 160);color:oklch(0.36 0.005 160);">
+            <div class="tag-dot" style="background:oklch(0.78 0.005 160);"></div>Cinza
+          </div>
+          <div class="tag-meta">bg 0.92 0.005 160<br>ink 0.36 0.005 160<br>dot 0.78 0.005 160</div>
+        </div>
+        <div class="tag-card" style="background:oklch(0.90 0.045 235);border-color:oklch(0.38 0.08 235);">
+          <div class="tag-pill" style="background:oklch(0.90 0.045 235);color:oklch(0.38 0.08 235);">
+            <div class="tag-dot" style="background:oklch(0.74 0.08 235);"></div>Azul
+          </div>
+          <div class="tag-meta">bg 0.90 0.045 235<br>ink 0.38 0.08 235<br>dot 0.74 0.08 235</div>
+        </div>
+        <div class="tag-card" style="background:oklch(0.93 0.06 95);border-color:oklch(0.40 0.07 95);">
+          <div class="tag-pill" style="background:oklch(0.93 0.06 95);color:oklch(0.40 0.07 95);">
+            <div class="tag-dot" style="background:oklch(0.83 0.10 95);"></div>Amarelo
+          </div>
+          <div class="tag-meta">bg 0.93 0.06 95<br>ink 0.40 0.07 95<br>dot 0.83 0.10 95</div>
+        </div>
+        <div class="tag-card" style="background:oklch(0.86 0.10 158);border-color:oklch(0.32 0.07 158);">
+          <div class="tag-pill" style="background:oklch(0.86 0.10 158);color:oklch(0.32 0.07 158);">
+            <div class="tag-dot" style="background:oklch(0.72 0.12 158);"></div>Verde
+          </div>
+          <div class="tag-meta">bg 0.86 0.10 158<br>ink 0.32 0.07 158<br>dot 0.72 0.12 158</div>
+        </div>
+        <div class="tag-card" style="background:oklch(0.86 0.06 25);border-color:oklch(0.40 0.10 25);">
+          <div class="tag-pill" style="background:oklch(0.86 0.06 25);color:oklch(0.40 0.10 25);">
+            <div class="tag-dot" style="background:oklch(0.72 0.10 25);"></div>Vermelho
+          </div>
+          <div class="tag-meta">bg 0.86 0.06 25<br>ink 0.40 0.10 25<br>dot 0.72 0.10 25</div>
+        </div>
+        <div class="tag-card" style="background:oklch(0.86 0.06 295);border-color:oklch(0.40 0.09 295);">
+          <div class="tag-pill" style="background:oklch(0.86 0.06 295);color:oklch(0.40 0.09 295);">
+            <div class="tag-dot" style="background:oklch(0.72 0.08 295);"></div>Roxo
+          </div>
+          <div class="tag-meta">bg 0.86 0.06 295<br>ink 0.40 0.09 295<br>dot 0.72 0.08 295</div>
+        </div>
+        <div class="tag-card" style="background:oklch(0.88 0.05 355);border-color:oklch(0.40 0.09 355);">
+          <div class="tag-pill" style="background:oklch(0.88 0.05 355);color:oklch(0.40 0.09 355);">
+            <div class="tag-dot" style="background:oklch(0.78 0.07 355);"></div>Rosa
+          </div>
+          <div class="tag-meta">bg 0.88 0.05 355<br>ink 0.40 0.09 355<br>dot 0.78 0.07 355</div>
+        </div>
+        <div class="tag-card" style="background:oklch(0.82 0.04 60);border-color:oklch(0.36 0.04 60);">
+          <div class="tag-pill" style="background:oklch(0.82 0.04 60);color:oklch(0.36 0.04 60);">
+            <div class="tag-dot" style="background:oklch(0.68 0.05 60);"></div>Marrom
+          </div>
+          <div class="tag-meta">bg 0.82 0.04 60<br>ink 0.36 0.04 60<br>dot 0.68 0.05 60</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHAPES & SHADOWS -->
+  <section id="shapes">
+    <div class="section-label">Formas & sombras</div>
+    <div class="grid2">
+      <div class="card">
+        <div style="font-size:12px;font-weight:600;color:var(--mute);margin-bottom:10px;">Border-radius</div>
+        <div class="shape-row">
+          <div class="shape-demo" style="border-radius:26px;"></div>
+          <div class="shape-name">r-26 / full-pill</div>
+          <div class="shape-use">FAB, botão primário (54h)</div>
+        </div>
+        <div class="shape-row">
+          <div class="shape-demo" style="border-radius:24px;"></div>
+          <div class="shape-name">r-24</div>
+          <div class="shape-use">Bottom sheets (top corners)</div>
+        </div>
+        <div class="shape-row">
+          <div class="shape-demo" style="border-radius:22px;"></div>
+          <div class="shape-name">r-22</div>
+          <div class="shape-use">Cards (resumo onboarding)</div>
+        </div>
+        <div class="shape-row">
+          <div class="shape-demo" style="border-radius:18px;"></div>
+          <div class="shape-name">r-18</div>
+          <div class="shape-use">Icon buttons (36px)</div>
+        </div>
+        <div class="shape-row">
+          <div class="shape-demo" style="border-radius:16px;"></div>
+          <div class="shape-name">r-16</div>
+          <div class="shape-use">Scope options, cards</div>
+        </div>
+        <div class="shape-row">
+          <div class="shape-demo" style="border-radius:14px;"></div>
+          <div class="shape-name">r-14</div>
+          <div class="shape-use">Search bar, toast, badge</div>
+        </div>
+        <div class="shape-row">
+          <div class="shape-demo" style="border-radius:12px;"></div>
+          <div class="shape-name">r-12</div>
+          <div class="shape-use">Tag color swatches</div>
+        </div>
+        <div class="shape-row">
+          <div class="shape-demo" style="border-radius:8px;"></div>
+          <div class="shape-name">r-8</div>
+          <div class="shape-use">Transaction icon chip (32px)</div>
+        </div>
+        <div class="shape-row">
+          <div class="shape-demo" style="border-radius:4px;"></div>
+          <div class="shape-name">r-4 / r-3</div>
+          <div class="shape-use">Sub-labels, dot badges</div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:12px;font-weight:600;color:var(--mute);margin-bottom:14px;">Sombras</div>
+        <div style="margin-bottom:14px;border-radius:36px;overflow:hidden;border:1px solid var(--hair);">
+          <div class="shadow-demo" style="box-shadow:0 30px 80px -30px rgba(0,40,20,0.25),0 4px 12px -6px rgba(0,0,0,0.08);padding:16px 18px;">
+            <div style="font-size:12px;font-weight:600;">Phone shell</div>
+            <div class="shadow-name">0 30px 80px -30px rgba(0,40,20,.25)<br>0 4px 12px -6px rgba(0,0,0,.08)</div>
+          </div>
+        </div>
+        <div style="margin-bottom:14px;border-radius:14px;overflow:hidden;border:1px solid var(--hair);">
+          <div class="shadow-demo" style="box-shadow:0 -20px 50px -10px rgba(20,40,30,0.20);padding:16px 18px;">
+            <div style="font-size:12px;font-weight:600;">Bottom sheet</div>
+            <div class="shadow-name">0 -20px 50px -10px rgba(20,40,30,.20)</div>
+          </div>
+        </div>
+        <div style="margin-bottom:14px;border-radius:14px;overflow:hidden;border:1px solid var(--hair);">
+          <div class="shadow-demo" style="box-shadow:0 4px 18px -10px rgba(20,40,30,0.18);padding:16px 18px;">
+            <div style="font-size:12px;font-weight:600;">Summary card</div>
+            <div class="shadow-name">0 4px 18px -10px rgba(20,40,30,.18)</div>
+          </div>
+        </div>
+        <div style="margin-bottom:14px;border-radius:14px;overflow:hidden;border:1px solid var(--hair);">
+          <div class="shadow-demo" style="padding:16px 18px;">
+            <div style="display:inline-flex;width:52px;height:52px;border-radius:26px;background:oklch(0.32 0.06 160);box-shadow:0 8px 20px -8px oklch(0.30 0.06 160 / 0.5);align-items:center;justify-content:center;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+            <div class="shadow-name" style="margin-left:14px;">FAB<br>0 8px 20px -8px oklch(0.30 0.06 160 / 0.5)</div>
+          </div>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:var(--mute);margin-top:16px;margin-bottom:10px;">Overlay de fundo (modal/sheet)</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--mute);line-height:1.8;">
+          Padrão: <code>rgba(20,30,25, 0.32)</code><br>
+          Delete confirm: <code>rgba(15,25,20, 0.22)</code> + <code>backdrop-filter:blur(2px)</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CORES POR TELA -->
+  <section id="by-screen">
+    <div class="section-label">Cores por tela / seção</div>
+
+    <!-- V4 Main -->
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">V4 · Tela principal (lista do mês)</div>
+      <div style="font-size:12px;color:var(--mute);margin-bottom:14px;">Fundo: <code>#ffffff</code> · Header chrome, barra de sparkline, rows de dias</div>
+      <table class="screen-table">
+        <thead><tr><th>Elemento</th><th>Cor oklch</th><th>Token</th></tr></thead>
+        <tbody>
+          <tr><td>Background geral</td><td><code>#ffffff</code></td><td><code>bg</code></td></tr>
+          <tr><td>Ícones nav (cal, grid)</td><td><code>oklch(0.32 0.06 160)</code></td><td><code>green</code></td></tr>
+          <tr><td>Mês "Mai"</td><td><code>oklch(0.18 0.01 160)</code></td><td><code>text</code></td></tr>
+          <tr><td>"/ 26" (muted)</td><td><code>oklch(0.72 0.005 160)</code></td><td><code>faint</code></td></tr>
+          <tr><td>Saldo número (R$ 2.089)</td><td><code>oklch(0.18 0.01 160)</code></td><td><code>text</code></td></tr>
+          <tr><td>Sparkline linha</td><td><code>oklch(0.32 0.06 160)</code></td><td><code>green</code></td></tr>
+          <tr><td>Sparkline fill (grad)</td><td><code>oklch(0.55 0.10 158)</code> → transparent</td><td><code>greenMid</code></td></tr>
+          <tr><td>Today dashed line</td><td><code>oklch(0.78 0.07 158)</code></td><td><code>greenSoft</code></td></tr>
+          <tr><td>Dia selecionado (row bg)</td><td><code>oklch(0.94 0.04 158)</code></td><td><code>greenTint</code></td></tr>
+          <tr><td>Célula de saldo (coluna direita)</td><td>Por tier — ver tabela de tiers</td><td><code>SALDO_LIGHT</code></td></tr>
+          <tr><td>Divisórias</td><td><code>oklch(0.93 0.005 160)</code></td><td><code>hair</code></td></tr>
+          <tr><td>FAB +</td><td><code>oklch(0.32 0.06 160)</code> bg · <code>#fff</code> icon</td><td><code>green</code></td></tr>
+          <tr><td>Tab ativo (Saldos)</td><td><code>oklch(0.32 0.06 160)</code></td><td><code>green</code></td></tr>
+          <tr><td>Tabs inativos</td><td><code>oklch(0.50 0.005 160)</code></td><td><code>mute</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- V4 Detail -->
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">V4 · Detalhe do dia</div>
+      <div style="font-size:12px;color:var(--mute);margin-bottom:14px;">Fundo: <code>#ffffff</code> · Header ontem/hoje/amanhã + lista de lançamentos</div>
+      <table class="screen-table">
+        <thead><tr><th>Elemento</th><th>Cor oklch</th><th>Token</th></tr></thead>
+        <tbody>
+          <tr><td>Header trajectory bg</td><td><code>oklch(0.985 0.005 160)</code></td><td><code>surface</code></td></tr>
+          <tr><td>Saldo central (hoje)</td><td><code>oklch(0.32 0.06 160)</code></td><td><code>green</code></td></tr>
+          <tr><td>Saldos laterais (ontem/amanhã)</td><td><code>oklch(0.72 0.005 160)</code></td><td><code>faint</code></td></tr>
+          <tr><td>Entradas valor</td><td><code>oklch(0.55 0.10 158)</code></td><td><code>greenMid</code></td></tr>
+          <tr><td>Dashed divider</td><td><code>oklch(0.86 0.005 160)</code></td><td><code>hairStrong</code></td></tr>
+          <tr><td>Previsão row bg</td><td><code>oklch(0.94 0.04 158)</code></td><td><code>greenTint</code></td></tr>
+          <tr><td>Previsão texto</td><td><code>oklch(0.32 0.06 160)</code></td><td><code>green</code></td></tr>
+          <tr><td>Previsão deep (título)</td><td><code>oklch(0.22 0.04 162)</code></td><td><code>greenDeep</code></td></tr>
+          <tr><td>Badge "Previsão"</td><td>bg <code>#fff</code> · border/text <code>oklch(0.78 0.07 158)</code></td><td><code>greenSoft</code></td></tr>
+          <tr><td>Transaction icon chip bg</td><td><code>oklch(0.96 0.025 160)</code></td><td>— (inline)</td></tr>
+          <tr><td>Transaction icon color</td><td><code>oklch(0.32 0.06 160)</code></td><td><code>green</code></td></tr>
+          <tr><td>Sub-label badge</td><td>bg <code>oklch(0.96 0.005 160)</code> · text mute</td><td><code>surface</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- V7/V8 -->
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">V7 & V8 — diferenças de token</div>
+      <div style="font-size:12px;color:var(--mute);margin-bottom:14px;">Mesmos tokens-base que V4. Adicionam <code>future</code>, <code>futureMute</code>, <code>tabBg</code>. V8 substitui tier-cells por interpolação RGB contínua.</div>
+      <table class="screen-table">
+        <thead><tr><th>Elemento</th><th>Cor oklch</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td>Número do dia futuro</td><td><code>oklch(0.62 0.01 160)</code></td><td><code>future</code></td></tr>
+          <tr><td>Label dia futuro (dow)</td><td><code>oklch(0.78 0.005 160)</code></td><td><code>futureMute</code></td></tr>
+          <tr><td>Dot projetado (dashed)</td><td><code>oklch(0.62 0.01 160)</code></td><td>border-style: dashed</td></tr>
+          <tr><td>Celula saldo futuro</td><td><code>color-mix(tier.fill 70%, #fff)</code></td><td>V7/V8 desat. futuros</td></tr>
+          <tr><td>Badge runway "≈ N dias"</td><td>bg <code>oklch(0.95 0.03 158)</code> · text <code>oklch(0.55 0.10 158)</code></td><td>V8 only</td></tr>
+          <tr><td>Saldo no detalhe (runway badge)</td><td>Interpolado de v8Colour(saldo)</td><td>V8 only</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Onboarding -->
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Onboarding — telas claras (0–7)</div>
+      <table class="screen-table">
+        <thead><tr><th>Elemento</th><th>Cor oklch</th><th>Token / nota</th></tr></thead>
+        <tbody>
+          <tr><td>Background</td><td><code>#ffffff</code></td><td><code>bg</code></td></tr>
+          <tr><td>Step badge (verde)</td><td><code>oklch(0.32 0.06 160)</code></td><td><code>green</code></td></tr>
+          <tr><td>Underline input (focused)</td><td><code>oklch(0.32 0.06 160)</code></td><td><code>green</code></td></tr>
+          <tr><td>Underline input (blur)</td><td><code>oklch(0.86 0.005 160)</code></td><td><code>hairStrong</code></td></tr>
+          <tr><td>Skip toast bg</td><td><code>oklch(0.94 0.04 158)</code></td><td><code>greenTint</code></td></tr>
+          <tr><td>Dots de progresso (ativos)</td><td><code>oklch(0.32 0.06 160)</code></td><td><code>green</code></td></tr>
+          <tr><td>Dots de progresso (inativos)</td><td><code>oklch(0.86 0.005 160)</code></td><td><code>hairStrong</code></td></tr>
+          <tr><td>Botão primário bg (claro)</td><td><code>#0f0f10</code></td><td>near-black (não oklch)</td></tr>
+          <tr><td>Botão primário desabilitado</td><td><code>oklch(0.85 0 0)</code></td><td>—</td></tr>
+          <tr><td>Botão outline border</td><td><code>oklch(0.86 0.005 160)</code></td><td><code>hairStrong</code></td></tr>
+          <tr><td>Link button</td><td><code>oklch(0.32 0.06 160)</code></td><td><code>green</code></td></tr>
+          <tr><td>Erro de validação (underline)</td><td><code>oklch(0.55 0.16 25)</code></td><td>vermelho</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Onboarding — Tela de saldo (dark, tela 8)</div>
+      <table class="screen-table">
+        <thead><tr><th>Elemento</th><th>Cor oklch / rgba</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td>Background</td><td><code>oklch(0.22 0.04 162)</code></td><td><code>greenDeep</code></td></tr>
+          <tr><td>Texto principal</td><td><code>#ffffff</code></td><td>—</td></tr>
+          <tr><td>Texto secundário</td><td><code>rgba(255,255,255,0.78)</code></td><td>—</td></tr>
+          <tr><td>Muted / labels</td><td><code>rgba(255,255,255,0.55)</code></td><td>—</td></tr>
+          <tr><td>Underline input (focused)</td><td><code>#ffffff</code></td><td>—</td></tr>
+          <tr><td>Underline input (blur)</td><td><code>rgba(255,255,255,0.30)</code></td><td>—</td></tr>
+          <tr><td>Toast (dark variant)</td><td><code>rgba(255,255,255,0.08)</code> bg · <code>rgba(255,255,255,0.14)</code> border</td><td>—</td></tr>
+          <tr><td>Botão primário bg (dark)</td><td><code>#ffffff</code></td><td>texto = greenDeep</td></tr>
+          <tr><td>Botão back arrow</td><td><code>rgba(255,255,255,0.85)</code></td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tags -->
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Tags — lista, detalhe, criar, editar, excluir</div>
+      <table class="screen-table">
+        <thead><tr><th>Elemento</th><th>Cor oklch</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td>Tag detail header bg</td><td>Cor da tag selecionada (bg do TAG_PALETTE)</td><td>Dinâmico</td></tr>
+          <tr><td>Tag detail header ink</td><td>Cor da tag selecionada (ink do TAG_PALETTE)</td><td>Dinâmico</td></tr>
+          <tr><td>Editor underline (ativo)</td><td><code>oklch(0.32 0.06 160)</code></td><td><code>green</code></td></tr>
+          <tr><td>Editor underline (erro)</td><td><code>oklch(0.55 0.16 25)</code></td><td>vermelho</td></tr>
+          <tr><td>Trash icon</td><td><code>oklch(0.55 0.16 25)</code></td><td>vermelho</td></tr>
+          <tr><td>Botão "Excluir tag"</td><td><code>oklch(0.50 0.18 25)</code></td><td>vermelho mais saturado</td></tr>
+          <tr><td>Delete overlay</td><td><code>rgba(15,25,20,0.22)</code> + blur 2px</td><td>—</td></tr>
+          <tr><td>Delete card bg</td><td><code>#ffffff</code></td><td>sombra especial</td></tr>
+          <tr><td>Tag info strip (delete card)</td><td>Usa bg + dot da tag sendo excluída</td><td>Dinâmico</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Transação -->
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Transação — criar / editar / scope sheet</div>
+      <table class="screen-table">
+        <thead><tr><th>Elemento</th><th>Cor oklch</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td>TypeChip "Diário" (ativo)</td><td>bg <code>oklch(0.95 0.02 85)</code> · ink <code>oklch(0.40 0.08 85)</code></td><td>—</td></tr>
+          <tr><td>TypeChip "Saída" (ativo)</td><td>bg <code>oklch(0.95 0.025 30)</code> · ink <code>oklch(0.42 0.10 30)</code></td><td>—</td></tr>
+          <tr><td>TypeChip "Entrada" (ativo)</td><td>bg <code>oklch(0.95 0.03 158)</code> · ink <code>oklch(0.32 0.06 160)</code></td><td>—</td></tr>
+          <tr><td>TypeChip "Economia" (ativo)</td><td>bg <code>oklch(0.95 0.03 230)</code> · ink <code>oklch(0.40 0.08 235)</code></td><td>—</td></tr>
+          <tr><td>Recurrence pill (ativo)</td><td>bg <code>oklch(0.94 0.04 158)</code> · text <code>oklch(0.32 0.06 160)</code></td><td><code>greenTint</code></td></tr>
+          <tr><td>Recurrence end left-bar</td><td><code>oklch(0.94 0.04 158)</code></td><td><code>greenTint</code></td></tr>
+          <tr><td>SeriesBadge bg</td><td><code>oklch(0.94 0.04 158)</code></td><td><code>greenTint</code></td></tr>
+          <tr><td>ScopeSheet "delete" badge</td><td>bg <code>oklch(0.96 0.025 25)</code> · text <code>oklch(0.50 0.16 25)</code></td><td>vermelho suave</td></tr>
+          <tr><td>ScopeSheet "all" (delete)</td><td>fg <code>oklch(0.50 0.16 25)</code> · bg <code>oklch(0.98 0.012 25)</code> · ring <code>oklch(0.86 0.05 25)</code></td><td>—</td></tr>
+          <tr><td>ScopeSheet "following" warn</td><td>ring <code>oklch(0.86 0.05 75)</code> · badgeBg <code>oklch(0.96 0.06 80)</code></td><td>amarelo</td></tr>
+          <tr><td>Warn icon "!"</td><td><code>oklch(0.55 0.14 75)</code></td><td>âmbar</td></tr>
+          <tr><td>Calendar: dia selecionado</td><td>bg <code>oklch(0.32 0.06 160)</code> · text <code>#fff</code></td><td><code>green</code></td></tr>
+          <tr><td>Calendar: dia de início</td><td>bg <code>oklch(0.94 0.04 158)</code> · text <code>oklch(0.32 0.06 160)</code></td><td><code>greenTint</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Totais -->
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Totais — mês + detalhe anual</div>
+      <table class="screen-table">
+        <thead><tr><th>Elemento</th><th>Cor oklch</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td>Mês atual row bg</td><td><code>oklch(0.97 0.015 158)</code></td><td>—</td></tr>
+          <tr><td>Dot "mês atual"</td><td><code>oklch(0.32 0.06 160)</code></td><td><code>green</code></td></tr>
+          <tr><td>Badge "projeção"</td><td>border dashed <code>oklch(0.86 0.005 160)</code></td><td><code>hairStrong</code></td></tr>
+          <tr><td>Performance positiva</td><td><code>oklch(0.40 0.10 158)</code></td><td>verde médio</td></tr>
+          <tr><td>Performance negativa</td><td><code>oklch(0.50 0.16 25)</code></td><td>vermelho</td></tr>
+          <tr><td>Econ. "Dentro do ideal"</td><td><code>oklch(0.40 0.10 158)</code></td><td>—</td></tr>
+          <tr><td>Econ. "Abaixo do ideal"</td><td><code>oklch(0.50 0.005 160)</code></td><td>neutro</td></tr>
+          <tr><td>Econ. "Acima do ideal"</td><td><code>oklch(0.45 0.10 158)</code></td><td>—</td></tr>
+          <tr><td>Custo "Acima da renda"</td><td><code>oklch(0.50 0.16 25)</code></td><td>vermelho</td></tr>
+          <tr><td>Barra economias fill</td><td><code>oklch(0.65 0.18 130)</code></td><td>CATS.economia.color</td></tr>
+          <tr><td>Barra track bg</td><td><code>oklch(0.93 0.005 160)</code></td><td><code>hair</code></td></tr>
+          <tr><td>Guias "20%/30%"</td><td><code>rgba(0,0,0,0.18)</code></td><td>linha de 1px</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>

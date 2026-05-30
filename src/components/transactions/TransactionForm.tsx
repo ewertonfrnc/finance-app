@@ -105,7 +105,7 @@ export function TransactionForm({
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <ArrowLeft size={22} className="text-foreground" />
         </Pressable>
-        <Text className="text-foreground text-base font-semibold">
+        <Text className="text-foreground text-sheet-title font-bold">
           {TITLE[mode]}
         </Text>
         <Pressable onPress={() => router.back()} hitSlop={8}>
@@ -123,7 +123,7 @@ export function TransactionForm({
 
         {/* Tipo */}
         <View className="gap-2">
-          <Text className="text-muted text-xs font-semibold tracking-widest">
+          <Text className="text-muted text-label font-semibold tracking-widest">
             TIPO
           </Text>
           <TypeSelector value={type} onChange={setType} />
@@ -133,7 +133,7 @@ export function TransactionForm({
         <View className="gap-2">
           <View className="flex-row items-center gap-1.5">
             <View className={`h-2 w-2 rounded-full ${TYPE_DOT_CLASS[type]}`} />
-            <Text className="text-muted text-xs font-semibold tracking-widest">
+            <Text className="text-muted text-label font-semibold tracking-widest">
               VALOR
             </Text>
           </View>
@@ -146,7 +146,7 @@ export function TransactionForm({
 
         {/* Descrição */}
         <View className="gap-1">
-          <Text className="text-muted text-xs font-semibold tracking-widest">
+          <Text className="text-muted text-label font-semibold tracking-widest">
             DESCRIÇÃO
           </Text>
           <TextInput
@@ -156,7 +156,7 @@ export function TransactionForm({
             placeholderTextColor="#9ca3af"
             maxLength={200}
             returnKeyType="done"
-            className="text-foreground border-surface-tertiary border-b-2 py-2 text-base"
+            className="text-foreground border-surface-tertiary text-input border-b-2 py-2 font-medium"
           />
           <Text className="text-muted self-end text-xs">
             {description.length}/200
@@ -167,7 +167,7 @@ export function TransactionForm({
 
         {/* Data */}
         <View className="gap-2">
-          <Text className="text-muted text-xs font-semibold tracking-widest">
+          <Text className="text-muted text-label font-semibold tracking-widest">
             DATA
           </Text>
           <DateField value={date} onChange={setDate} />
@@ -179,7 +179,7 @@ export function TransactionForm({
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-1.5">
                 <Repeat size={13} className="text-muted" />
-                <Text className="text-muted text-xs font-semibold tracking-widest">
+                <Text className="text-muted text-label font-semibold tracking-widest">
                   RECORRÊNCIA
                 </Text>
               </View>

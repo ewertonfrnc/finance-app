@@ -1,6 +1,12 @@
 import { formatMonthHeader } from "@/src/lib/date";
 import { useDateStore } from "@/src/stores/useDateStore";
-import { Calendar, ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react-native";
+import {
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  EyeOff,
+} from "lucide-react-native";
 import { Pressable, Text, View, useColorScheme } from "react-native";
 
 interface MonthNavigatorProps {
@@ -46,7 +52,7 @@ export function MonthNavigator({
           >
             <ChevronLeft size={20} color={mutedColor} />
           </Pressable>
-          <Text className="text-foreground px-2 text-base font-semibold">
+          <Text className="text-foreground text-month px-2 font-semibold">
             {formatMonthHeader(selectedYear, selectedMonth)}
           </Text>
           <Pressable
@@ -88,7 +94,7 @@ export function MonthNavigator({
 
       <View className="flex-row items-center gap-2">
         <Calendar size={16} color={mutedColor} />
-        <Text className="text-foreground text-base font-semibold">
+        <Text className="text-foreground text-month font-semibold">
           {formatMonthHeader(selectedYear, selectedMonth)}
         </Text>
       </View>

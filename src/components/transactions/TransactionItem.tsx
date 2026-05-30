@@ -42,7 +42,7 @@ export function TransactionItem({
 
       <View className="flex-1">
         <Text
-          className="text-foreground text-base font-medium"
+          className="text-foreground text-transaction font-semibold"
           numberOfLines={1}
         >
           {description}
@@ -52,7 +52,7 @@ export function TransactionItem({
           <View className="mt-1 flex-row flex-wrap items-center gap-1">
             {isRecurring && <Repeat size={12} className="text-muted" />}
             {showDate && (
-              <Text className="text-muted text-xs">
+              <Text className="text-muted text-body-small">
                 {formatDayHeader(transaction.date)}
               </Text>
             )}
@@ -70,7 +70,9 @@ export function TransactionItem({
 
       <View className="items-end">
         <CurrencyText value={amount} sign="neutral" variant="small" />
-        <Text className="text-muted mt-0.5 text-xs">{TYPE_LABEL[type]}</Text>
+        <Text className="text-muted text-body-small mt-0.5">
+          {TYPE_LABEL[type]}
+        </Text>
       </View>
     </Pressable>
   );

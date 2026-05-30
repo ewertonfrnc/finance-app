@@ -65,7 +65,7 @@ export function ScopeSheet({
           </View>
         ) : null}
 
-        <Text className="text-foreground mb-4 text-lg font-semibold">
+        <Text className="text-foreground text-sheet-title mb-4 font-bold">
           {title}
         </Text>
 
@@ -124,11 +124,7 @@ export function ScopeSheet({
                 <ChevronRight
                   size={18}
                   className={
-                    danger
-                      ? "text-danger"
-                      : warn
-                        ? "text-accent"
-                        : "text-muted"
+                    danger ? "text-danger" : warn ? "text-accent" : "text-muted"
                   }
                 />
               </Pressable>

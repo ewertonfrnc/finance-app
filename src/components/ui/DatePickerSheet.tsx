@@ -137,7 +137,9 @@ export const DatePickerSheet = forwardRef<
       handleIndicatorStyle={{ backgroundColor: colors.muted }}
     >
       <BottomSheetView className="px-5 pt-1 pb-6">
-        <Text className="text-foreground text-lg font-semibold">{title}</Text>
+        <Text className="text-foreground text-sheet-title font-bold">
+          {title}
+        </Text>
         <Text className="text-muted mt-1 text-sm">{description}</Text>
 
         {/* Cabeçalho do mês com navegação */}
@@ -145,7 +147,7 @@ export const DatePickerSheet = forwardRef<
           <Pressable onPress={() => shiftMonth(-1)} hitSlop={10}>
             <ChevronLeft size={22} className="text-muted" />
           </Pressable>
-          <Text className="text-foreground text-base font-semibold">
+          <Text className="text-foreground text-month font-semibold">
             {monthLabel(visibleMonthId)}
           </Text>
           <Pressable onPress={() => shiftMonth(1)} hitSlop={10}>

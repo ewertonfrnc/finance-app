@@ -1,5 +1,10 @@
 import { formatDayHeader, formatWeekdayLong } from "@/src/lib/date";
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus } from "lucide-react-native";
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+} from "lucide-react-native";
 import { Pressable, Text, View, useColorScheme } from "react-native";
 
 interface DayNavigatorProps {
@@ -10,7 +15,13 @@ interface DayNavigatorProps {
   onAdd: () => void;
 }
 
-export function DayNavigator({ date, onBack, onPrev, onNext, onAdd }: DayNavigatorProps) {
+export function DayNavigator({
+  date,
+  onBack,
+  onPrev,
+  onNext,
+  onAdd,
+}: DayNavigatorProps) {
   const scheme = useColorScheme();
   const mutedColor = scheme === "dark" ? "#6b8c78" : "#7a9485";
   const accentColor = scheme === "dark" ? "#5ab87a" : "#1e3d2b";
@@ -33,10 +44,10 @@ export function DayNavigator({ date, onBack, onPrev, onNext, onAdd }: DayNavigat
         </Pressable>
 
         <View className="items-center px-2">
-          <Text className="text-foreground text-base font-semibold">
+          <Text className="text-foreground text-month font-semibold">
             {formatDayHeader(date)}
           </Text>
-          <Text className="text-muted text-xs">
+          <Text className="text-muted text-body-small">
             {formatWeekdayLong(date)}
           </Text>
         </View>
