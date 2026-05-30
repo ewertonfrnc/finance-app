@@ -95,7 +95,7 @@ export default function SaldosScreen() {
       <View className="border-surface-secondary flex-row justify-between border-b px-4 pt-2">
         <Animated.View
           style={indicatorStyle}
-          className="bg-foreground absolute bottom-0 left-0 h-0.5"
+          className="bg-accent absolute bottom-0 left-0 h-0.5"
         />
         {DAY_FILTER_OPTIONS.map((opt, index) => (
           <Pressable
@@ -105,7 +105,7 @@ export default function SaldosScreen() {
             onLayout={(e) => onTabLayout(index, e)}
           >
             <Text
-              className={`text-sm font-medium ${filterIndex === index ? "text-foreground" : "text-muted"}`}
+              className={`text-sm font-medium ${filterIndex === index ? "text-accent" : "text-muted"}`}
             >
               {opt.label}
             </Text>

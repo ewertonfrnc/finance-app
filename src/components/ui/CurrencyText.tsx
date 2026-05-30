@@ -13,7 +13,7 @@ interface CurrencyTextProps extends Omit<TextProps, "children"> {
 const VARIANT_CLASSES: Record<Variant, string> = {
   large: "font-mono-semibold text-balance-highlight",
   regular: "text-base font-mono-medium",
-  small: "text-base font-mono-medium",
+  small: "text-sm font-mono-medium",
 };
 
 const SIGN_CLASSES: Record<Sign, string> = {

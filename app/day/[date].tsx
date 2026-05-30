@@ -1,5 +1,6 @@
 import { format, parseISO } from "date-fns";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useToast } from "heroui-native";
 import { useMemo, useState } from "react";
 import {
   FlatList,
@@ -11,7 +12,6 @@ import {
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
-import { useToast } from "heroui-native";
 
 import { useHorizontalSwipe } from "@/src/components/gestures/useHorizontalSwipe";
 import { DayNavigator } from "@/src/components/navigation/DayNavigator";
@@ -22,27 +22,12 @@ import { Screen } from "@/src/components/ui/Screen";
 import { useBalanceQuery } from "@/src/features/saldos/hooks/useBalanceQuery";
 import { useDayTransactions } from "@/src/features/transactions/hooks/useDayTransactions";
 import type { TransactionType } from "@/src/features/transactions/types";
+import { formatBRL } from "@/src/lib/currency";
 import { formatDayHeader, nextDay, prevDay } from "@/src/lib/date";
+import { colorsForScheme } from "@/src/lib/designTokens";
 import { transactionDetailHref } from "@/src/lib/transactionHref";
 
 const TODAY = format(new Date(), "yyyy-MM-dd");
-
-const PROJECTION_CARD_COLORS = {
-  light: {
-    bg: "#dbf4e7",
-    title: "#185b43",
-    badge: "#b8ecd4",
-    badgeText: "#114d36",
-    bullet: "#2d6b4e",
-  },
-  dark: {
-    bg: "#1a3f31",
-    title: "#a6efca",
-    badge: "#214f3c",
-    badgeText: "#baf5d7",
-    bullet: "#7edcb0",
-  },
-} as const;
 
 function DailyProjectionCard({
   date,
@@ -54,25 +39,32 @@ function DailyProjectionCard({
   onAdjustPress: () => void;
 }) {
   const scheme = useColorScheme();
-  const c = PROJECTION_CARD_COLORS[scheme === "dark" ? "dark" : "light"];
+  const c = colorsForScheme(scheme);
   const dayLabel = format(parseISO(date), "dd/MM");
 
   return (
     <View
-      style={{ backgroundColor: c.bg }}
+      style={{ backgroundColor: c.greenTint }}
       className="mx-4 mt-3 mb-2 gap-2 rounded-xl px-4 py-3"
     >
       <View className="flex-row items-center gap-2">
-        <Text style={{ color: c.title }} className="flex-1 text-sm font-medium">
+        <Text
+          style={{ color: c.greenDeep }}
+          className="flex-1 text-sm font-semibold"
+        >
           Diário previsto
         </Text>
         <View
-          style={{ backgroundColor: c.badge }}
+          style={{
+            backgroundColor: c.bg,
+            borderWidth: 1,
+            borderColor: c.greenSoft,
+          }}
           className="rounded px-1.5 py-0.5"
         >
           <Text
-            style={{ color: c.badgeText }}
-            className="text-xs font-medium tracking-wide"
+            style={{ color: c.greenSoft }}
+            className="text-xs font-semibold tracking-wide"
           >
             PREVISÃO
           </Text>
@@ -81,49 +73,40 @@ function DailyProjectionCard({
           value={amount}
           variant="small"
           sign="negative"
-          style={{ color: c.title }}
+          style={{ color: c.green }}
         />
       </View>
 
       <View className="gap-1.5">
         <View className="flex-row gap-1.5">
-          <Text style={{ color: c.bullet }} className="text-xs leading-5">
+          <Text style={{ color: c.green }} className="text-xs leading-5">
             •
           </Text>
-          <Text
-            style={{ color: c.bullet }}
-            className="flex-1 text-xs leading-5"
-          >
+          <Text style={{ color: c.green }} className="flex-1 text-xs leading-5">
             No dia <Text className="font-semibold">{dayLabel}</Text> será
             descontado este previsto{" "}
             <Text className="font-semibold">somado</Text> ao que você lançar.
           </Text>
         </View>
         <View className="flex-row gap-1.5">
-          <Text style={{ color: c.bullet }} className="text-xs leading-5">
+          <Text style={{ color: c.green }} className="text-xs leading-5">
             •
           </Text>
-          <Text
-            style={{ color: c.bullet }}
-            className="flex-1 text-xs leading-5"
-          >
+          <Text style={{ color: c.green }} className="flex-1 text-xs leading-5">
             Quando o dia chegar, o previsto{" "}
             <Text className="font-semibold">zera à meia-noite</Text> — fica só o
             que foi lançado.
           </Text>
         </View>
         <View className="flex-row gap-1.5">
-          <Text style={{ color: c.bullet }} className="text-xs leading-5">
+          <Text style={{ color: c.green }} className="text-xs leading-5">
             •
           </Text>
-          <Text
-            style={{ color: c.bullet }}
-            className="flex-1 text-xs leading-5"
-          >
+          <Text style={{ color: c.green }} className="flex-1 text-xs leading-5">
             Vem da sua previsão mensal de diários.{" "}
             <Pressable onPress={onAdjustPress} hitSlop={8}>
               <Text
-                style={{ color: c.title }}
+                style={{ color: c.greenDeep }}
                 className="text-xs font-semibold underline"
               >
                 Toque para ajustar.
@@ -151,6 +134,8 @@ export default function DayScreen() {
   const [selectedType, setSelectedType] = useState<TransactionType | null>(
     null,
   );
+  const scheme = useColorScheme();
+  const c = colorsForScheme(scheme);
   const filterScrollGesture = Gesture.Native();
 
   const [year, month, day] = date.split("-").map(Number);
@@ -246,51 +231,76 @@ export default function DayScreen() {
         onAdd={openNewTransaction}
       />
 
-      {/* Saldo fim do dia */}
-      <View className="flex-row justify-between px-4 py-4">
-        <View className="items-center">
-          <Text className="text-muted text-body-small mb-1">
-            Ontem · {formatDayHeader(prevDate)}
+      {/* Saldo fim do dia — DS: header trajectory bg = surface */}
+      <View className="bg-surface-secondary flex-row items-start justify-between px-4 py-4">
+        {/* Ontem */}
+        <View className="items-start">
+          <Text
+            style={{ color: c.faint }}
+            className="text-label mb-1 font-mono uppercase"
+          >
+            ONTEM · {formatDayHeader(prevDate)}
           </Text>
-          {yesterdayBalance !== null ? (
-            <CurrencyText value={yesterdayBalance} variant="small" />
-          ) : (
-            <Text className="text-muted font-mono text-sm">—</Text>
-          )}
+          <Text
+            style={{ color: c.faint }}
+            className="text-body-small font-mono"
+          >
+            {yesterdayBalance !== null ? formatBRL(yesterdayBalance) : "—"}
+          </Text>
         </View>
 
+        {/* Hoje */}
         <View className="items-center">
-          <Text className="text-muted text-label mb-1 font-semibold tracking-widest uppercase">
-            Saldo · Fim do dia
+          <Text className="text-muted text-label mb-1 font-semibold tracking-wide uppercase">
+            {isFuture ? "SALDO · PREVISTO" : "SALDO · FIM DO DIA"}
           </Text>
           {todayBalance !== null ? (
-            <CurrencyText value={todayBalance} variant="large" />
+            <CurrencyText
+              value={todayBalance}
+              variant="regular"
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              className={todayBalance >= 0 ? "text-ds-green" : undefined}
+            />
           ) : (
-            <Text className="text-muted font-mono-medium text-2xl">—</Text>
+            <Text className="text-ds-green font-mono-semibold text-balance-highlight">
+              —
+            </Text>
           )}
         </View>
 
-        <View className="items-center">
-          <Text className="text-muted text-body-small mb-1">
-            Amanhã · {formatDayHeader(nextDate)}
+        {/* Amanhã */}
+        <View className="items-end">
+          <Text
+            style={{ color: c.faint }}
+            className="text-label mb-1 font-mono uppercase"
+          >
+            AMANHÃ · {formatDayHeader(nextDate)}
           </Text>
-          {tomorrowBalance !== null ? (
-            <CurrencyText value={tomorrowBalance} variant="small" />
-          ) : (
-            <Text className="text-muted font-mono text-sm">—</Text>
-          )}
+          <Text
+            style={{ color: c.faint }}
+            className="text-body-small font-mono"
+          >
+            {tomorrowBalance !== null ? formatBRL(tomorrowBalance) : "—"}
+          </Text>
         </View>
       </View>
 
-      <View className="bg-surface-secondary mx-4 h-px" />
+      {/* <View className="" /> */}
+      <View className="border-surface border-dotted" />
 
-      {/* Resumo de fluxo */}
-      <View className="flex-row px-4 py-4">
+      {/* Resumo de fluxo — DS: entradas=greenMid, saídas=danger, líquido=sign-based */}
+      <View className="bg-surface-secondary flex-row items-start justify-between px-4 py-4">
         <View className="flex-1">
           <Text className="text-muted text-label mb-1 font-semibold tracking-widest">
             ENTRADAS
           </Text>
-          <CurrencyText value={income} variant="small" sign="positive" />
+          <CurrencyText
+            value={income}
+            variant="small"
+            sign="positive"
+            className="text-ds-green-mid"
+          />
         </View>
         <View className="flex-1 items-center">
           <Text className="text-muted text-label mb-1 font-semibold tracking-widest">

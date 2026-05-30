@@ -7,6 +7,7 @@ import {
 } from "lucide-react-native";
 import { Text, View, useColorScheme } from "react-native";
 
+import { colorsForScheme } from "@/src/lib/designTokens";
 import { IconButton } from "../ui/IconButton";
 
 interface DayNavigatorProps {
@@ -25,8 +26,9 @@ export function DayNavigator({
   onAdd,
 }: DayNavigatorProps) {
   const scheme = useColorScheme();
-  const mutedColor = scheme === "dark" ? "#6b8c78" : "#7a9485";
-  const accentColor = scheme === "dark" ? "#5ab87a" : "#1e3d2b";
+  const colors = colorsForScheme(scheme);
+  const mutedColor = colors.mute;
+  const accentColor = colors.green;
 
   return (
     <View className="flex-row items-center justify-between px-4 py-3">

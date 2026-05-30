@@ -23,6 +23,7 @@ import type {
 } from "@/src/features/transactions/types";
 import { getBalanceTierColors } from "@/src/lib/balanceTier";
 import { formatWeekday, isWeekend } from "@/src/lib/date";
+import { colorsForScheme } from "@/src/lib/designTokens";
 import { usePrivacyStore } from "@/src/stores/usePrivacyStore";
 import { CurrencyText } from "../ui/CurrencyText";
 
@@ -150,11 +151,6 @@ export const DayRow = memo(function DayRow({
     dayBalance.income === 0 &&
     dayBalance.expense === 0 &&
     dayBalance.savings === 0;
-  const futureOpacity = isProjectionOnly
-    ? "opacity-50"
-    : isFuture
-      ? "opacity-80"
-      : "";
   const dayNum = format(parseISO(dayBalance.date), "dd");
   const weekday = formatWeekday(dayBalance.date);
 
@@ -171,6 +167,13 @@ export const DayRow = memo(function DayRow({
 
   const scheme = useColorScheme();
   const colors = getBalanceTierColors(dayBalance.endBalance, scheme);
+  const dsColors = colorsForScheme(scheme);
+  const dayNumColor = isToday
+    ? dsColors.green
+    : isFuture
+      ? dsColors.future
+      : dsColors.text;
+  const weekdayColor = isFuture ? dsColors.futureMute : dsColors.mute;
 
   const weekendDayBg = weekend
     ? scheme === "dark"
@@ -209,19 +212,28 @@ export const DayRow = memo(function DayRow({
         className="my-2 w-8 items-center justify-center rounded-md py-0.5"
       >
         <Text
-          className={`font-mono-medium text-sm ${isToday ? "text-success" : "text-foreground"}`}
+          style={{ color: dayNumColor }}
+          className="font-mono-medium text-sm"
         >
           {dayNum}
         </Text>
         {isToday && (
-          <View className="bg-success absolute top-1 -right-1 h-1.5 w-1.5 rounded-full" />
+          <View
+            style={{ backgroundColor: dsColors.green }}
+            className="absolute top-1 -right-1 h-1.5 w-1.5 rounded-full"
+          />
         )}
-        <Text className="text-muted text-weekday font-medium tracking-wide uppercase">
+        <Text
+          style={{ color: weekdayColor }}
+          className="text-weekday font-medium tracking-wide uppercase"
+        >
           {weekday}
         </Text>
       </View>
 
-      <View className={`flex-1 justify-center gap-1 py-2 ${futureOpacity}`}>
+      <View
+        className={`flex-1 justify-center gap-1 py-2 ${isProjectionOnly ? "opacity-50" : ""}`}
+      >
         <TransactionLines
           lines={visibleLines}
           amounts={amounts}
@@ -235,9 +247,9 @@ export const DayRow = memo(function DayRow({
           backgroundColor: colors.bg,
           width: 144,
           borderBottomWidth: 2,
-          borderBottomColor: scheme === "dark" ? "#131c14" : "#f7faf8",
+          borderBottomColor: dsColors.hair,
         }}
-        className={`items-end justify-center px-2.5 ${futureOpacity}`}
+        className={`items-end justify-center px-2.5 ${isProjectionOnly ? "opacity-50" : ""}`}
       >
         <Animated.View style={fadeStyle}>
           {displayHidden ? (

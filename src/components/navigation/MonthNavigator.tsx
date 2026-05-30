@@ -1,3 +1,4 @@
+import { colorsForScheme } from "@/src/lib/designTokens";
 import { formatMonthHeader } from "@/src/lib/date";
 import { useDateStore } from "@/src/stores/useDateStore";
 import {
@@ -29,7 +30,7 @@ export function MonthNavigator({
   const { selectedYear, selectedMonth, goToPrevMonth, goToNextMonth } =
     useDateStore();
   const scheme = useColorScheme();
-  const mutedColor = scheme === "dark" ? "#6b8c78" : "#7a9485";
+  const iconColor = colorsForScheme(scheme).green;
 
   const handlePrev = onPrev ?? goToPrevMonth;
   const handleNext = onNext ?? goToNextMonth;
@@ -41,7 +42,7 @@ export function MonthNavigator({
           onPress={onCalendarPress}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Calendar size={18} color={mutedColor} />
+          <Calendar size={18} color={iconColor} />
         </Pressable>
 
         <View className="flex-row items-center gap-1">
@@ -50,7 +51,7 @@ export function MonthNavigator({
             disabled={disabled}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <ChevronLeft size={20} color={mutedColor} />
+            <ChevronLeft size={20} color={iconColor} />
           </Pressable>
           <Text className="text-foreground text-month px-2 font-semibold">
             {formatMonthHeader(selectedYear, selectedMonth)}
@@ -60,7 +61,7 @@ export function MonthNavigator({
             disabled={disabled}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <ChevronRight size={20} color={mutedColor} />
+            <ChevronRight size={20} color={iconColor} />
           </Pressable>
         </View>
 
@@ -70,9 +71,9 @@ export function MonthNavigator({
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             {isHidden ? (
-              <EyeOff size={18} color={mutedColor} />
+              <EyeOff size={18} color={iconColor} />
             ) : (
-              <Eye size={18} color={mutedColor} />
+              <Eye size={18} color={iconColor} />
             )}
           </Pressable>
         ) : (
@@ -89,11 +90,11 @@ export function MonthNavigator({
         disabled={disabled}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
-        <ChevronLeft size={20} color={mutedColor} />
+        <ChevronLeft size={20} color={iconColor} />
       </Pressable>
 
       <View className="flex-row items-center gap-2">
-        <Calendar size={16} color={mutedColor} />
+        <Calendar size={16} color={iconColor} />
         <Text className="text-foreground text-month font-semibold">
           {formatMonthHeader(selectedYear, selectedMonth)}
         </Text>
@@ -104,7 +105,7 @@ export function MonthNavigator({
         disabled={disabled}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
-        <ChevronRight size={20} color={mutedColor} />
+        <ChevronRight size={20} color={iconColor} />
       </Pressable>
     </View>
   );
