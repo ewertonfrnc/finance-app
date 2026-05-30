@@ -57,9 +57,9 @@ export function ScopeSheet({
     >
       <BottomSheetView className="px-5 pt-1 pb-6">
         {recurrenceLabel ? (
-          <View className="bg-success/15 mb-3 flex-row items-center gap-1.5 self-start rounded-full px-2.5 py-1">
-            <Repeat size={12} className="text-success" />
-            <Text className="text-success text-xs font-semibold">
+          <View className="bg-ds-green-tint mb-3 flex-row items-center gap-1.5 self-start rounded-full px-2.5 py-1">
+            <Repeat size={12} className="text-ds-green" />
+            <Text className="text-ds-green text-xs font-semibold">
               {recurrenceLabel}
             </Text>
           </View>
@@ -82,7 +82,7 @@ export function ScopeSheet({
                   danger
                     ? "border-danger/30 bg-danger/5"
                     : warn
-                      ? "border-accent/40 bg-accent/10"
+                      ? "border-ds-amber-ring bg-ds-amber-bg"
                       : "border-surface-tertiary"
                 } ${isPending ? "opacity-50" : ""}`}
               >
@@ -91,12 +91,12 @@ export function ScopeSheet({
                     danger
                       ? "bg-danger/15"
                       : warn
-                        ? "bg-accent/20"
+                        ? "bg-ds-amber-bg"
                         : "bg-surface-secondary"
                   }`}
                 >
                   {warn ? (
-                    <AlertTriangle size={13} className="text-accent" />
+                    <AlertTriangle size={13} className="text-ds-amber" />
                   ) : (
                     <Text
                       className={`text-xs font-semibold ${
@@ -113,7 +113,7 @@ export function ScopeSheet({
                       danger
                         ? "text-danger"
                         : warn
-                          ? "text-accent"
+                          ? "text-ds-amber"
                           : "text-foreground"
                     }`}
                   >
@@ -124,7 +124,11 @@ export function ScopeSheet({
                 <ChevronRight
                   size={18}
                   className={
-                    danger ? "text-danger" : warn ? "text-accent" : "text-muted"
+                    danger
+                      ? "text-danger"
+                      : warn
+                        ? "text-ds-amber"
+                        : "text-muted"
                   }
                 />
               </Pressable>

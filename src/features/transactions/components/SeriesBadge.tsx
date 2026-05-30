@@ -19,10 +19,10 @@ export function SeriesBadge({ recurrence, endDate }: SeriesBadgeProps) {
   const label = formatRecurrenceLabel(recurrence);
 
   return (
-    <View className="border-success/30 bg-success/10 flex-row items-start gap-2 rounded-xl border px-3 py-2.5">
-      <Repeat size={15} className="text-success mt-0.5" />
+    <View className="border-ds-hair-strong bg-ds-green-tint flex-row items-start gap-2 rounded-xl border px-3 py-2.5">
+      <Repeat size={15} className="text-ds-green mt-0.5" />
       <View className="flex-1">
-        <Text className="text-success text-xs font-semibold">
+        <Text className="text-ds-green text-xs font-semibold">
           Lançamento recorrente{label ? ` · ${label}` : ""}
         </Text>
         <Text className="text-muted mt-0.5 text-xs">

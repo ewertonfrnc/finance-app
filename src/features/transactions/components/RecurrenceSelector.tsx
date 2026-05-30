@@ -37,19 +37,19 @@ export function RecurrenceSelector({
             onPress={() => onChange(option.value)}
             className={`flex-row items-center gap-1.5 rounded-full px-3.5 py-2 ${
               active
-                ? "bg-success/15 border border-success/40"
+                ? "bg-ds-green-tint border border-ds-hair-strong"
                 : "bg-surface border border-surface-tertiary"
             }`}
           >
             {showIcon && (
               <Repeat
                 size={13}
-                className={active ? "text-success" : "text-muted/70"}
+                className={active ? "text-ds-green" : "text-muted/70"}
               />
             )}
             <Text
               className={`text-sm font-semibold ${
-                active ? "text-success" : "text-muted"
+                active ? "text-ds-green" : "text-muted"
               }`}
             >
               {option.label}

@@ -24,7 +24,7 @@ export function RecurrenceEndField({
   const sheetRef = useRef<DatePickerSheetRef>(null);
 
   return (
-    <View className="border-success/30 gap-2 border-l-2 pl-3">
+    <View className="border-ds-green-soft gap-2 border-l-2 pl-3">
       <View className="flex-row items-center justify-between">
         <Text className="text-muted text-label font-semibold tracking-widest">
           TERMINA EM
