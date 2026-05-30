@@ -30,17 +30,18 @@ interface TransactionFormProps {
   onDelete?: () => void;
   isLoading?: boolean;
   isDeleting?: boolean;
+  tagField?: React.ReactNode;
   children?: React.ReactNode;
 }
 
 const TITLE = { new: "Novo lançamento", edit: "Editar lançamento" } as const;
 const SUBMIT_LABEL = { new: "Lançar", edit: "Salvar alterações" } as const;
 
-const TYPE_LABEL_CLASS: Record<TransactionType, string> = {
-  diario: "text-warning",
-  saida: "text-danger",
-  entrada: "text-success",
-  economia: "text-accent",
+const TYPE_DOT_CLASS: Record<TransactionType, string> = {
+  diario: "bg-warning",
+  saida: "bg-danger",
+  entrada: "bg-success",
+  economia: "bg-accent",
 };
 
 export function TransactionForm({
@@ -50,6 +51,7 @@ export function TransactionForm({
   onDelete,
   isLoading = false,
   isDeleting = false,
+  tagField,
   children,
 }: TransactionFormProps) {
   const router = useRouter();
@@ -95,7 +97,7 @@ export function TransactionForm({
   }
 
   return (
-    <KeyboardAvoidingView className="bg-background flex-1" behavior="padding">
+    <KeyboardAvoidingView className="bg-surface flex-1" behavior="padding">
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-4">
         <Pressable onPress={() => router.back()} hitSlop={8}>
@@ -113,7 +115,7 @@ export function TransactionForm({
         className="flex-1 px-4"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        contentContainerClassName="gap-8 pb-8"
+        contentContainerClassName="gap-6 pb-8"
       >
         {/* Tipo */}
         <View className="gap-2">
@@ -125,11 +127,12 @@ export function TransactionForm({
 
         {/* Valor */}
         <View className="gap-2">
-          <Text
-            className={`text-xs font-semibold tracking-widest ${TYPE_LABEL_CLASS[type]}`}
-          >
-            VALOR
-          </Text>
+          <View className="flex-row items-center gap-1.5">
+            <View className={`h-2 w-2 rounded-full ${TYPE_DOT_CLASS[type]}`} />
+            <Text className="text-muted text-xs font-semibold tracking-widest">
+              VALOR
+            </Text>
+          </View>
           <CurrencyInput
             value={amountCents}
             onValueChange={setAmountCents}
@@ -156,6 +159,8 @@ export function TransactionForm({
           </Text>
         </View>
 
+        {tagField}
+
         {/* Data */}
         <View className="gap-2">
           <Text className="text-muted text-xs font-semibold tracking-widest">
@@ -166,7 +171,7 @@ export function TransactionForm({
 
         {/* Recorrência — só na criação (no modo edit o escopo é tratado à parte) */}
         {mode === "new" && (
-          <View className="gap-2">
+          <View className="gap-3">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-1.5">
                 <Repeat size={13} className="text-muted" />

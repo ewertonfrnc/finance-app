@@ -65,12 +65,13 @@ export default function NewTransactionScreen() {
         initialValues={{ date: initialDate }}
         onSubmit={handleSubmit}
         isLoading={isPending}
-      >
-        <TagField
-          selectedTagIds={selectedTagIds}
-          onChangeTagIds={setSelectedTagIds}
-        />
-      </TransactionForm>
+        tagField={
+          <TagField
+            selectedTagIds={selectedTagIds}
+            onChangeTagIds={setSelectedTagIds}
+          />
+        }
+      />
     </Screen>
   );
 }

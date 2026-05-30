@@ -109,7 +109,7 @@ export default function EditTransactionScreen() {
 
   async function handleDeleteSuccess() {
     router.back();
-    await invalidate();
+    await Promise.all([invalidate(), invalidateTags()]);
     queryClient.removeQueries({
       queryKey: queryKeys.transaction(userId, id),
     });
@@ -160,12 +160,14 @@ export default function EditTransactionScreen() {
         onDelete={handleDelete}
         isLoading={isUpdating}
         isDeleting={isDeleting}
+        tagField={
+          <TagField
+            selectedTagIds={selectedTagIds}
+            onChangeTagIds={setSelectedTagIds}
+          />
+        }
       >
         {transaction.sourceSeriesId ? <SeriesOriginNotice /> : null}
-        <TagField
-          selectedTagIds={selectedTagIds}
-          onChangeTagIds={setSelectedTagIds}
-        />
       </TransactionForm>
 
       {showDeleteSheet ? (

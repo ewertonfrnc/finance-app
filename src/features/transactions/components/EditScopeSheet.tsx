@@ -5,17 +5,17 @@ const OPTIONS: ScopeOption[] = [
   {
     scope: "single",
     label: "Apenas este lançamento",
-    desc: "Cria uma exceção só para esta data. A série segue como estava.",
+    desc: "Muda só este dia. Os outros continuam iguais.",
   },
   {
     scope: "following",
     label: "Este e os próximos",
-    desc: "Aplica a esta e às próximas ocorrências da série.",
+    desc: "Muda este e os próximos lançamentos da série.",
   },
   {
     scope: "all",
     label: "Toda a série",
-    desc: "Aplica a todas as ocorrências. A data não muda.",
+    desc: "Muda todos os lançamentos da série.",
   },
 ];
 

@@ -10,9 +10,9 @@ interface RecurrenceSelectorProps {
 
 const OPTIONS: { value: RecurrenceType; label: string }[] = [
   { value: "none", label: "Não repete" },
-  { value: "daily", label: "Todo dia" },
-  { value: "weekly", label: "Toda semana" },
   { value: "monthly", label: "Todo mês" },
+  { value: "weekly", label: "Toda semana" },
+  { value: "daily", label: "Todo dia" },
   { value: "yearly", label: "Todo ano" },
 ];
 
@@ -38,18 +38,18 @@ export function RecurrenceSelector({
             className={`flex-row items-center gap-1.5 rounded-full px-3.5 py-2 ${
               active
                 ? "bg-success/15 border border-success/40"
-                : "bg-surface-secondary border border-transparent"
+                : "bg-surface border border-surface-tertiary"
             }`}
           >
             {showIcon && (
               <Repeat
                 size={13}
-                className={active ? "text-success" : "text-muted"}
+                className={active ? "text-success" : "text-muted/70"}
               />
             )}
             <Text
               className={`text-sm font-semibold ${
-                active ? "text-success" : "text-foreground"
+                active ? "text-success" : "text-muted"
               }`}
             >
               {option.label}

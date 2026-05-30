@@ -5,17 +5,17 @@ const OPTIONS: ScopeOption[] = [
   {
     scope: "single",
     label: "Apenas este lançamento",
-    desc: "Remove só a ocorrência desta data. A série continua.",
+    desc: "Remove só este dia. A série continua.",
   },
   {
     scope: "following",
     label: "Este e os próximos",
-    desc: "Encerra a série a partir desta data.",
+    desc: "Remove este e todos os próximos lançamentos.",
   },
   {
     scope: "all",
     label: "Toda a série",
-    desc: "Remove o lançamento original e todas as ocorrências.",
+    desc: "Remove todos os lançamentos da série.",
     tone: "danger",
   },
 ];
