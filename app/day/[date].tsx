@@ -16,6 +16,7 @@ import { useBalanceQuery } from "@/src/features/saldos/hooks/useBalanceQuery";
 import { useDayTransactions } from "@/src/features/transactions/hooks/useDayTransactions";
 import type { TransactionType } from "@/src/features/transactions/types";
 import { formatDayHeader, nextDay, prevDay } from "@/src/lib/date";
+import { transactionDetailHref } from "@/src/lib/transactionHref";
 
 const TODAY = format(new Date(), "yyyy-MM-dd");
 
@@ -285,7 +286,7 @@ export default function DayScreen() {
           {/* Lista */}
           <FlatList
             data={filtered}
-            keyExtractor={(tx) => tx.id}
+            keyExtractor={(tx) => tx.occurrenceKey}
             ListHeaderComponent={
               isFuture && projectedDaily > 0 ? (
                 <DailyProjectionCard
@@ -307,7 +308,7 @@ export default function DayScreen() {
                 transaction={item}
                 onPress={() => {
                   if (isTransitioning) return;
-                  router.push(`/transaction/${item.id}`);
+                  router.push(transactionDetailHref(item));
                 }}
               />
             )}

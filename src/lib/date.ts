@@ -5,6 +5,16 @@ export function formatIsoDate(date: Date): string {
   return format(date, "yyyy-MM-dd");
 }
 
+/** Primeira letra maiúscula. Útil pros nomes de mês do date-fns (vêm minúsculos). */
+export function capitalize(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+/** "2026-04-12" → "12/04/2026" */
+export function formatFullDate(date: string): string {
+  return format(parseISO(date), "dd/MM/yyyy", { locale: ptBR });
+}
+
 export function isIsoDate(date: string): boolean {
   const parsed = parseISO(date);
   return !Number.isNaN(parsed.getTime()) && format(parsed, "yyyy-MM-dd") === date;

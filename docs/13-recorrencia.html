@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recorrência · finance-app · Plano de Implementação</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0b0c12;
+      --bg-2:     #0f1018;
+      --surface:  #13141c;
+      --surf-2:   #191a26;
+      --surf-3:   #20212f;
+      --surf-4:   #272838;
+      --border:   #252634;
+      --bdr-h:    #363748;
+      --text:     #dde0f0;
+      --muted:    #7578a0;
+      --dim:      #3f4158;
+      --blue:     #4d7eff;
+      --blue-lg:  #7aa3ff;
+      --green:    #2dd87a;
+      --amber:    #f5a623;
+      --red:      #ff5c72;
+      --purple:   #9d7aff;
+      --teal:     #2dc8c8;
+      --radius:   10px;
+      --radius-sm:6px;
+      --font:     'DM Sans', system-ui, sans-serif;
+      --display:  'Syne', system-ui, sans-serif;
+      --mono:     'JetBrains Mono', monospace;
+    }
+
+    html, body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.65; min-height: 100vh; }
+
+    /* ── HEADER ─────────────────────────────── */
+    .top {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(11,12,18,0.88); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 20px;
+      padding: 0 28px; height: 52px;
+    }
+    .logo { display: flex; align-items: center; gap: 9px; }
+    .logo-icon {
+      width: 26px; height: 26px; border-radius: 7px;
+      background: linear-gradient(135deg, #4d7eff 0%, #9d7aff 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--display); font-size: 12px; font-weight: 700; color: #fff;
+    }
+    .logo-text { font-family: var(--display); font-size: 14px; font-weight: 600; }
+    .logo-sub  { font-size: 12px; color: var(--muted); }
+
+    .nav { margin-left: auto; display: flex; gap: 2px; }
+    .nav-btn {
+      background: none; border: none; color: var(--muted);
+      padding: 6px 14px; border-radius: var(--radius-sm);
+      font-family: var(--font); font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all .15s; position: relative;
+    }
+    .nav-btn:hover { background: var(--surf-2); color: var(--text); }
+    .nav-btn.active { color: var(--text); background: var(--surf-3); }
+    .nav-btn.active::after {
+      content: ''; position: absolute; bottom: -1px; left: 14px; right: 14px;
+      height: 2px; border-radius: 2px;
+      background: linear-gradient(90deg, var(--blue), var(--purple));
+    }
+
+    /* ── VIEWS ──────────────────────────────── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── LAYOUT ─────────────────────────────── */
+    .page { padding: 36px 28px 80px; max-width: 1300px; margin: 0 auto; }
+    .page-hero { margin-bottom: 32px; }
+    .page-title { font-family: var(--display); font-size: 28px; font-weight: 700; letter-spacing: -.02em; }
+    .page-sub { color: var(--muted); font-size: 13px; margin-top: 5px; }
+
+    /* ── SECTION BLOCK ───────────────────────── */
+    .block {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    .block + .block { margin-top: 16px; }
+
+    .block-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .block-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0;
+    }
+    .block-title { font-family: var(--display); font-size: 15px; font-weight: 600; }
+    .block-body { padding: 20px; }
+
+    /* ── OVERVIEW TWO-COL ───────────────────── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 800px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── INFO GRID ───────────────────────────── */
+    .info-grid { display: grid; gap: 0; }
+    .info-row {
+      display: flex; gap: 0; border-bottom: 1px solid var(--border);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-key {
+      width: 180px; flex-shrink: 0;
+      padding: 10px 14px; font-size: 12px; font-weight: 500;
+      color: var(--muted); border-right: 1px solid var(--border);
+      background: var(--surf-2);
+    }
+    .info-val { flex: 1; padding: 10px 14px; font-size: 12px; color: var(--text); background: var(--surface); }
+
+    /* ── PILL / BADGE ───────────────────────── */
+    .pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+    }
+    .pill-blue   { background: rgba(77,126,255,.14); color: #7aa3ff; border: 1px solid rgba(77,126,255,.28); }
+    .pill-green  { background: rgba(45,216,122,.12); color: #2dd87a; border: 1px solid rgba(45,216,122,.28); }
+    .pill-amber  { background: rgba(245,166,35,.12); color: #f5c842; border: 1px solid rgba(245,166,35,.28); }
+    .pill-red    { background: rgba(255,92,114,.12); color: #ff5c72; border: 1px solid rgba(255,92,114,.28); }
+    .pill-purple { background: rgba(157,122,255,.12); color: #b99aff; border: 1px solid rgba(157,122,255,.28); }
+    .pill-dim    { background: rgba(100,100,130,.10); color: var(--muted); border: 1px solid var(--border); }
+
+    /* ── GAP CARDS ───────────────────────────── */
+    .gap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+    .gap-card {
+      background: var(--surf-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 16px;
+      display: flex; gap: 12px; align-items: flex-start;
+      transition: border-color .15s;
+    }
+    .gap-card:hover { border-color: var(--bdr-h); }
+    .gap-em { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .gap-title { font-size: 12px; font-weight: 600; }
+    .gap-desc { font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+
+    /* ── CALLOUT ─────────────────────────────── */
+    .callout {
+      border-left: 3px solid; border-radius: 8px; padding: 11px 14px;
+      font-size: 12.5px; line-height: 1.55;
+    }
+    .callout-title { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
+    .callout.blue  { background: rgba(77,126,255,.07); border-color: #4d7eff; }
+    .callout.blue  .callout-title { color: #7aa3ff; }
+    .callout.amber { background: rgba(245,166,35,.07); border-color: var(--amber); }
+    .callout.amber .callout-title { color: var(--amber); }
+    .callout.red   { background: rgba(255,92,114,.07); border-color: var(--red); }
+    .callout.red   .callout-title { color: var(--red); }
+    .callout.green { background: rgba(45,216,122,.07); border-color: var(--green); }
+    .callout.green .callout-title { color: var(--green); }
+
+    /* ── DATA FLOW ───────────────────────────── */
+    .flow-wrap { padding: 24px 20px; overflow-x: auto; }
+    .flow {
+      display: flex; align-items: center; gap: 0;
+      min-width: 600px;
+    }
+    .flow-node {
+      background: var(--surf-3); border: 1px solid var(--bdr-h);
+      border-radius: var(--radius); padding: 10px 16px;
+      text-align: center; min-width: 120px;
+      transition: border-color .2s;
+    }
+    .flow-node:hover { border-color: var(--blue); }
+    .flow-node-label { font-size: 12px; font-weight: 600; color: var(--text); }
+    .flow-node-sub { font-size: 10px; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
+    .flow-node.blue   { border-color: rgba(77,126,255,.4); background: rgba(77,126,255,.07); }
+    .flow-node.green  { border-color: rgba(45,216,122,.4); background: rgba(45,216,122,.07); }
+    .flow-node.purple { border-color: rgba(157,122,255,.4); background: rgba(157,122,255,.07); }
+    .flow-node.teal   { border-color: rgba(45,200,200,.4); background: rgba(45,200,200,.07); }
+    .flow-node.amber  { border-color: rgba(245,166,35,.4);  background: rgba(245,166,35,.07); }
+    .flow-arr {
+      padding: 0 8px; color: var(--dim); font-size: 18px;
+      display: flex; align-items: center; flex-direction: column; gap: 2px;
+    }
+    .flow-arr-label { font-size: 10px; color: var(--dim); font-family: var(--mono); white-space: nowrap; }
+
+    /* ── TIMELINE (SLICES) ───────────────────── */
+    .timeline { display: flex; flex-direction: column; gap: 0; position: relative; }
+    .timeline::before {
+      content: ''; position: absolute; left: 40px; top: 20px; bottom: 20px;
+      width: 1px; background: var(--border);
+    }
+    .tl-item { display: grid; grid-template-columns: 80px 1fr; gap: 0; position: relative; }
+    .tl-label {
+      padding: 20px 20px 20px 0; text-align: right;
+      border-right: none; position: relative;
+    }
+    .tl-dot {
+      position: absolute; right: -5px; top: 26px;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--surf-4); border: 2px solid var(--border);
+      z-index: 2; transition: all .2s;
+    }
+    .tl-item:hover .tl-dot { border-color: var(--blue); background: var(--blue); }
+    .tl-week { font-size: 11px; font-weight: 700; color: var(--text); font-family: var(--mono); }
+    .tl-time { font-size: 10px; color: var(--dim); }
+    .tl-cards { padding: 12px 0 12px 24px; display: flex; flex-direction: column; gap: 8px; }
+
+    .slice-card {
+      background: var(--surf-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px;
+      border-left: 3px solid var(--border); transition: border-color .15s;
+    }
+    .slice-card:hover { border-color: var(--bdr-h); }
+    .slice-card.api    { border-left-color: var(--blue); }
+    .slice-card.app    { border-left-color: var(--purple); }
+    .slice-card.db     { border-left-color: var(--teal); }
+    .slice-card.ui     { border-left-color: var(--amber); }
+    .slice-card.ux     { border-left-color: var(--green); }
+
+    .slice-title { font-family: var(--display); font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .slice-desc  { font-size: 12px; color: var(--muted); line-height: 1.55; margin-bottom: 10px; }
+    .slice-tags  { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+    .slice-checklist { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+    .check-item { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; color: var(--muted); }
+    .check-box  { width: 13px; height: 13px; border-radius: 3px; background: var(--surf-4); border: 1px solid var(--bdr-h); flex-shrink: 0; margin-top: 1px; }
+    .check-done { background: var(--green); border-color: var(--green); color: #000; font-size: 9px; display: flex; align-items: center; justify-content: center; }
+    .slice-footer { display: flex; align-items: center; justify-content: space-between; }
+    .slice-effort { font-size: 11px; color: var(--dim); }
+
+    /* ── CODE BLOCKS ──────────────────────────── */
+    .code-section { margin-bottom: 24px; }
+    .code-section:last-child { margin-bottom: 0; }
+    .file-label {
+      display: inline-block; margin-bottom: -1px;
+      background: #1d2035; border: 1px solid var(--border);
+      border-bottom: none; border-radius: 6px 6px 0 0;
+      padding: 5px 12px; font-family: var(--mono); font-size: 11px;
+      color: #8a9ec8; letter-spacing: .02em;
+    }
+    pre {
+      background: #0f101a; border: 1px solid var(--border);
+      border-radius: 0 8px 8px 8px; padding: 16px;
+      overflow-x: auto; line-height: 1.6;
+      font-family: var(--mono); font-size: 12px; color: #c9d5f7;
+    }
+    code { font-family: var(--mono); font-size: .9em; background: var(--surf-3); padding: 1px 5px; border-radius: 4px; }
+    pre code { background: transparent; padding: 0; }
+
+    /* ── TOKEN COLORS (minimal) ──────────────── */
+    .t-k  { color: #7aa3ff; } /* keyword */
+    .t-s  { color: #a0d0a0; } /* string */
+    .t-c  { color: #5a607a; font-style: italic; } /* comment */
+    .t-t  { color: #d4c5ff; } /* type */
+    .t-fn { color: #7dd5f5; } /* function */
+    .t-n  { color: #ffd0a0; } /* number/const */
+    .t-p  { color: #c9d5f7; } /* punctuation */
+    .t-new { background: rgba(45,216,122,.12); color: #2dd87a; padding: 0 2px; border-radius: 3px; } /* new lines */
+
+    /* ── RISK TABLE ───────────────────────────── */
+    .risk-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .risk-table th {
+      text-align: left; padding: 9px 14px;
+      font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--muted); background: var(--surf-2); border-bottom: 1px solid var(--border);
+    }
+    .risk-table td {
+      padding: 11px 14px; border-bottom: 1px solid var(--border);
+      vertical-align: top; color: var(--text); font-size: 12.5px;
+    }
+    .risk-table tr:last-child td { border-bottom: none; }
+    .risk-table tr:hover td { background: var(--surf-2); }
+    .sev { font-size: 10px; font-weight: 700; letter-spacing: .04em; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+    .sev-high { background: rgba(255,92,114,.15); color: var(--red); border: 1px solid rgba(255,92,114,.3); }
+    .sev-med  { background: rgba(245,166,35,.12); color: var(--amber); border: 1px solid rgba(245,166,35,.3); }
+    .sev-low  { background: rgba(45,216,122,.12); color: var(--green); border: 1px solid rgba(45,216,122,.3); }
+
+    /* ── BACKEND GAPS ────────────────────────── */
+    .gap-analysis { display: flex; flex-direction: column; gap: 8px; }
+    .gap-item {
+      background: var(--surf-2); border: 1px solid var(--border);
+      border-left: 3px solid var(--amber);
+      border-radius: var(--radius-sm); padding: 12px 14px;
+    }
+    .gap-num { font-family: var(--mono); font-size: 10px; color: var(--amber); font-weight: 600; margin-bottom: 3px; }
+    .gap-gtitle { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .gap-gbody { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+    /* ── PROGRESS BAR ────────────────────────── */
+    .prog-wrap { height: 4px; background: var(--surf-4); border-radius: 4px; overflow: hidden; margin-top: 5px; }
+    .prog-fill { height: 100%; border-radius: 4px; }
+
+    /* ── OPEN QUESTIONS ─────────────────────── */
+    .oq-list { display: flex; flex-direction: column; gap: 8px; }
+    .oq-item {
+      background: var(--surf-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 16px;
+      display: flex; gap: 12px;
+    }
+    .oq-em { font-size: 18px; flex-shrink: 0; }
+    .oq-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+    .oq-body { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .oq-decide { font-size: 11px; color: var(--blue-lg); margin-top: 5px; font-family: var(--mono); }
+
+    /* ── DIVIDER ────────────────────────────── */
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    p { margin-bottom: 12px; }
+    p:last-child { margin-bottom: 0; }
+    ul, ol { padding-left: 20px; margin-bottom: 12px; }
+    li { margin: 5px 0; font-size: 13px; }
+
+    @media (max-width: 640px) {
+      .page { padding: 20px 14px 60px; }
+      .top { padding: 0 14px; }
+      .nav-btn span { display: none; }
+      .tl-item { grid-template-columns: 60px 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<header class="top">
+  <div class="logo">
+    <div class="logo-icon">F</div>
+    <span class="logo-text">finance-app</span>
+    <span class="logo-sub">/ Recorrência</span>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="show('overview')" id="btn-overview"><span>📋 </span>Visão Geral</button>
+    <button class="nav-btn" onclick="show('slices')"   id="btn-slices"><span>🗓 </span>Slices</button>
+    <button class="nav-btn" onclick="show('code')"     id="btn-code"><span>⟨⟩ </span>Código-chave</button>
+    <button class="nav-btn" onclick="show('risks')"    id="btn-risks"><span>⚠ </span>Riscos</button>
+  </nav>
+</header>
+
+
+<!-- ═══════════════════════════════════════════
+     VIEW 1 — VISÃO GERAL
+     ═══════════════════════════════════════════ -->
+<div class="view active" id="view-overview">
+<div class="page">
+
+  <div class="page-hero">
+    <div class="page-title">Transações Recorrentes — App</div>
+    <div class="page-sub">Plano de implementação frontend · finance-app · React Native + Expo · 5 slices · backend de recorrência já implantado</div>
+  </div>
+
+  <!-- STATUS DO PLANO -->
+  <div class="block" style="margin-bottom:16px;">
+    <div class="block-body">
+      <div class="info-grid">
+        <div class="info-row">
+          <div class="info-key">Pré-requisito</div>
+          <div class="info-val">✅ <strong style="color:var(--green)">Backend pronto.</strong> Migration <code>000008_add_recurrence_to_transactions</code> aplicada e a API já aceita recorrência em todo o fluxo: create com <code>recurrence</code>/<code>recurrence_end_date</code>, list com ocorrências expandidas, delete e update com escopo.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-key">Esforço estimado</div>
+          <div class="info-val">~8 dias · 5 slices independentes, cada um deployável</div>
+        </div>
+        <div class="info-row">
+          <div class="info-key">Superfícies tocadas</div>
+          <div class="info-val">
+            <span class="pill pill-blue">types/api.ts</span>
+            <span class="pill pill-purple" style="margin-left:4px;">types/domain.ts</span>
+            <span class="pill pill-green" style="margin-left:4px;">mappers.ts</span>
+            <span class="pill pill-amber" style="margin-left:4px;">TransactionForm</span>
+            <span class="pill pill-dim" style="margin-left:4px;">TransactionItem</span>
+            <span class="pill pill-dim" style="margin-left:4px;">[id].tsx</span>
+            <span class="pill pill-dim" style="margin-left:4px;">day/[date].tsx</span>
+            <span class="pill pill-dim" style="margin-left:4px;">tags/[id].tsx</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-key">Paridade backend</div>
+          <div class="info-val">Os 5 slices rodam contra a API atual. <code>UpdateRecurring</code> (escopos <code>single</code>/<code>following</code>/<code>all</code>) já está implementado em <code>internal/store/transactions.go</code> — <strong style="color:var(--green)">Slice 5 deixou de ser bloqueado.</strong></div>
+        </div>
+        <div class="info-row">
+          <div class="info-key">Identidade da ocorrência</div>
+          <div class="info-val">⚠️ <code>GET /transactions/:id</code> retorna o <strong>template</strong> (a <code>date</code> de início da série), não a ocorrência tocada. Para deletar/editar "apenas este", a <code>date</code> da ocorrência precisa viajar pela rota (<code>/transaction/[id]?date=YYYY-MM-DD</code>) e ser usada nos escopos — nunca <code>transaction.date</code> da tela de edição.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMO O BACKEND ENTREGA RECORRÊNCIA -->
+  <div class="block">
+    <div class="block-header">
+      <div class="block-icon" style="background:rgba(77,126,255,.15);">🔁</div>
+      <span class="block-title">Como o backend entrega recorrência</span>
+    </div>
+    <div class="block-body">
+      <p style="color:var(--muted);font-size:13px;">
+        É importante entender o modelo antes de codar: o banco guarda <strong style="color:var(--text)">uma linha por série recorrente</strong> (o template). Ao listar transações de um mês, o PostgreSQL usa <code>generate_series</code> para expandir esse template em ocorrências virtuais. O app recebe o resultado como se fossem transações normais.
+      </p>
+
+      <div style="margin:16px 0;">
+        <div class="callout blue">
+          <div class="callout-title">Consequência direta no app</div>
+          Todas as ocorrências de uma série compartilham o mesmo <code>id</code> (o id do template). Para identificar uma ocorrência específica, o par <code>(series_id, date)</code> é necessário. Duas implicações que <strong>não eram óbvias</strong>: (1) listas que renderizam um mês inteiro recebem várias ocorrências diárias/semanais com o <em>mesmo</em> <code>id</code> — o <code>keyExtractor</code> precisa de uma chave própria (<code>occurrenceKey</code>); (2) a <code>date</code> da ocorrência só existe na listagem expandida — o detalhe (<code>GetByID</code>) devolve a data do template. Logo a data tocada deve ser propagada pela navegação.
+        </div>
+        <div class="callout amber" style="margin-top:8px;">
+          <div class="callout-title">Contrato assimétrico — atenção ao implementar</div>
+          O backend lê o escopo em <strong>lugares diferentes</strong> para cada verbo: <code>DELETE /transactions/:id?scope=…&amp;date=…</code> usa <strong>query params</strong> (chave <code>date</code>); já o <code>PATCH /transactions/:id</code> lê <code>scope</code> e <code>instance_date</code> do <strong>corpo JSON</strong>. Não dá para reutilizar a mesma forma de envio nos dois.
+        </div>
+      </div>
+
+      <!-- DATA FLOW -->
+      <div style="margin-top:20px;margin-bottom:4px;font-size:11px;color:var(--muted);font-family:var(--mono);">Fluxo: banco → API → app → UI</div>
+      <div class="flow-wrap" style="background:var(--surf-2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div class="flow">
+          <div class="flow-node teal">
+            <div class="flow-node-label">PostgreSQL</div>
+            <div class="flow-node-sub">template + generate_series</div>
+          </div>
+          <div class="flow-arr">
+            <div class="flow-arr-label">UNION ALL</div>
+            <span>→</span>
+          </div>
+          <div class="flow-node blue">
+            <div class="flow-node-label">Chi Handler</div>
+            <div class="flow-node-sub">ListTransactions()</div>
+          </div>
+          <div class="flow-arr">
+            <div class="flow-arr-label">ApiTransaction[]</div>
+            <span>→</span>
+          </div>
+          <div class="flow-node purple">
+            <div class="flow-node-label">mapApiTransaction</div>
+            <div class="flow-node-sub">mappers.ts</div>
+          </div>
+          <div class="flow-arr">
+            <div class="flow-arr-label">Transaction[]</div>
+            <span>→</span>
+          </div>
+          <div class="flow-node green">
+            <div class="flow-node-label">React Query</div>
+            <div class="flow-node-sub">cache por mês</div>
+          </div>
+          <div class="flow-arr"><span>→</span></div>
+          <div class="flow-node amber">
+            <div class="flow-node-label">UI</div>
+            <div class="flow-node-sub">badge + scope sheet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- O QUE MUDA NO APP -->
+  <div class="block" style="margin-top:16px;">
+    <div class="block-header">
+      <div class="block-icon" style="background:rgba(157,122,255,.15);">📦</div>
+      <span class="block-title">O que muda no app</span>
+    </div>
+    <div class="block-body">
+      <div class="gap-grid">
+        <div class="gap-card">
+          <span class="gap-em">🏷️</span>
+          <div>
+            <div class="gap-title">Tipos &amp; Contrato</div>
+            <div class="gap-desc"><code>ApiTransaction</code> ganha <code>recurrence</code>, <code>series_id</code>, <code>recurrence_end_date</code>. Tipos <code>RecurrenceType</code> e <code>RecurrenceScope</code> são adicionados; <code>ApiUpdateTransactionPayload</code> ganha <code>scope</code>/<code>instance_date</code>.</div>
+          </div>
+        </div>
+        <div class="gap-card">
+          <span class="gap-em">🔄</span>
+          <div>
+            <div class="gap-title">Mapper</div>
+            <div class="gap-desc"><code>mapApiTransaction</code> inclui os 3 novos campos no retorno. Único lugar de conversão — muda aqui, reflete em tudo.</div>
+          </div>
+        </div>
+        <div class="gap-card">
+          <span class="gap-em">📝</span>
+          <div>
+            <div class="gap-title">Formulário de Criação</div>
+            <div class="gap-desc">Novo campo <code>recurrence</code> no <code>FormValues</code>. Componente <code>RecurrenceSelector</code> adicionado ao <code>TransactionForm</code> (somente mode="new").</div>
+          </div>
+        </div>
+        <div class="gap-card">
+          <span class="gap-em">🔖</span>
+          <div>
+            <div class="gap-title">Badge Visual</div>
+            <div class="gap-desc"><code>TransactionItem</code> exibe ícone de repetição quando <code>recurrence !== "none"</code>. Mudança pequena, alto impacto visual.</div>
+          </div>
+        </div>
+        <div class="gap-card">
+          <span class="gap-em">🗑️</span>
+          <div>
+            <div class="gap-title">Delete com Escopo</div>
+            <div class="gap-desc">Ao excluir uma transação recorrente, um bottom sheet pergunta: "Apenas este", "Este e os próximos" ou "Todos". O serviço envia <code>?scope=X&amp;date=Y</code>.</div>
+          </div>
+        </div>
+        <div class="gap-card">
+          <span class="gap-em">✏️</span>
+          <div>
+            <div class="gap-title">Edição com Escopo</div>
+            <div class="gap-desc">Mesmo padrão do delete, mas o escopo vai no <strong>corpo</strong> do <code>PATCH</code> (<code>scope</code> + <code>instance_date</code>), não na query. O backend <code>UpdateRecurring</code> <strong style="color:var(--green)">já está pronto</strong> — sem bloqueio.</div>
+          </div>
+        </div>
+        <div class="gap-card">
+          <span class="gap-em">🔑</span>
+          <div>
+            <div class="gap-title">occurrenceKey &amp; navegação</div>
+            <div class="gap-desc">Mapper deriva <code>occurrenceKey = seriesId ? `${seriesId}:${date}` : id</code> para o <code>keyExtractor</code>. Ao abrir um item recorrente, navegar com <code>?date=</code> para preservar a ocorrência. Toca <code>day/[date].tsx</code> e <code>tags/[id].tsx</code>.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTRATO REAL DO BACKEND -->
+  <div class="block" style="margin-top:16px;">
+    <div class="block-header">
+      <div class="block-icon" style="background:rgba(45,216,122,.15);">✅</div>
+      <span class="block-title">Contrato real do backend — já implementado</span>
+      <span class="pill pill-green" style="margin-left:auto;">4 lacunas resolvidas</span>
+    </div>
+    <div class="block-body">
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">
+        As 4 lacunas que o plano apontava no guia da API (<code>UpdateRecurring</code>, Scans, SQL de totais/saldo, campo Tags) <strong style="color:var(--green)">já foram fechadas no código</strong> (<code>internal/store/transactions.go</code> + <code>cmd/api/transactions.go</code>). Use a tabela abaixo como contrato de verdade — confira sempre contra o handler, não contra o guia.
+      </p>
+      <div class="gap-analysis">
+
+        <div class="gap-item" style="border-left-color:var(--green);">
+          <div class="gap-num" style="color:var(--green);">CREATE · POST /v1/transactions</div>
+          <div class="gap-gtitle">Aceita <code>recurrence</code> e <code>recurrence_end_date</code></div>
+          <div class="gap-gbody">Body: <code>{ type, amount, description, date, tags?, recurrence?, recurrence_end_date? }</code>. <code>recurrence</code> é <code>omitempty</code> (default <code>none</code> no Go). Se <code>recurrence != none</code>, o backend gera o <code>series_id</code> sozinho. Resposta inclui <code>recurrence</code>, <code>series_id</code> e <code>recurrence_end_date</code>.</div>
+        </div>
+
+        <div class="gap-item" style="border-left-color:var(--green);">
+          <div class="gap-num" style="color:var(--green);">LIST · GET /v1/transactions</div>
+          <div class="gap-gtitle">Ocorrências já vêm expandidas via <code>generate_series</code></div>
+          <div class="gap-gbody">Cada ocorrência traz a <code>date</code> daquela instância, mas o <strong>mesmo</strong> <code>id</code>/<code>series_id</code> do template. Exceções (deletes "single") são filtradas por <code>transaction_exceptions</code>. O app não calcula nada de calendário.</div>
+        </div>
+
+        <div class="gap-item" style="border-left-color:var(--green);">
+          <div class="gap-num" style="color:var(--green);">DELETE · DELETE /v1/transactions/:id</div>
+          <div class="gap-gtitle">Escopo em <strong>query params</strong>: <code>?scope=&amp;date=</code></div>
+          <div class="gap-gbody">Se a transação tem <code>series_id</code>, o handler exige <code>scope</code> (default <code>single</code>) e, para <code>single</code>/<code>following</code>, a <code>date</code> da ocorrência (query key literal <code>date</code>). Avulsa: <code>DELETE</code> direto, sem params. <code>204 No Content</code>.</div>
+        </div>
+
+        <div class="gap-item" style="border-left-color:var(--green);">
+          <div class="gap-num" style="color:var(--green);">UPDATE · PATCH /v1/transactions/:id</div>
+          <div class="gap-gtitle">Escopo no <strong>corpo JSON</strong>: <code>scope</code> + <code>instance_date</code></div>
+          <div class="gap-gbody"><code>UpdateRecurring</code> implementa os 3 escopos. <code>single</code> = exceção + nova avulsa; <code>following</code> = trunca série + novo template; <code>all</code> = UPDATE no template (só <code>type</code>/<code>amount</code>/<code>description</code> propagam — <code>date</code> não). ⚠️ diferente do delete, o escopo vai no <strong>body</strong>, não na query.</div>
+        </div>
+
+      </div>
+      <div class="callout green" style="margin-top:12px;">
+        <div class="callout-title">O que isso destrava no plano</div>
+        Slice 5 não tem mais bloqueio de backend. O foco do app passa a ser puramente client-side: tipos, identidade de ocorrência (<code>occurrenceKey</code> + <code>date</code> na rota) e os dois sheets de escopo.
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     VIEW 2 — SLICES
+     ═══════════════════════════════════════════ -->
+<div class="view" id="view-slices">
+<div class="page">
+
+  <div class="page-hero">
+    <div class="page-title">Slices de Implementação</div>
+    <div class="page-sub">Cada slice é independente e pode ser revisado separadamente · backend de recorrência (migration 000008) já implantado</div>
+  </div>
+
+  <div class="timeline">
+
+    <!-- SLICE 1 -->
+    <div class="tl-item">
+      <div class="tl-label">
+        <div class="tl-dot"></div>
+        <div class="tl-week">S1</div>
+        <div class="tl-time">~2h · Dia 1</div>
+      </div>
+      <div class="tl-cards">
+        <div class="slice-card api">
+          <div class="slice-title">Tipos, Mapper e Serviço — fundação sem UI</div>
+          <div class="slice-desc">
+            Toda a camada de tipos precede qualquer mudança visual. Ao terminar este slice, o app já <em>recebe</em> os dados de recorrência da API corretamente — só não os exibe. Isso permite revisar e testar o contrato antes de qualquer toque de UI.
+          </div>
+          <div class="slice-checklist">
+            <div class="check-item"><div class="check-box"></div><span><code>types/api.ts</code> — <code>RecurrenceType</code>, <code>RecurrenceScope</code>; campos em <code>ApiTransaction</code> (<code>recurrence</code>, <code>series_id?</code>, <code>recurrence_end_date?</code>); <code>recurrence?</code>/<code>recurrence_end_date?</code> no create; <code>scope?</code>/<code>instance_date?</code> no <code>ApiUpdateTransactionPayload</code>; <code>ApiDeleteScopeParams</code> (query do delete)</span></div>
+            <div class="check-item"><div class="check-box"></div><span><code>types/domain.ts</code> — <code>recurrence</code>, <code>seriesId?</code>, <code>recurrenceEndDate?</code> e <code>occurrenceKey</code> em <code>Transaction</code>; <code>recurrence</code> em <code>FormValues</code></span></div>
+            <div class="check-item"><div class="check-box"></div><span><code>src/lib/mappers.ts</code> — mapear os 3 campos novos <strong>e derivar <code>occurrenceKey</code></strong> (<code>seriesId ? `${seriesId}:${date}` : id</code>)</span></div>
+            <div class="check-item"><div class="check-box"></div><span><code>transactions.service.ts</code> — <code>createTransaction</code> envia <code>recurrence</code>; <code>deleteTransaction</code> aceita <code>{ scope, date }</code> via <strong>query</strong>; <code>updateTransaction</code> envia <code>scope</code>/<code>instance_date</code> no <strong>body</strong></span></div>
+            <div class="check-item"><div class="check-box"></div><span><code>useDeleteTransaction</code> e <code>useUpdateTransaction</code> — assinaturas estendidas para repassar escopo + data da ocorrência</span></div>
+          </div>
+          <div class="slice-tags">
+            <span class="pill pill-blue">API Types</span>
+            <span class="pill pill-purple">Domain Types</span>
+            <span class="pill pill-green">Mapper</span>
+            <span class="pill pill-dim">Service</span>
+          </div>
+          <div class="slice-footer">
+            <span class="slice-effort">Sem UI · Revisar antes do Slice 2</span>
+            <span class="pill pill-blue">Fundação</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLICE 2 -->
+    <div class="tl-item">
+      <div class="tl-label">
+        <div class="tl-dot"></div>
+        <div class="tl-week">S2</div>
+        <div class="tl-time">~4h · Dia 2–3</div>
+      </div>
+      <div class="tl-cards">
+        <div class="slice-card ui">
+          <div class="slice-title">RecurrenceSelector — formulário de criação</div>
+          <div class="slice-desc">
+            Novo componente dentro da feature (<code>features/transactions/components/</code>, não em <code>components/</code> — segue a regra de features como ilhas). Exibido somente em <code>mode="new"</code>. Em <code>mode="edit"</code>, o escopo é tratado pelo Slice 5. Default: <code>"none"</code> (não repete).
+          </div>
+          <div class="slice-checklist">
+            <div class="check-item"><div class="check-box"></div><span>Criar <code>features/transactions/components/RecurrenceSelector.tsx</code> — 5 opções como pills horizontais com scroll</span></div>
+            <div class="check-item"><div class="check-box"></div><span><code>TransactionForm.tsx</code> — adicionar estado <code>recurrence</code>, renderizar <code>&lt;RecurrenceSelector /&gt;</code> somente em <code>mode="new"</code></span></div>
+            <div class="check-item"><div class="check-box"></div><span>Atualizar <code>handleSubmit</code> para incluir <code>recurrence</code> nos valores enviados</span></div>
+            <div class="check-item"><div class="check-box"></div><span>Verificar que <code>app/transaction/new.tsx</code> passa <code>recurrence</code> no payload para o hook</span></div>
+          </div>
+          <div class="slice-tags">
+            <span class="pill pill-amber">UI Component</span>
+            <span class="pill pill-purple">TransactionForm</span>
+          </div>
+          <div class="callout amber" style="margin-top:10px;">
+            <div class="callout-title">Decisão de UX — sua contribuição</div>
+            Como exibir as opções? Sugestão: pills horizontais com scroll (<code>Não repete · Todo dia · Toda semana · Todo mês · Todo ano</code>). Alternativa: dropdown/picker nativo. A escolha afeta o espaço vertical do formulário. Considere que "todo mês" será a opção mais usada.
+          </div>
+          <div class="slice-footer" style="margin-top:12px;">
+            <span class="slice-effort">Componente isolado, fácil de iterar</span>
+            <span class="pill pill-amber">UI</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLICE 3 -->
+    <div class="tl-item">
+      <div class="tl-label">
+        <div class="tl-dot"></div>
+        <div class="tl-week">S3</div>
+        <div class="tl-time">~1h · Dia 4</div>
+      </div>
+      <div class="tl-cards">
+        <div class="slice-card ux">
+          <div class="slice-title">Listagem: badge, occurrenceKey e navegação com date</div>
+          <div class="slice-desc">
+            Badge em <code>TransactionItem</code> (ícone <code>Repeat</code> do lucide quando <code>recurrence !== "none"</code>) <strong>mais</strong> dois ajustes de correção que precedem os Slices 4/5: trocar o <code>keyExtractor</code> para <code>occurrenceKey</code> (ocorrências diárias/semanais repetem o <code>id</code> no mesmo mês) e propagar a <code>date</code> da ocorrência na navegação para a tela de edição.
+          </div>
+          <div class="slice-checklist">
+            <div class="check-item"><div class="check-box"></div><span><code>TransactionItem.tsx</code> — <code>Repeat</code> de lucide na subline (<code>hasSubline</code> já suporta o flex row das tags)</span></div>
+            <div class="check-item"><div class="check-box"></div><span><code>day/[date].tsx</code> e <code>tags/[id].tsx</code> — <code>keyExtractor={(t) =&gt; t.occurrenceKey}</code> no lugar de <code>t.id</code></span></div>
+            <div class="check-item"><div class="check-box"></div><span>Navegação dos itens recorrentes: <code>/transaction/${id}?date=${occurrenceDate}</code> (avulsa continua sem <code>date</code>)</span></div>
+          </div>
+          <div class="slice-tags">
+            <span class="pill pill-green">TransactionItem</span>
+            <span class="pill pill-dim">day/[date].tsx</span>
+            <span class="pill pill-dim">tags/[id].tsx</span>
+          </div>
+          <div class="callout amber" style="margin-top:10px;">
+            <div class="callout-title">Por que isto vem antes do delete/edit com escopo</div>
+            Sem o <code>date</code> da ocorrência na rota, a tela de edição só conhece a data do <em>template</em> (o <code>GetByID</code> não expande). Aí <code>single</code>/<code>following</code> atuariam na ocorrência errada. O badge em si é cosmético, mas o <code>occurrenceKey</code> e o <code>date</code> na rota são pré-requisito de correção dos Slices 4 e 5.
+          </div>
+          <div class="slice-footer" style="margin-top:12px;">
+            <span class="slice-effort">~1h · patch mínimo</span>
+            <span class="pill pill-green">Visual</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLICE 4 -->
+    <div class="tl-item">
+      <div class="tl-label">
+        <div class="tl-dot"></div>
+        <div class="tl-week">S4</div>
+        <div class="tl-time">~1 dia · Dia 5–6</div>
+      </div>
+      <div class="tl-cards">
+        <div class="slice-card app">
+          <div class="slice-title">Delete com escopo — bottom sheet de 3 opções</div>
+          <div class="slice-desc">
+            Ao excluir uma transação com <code>seriesId</code>, exibir um modal com as 3 opções antes de confirmar. Transações avulsas (<code>seriesId</code> indefinido) continuam com o comportamento atual — sem sheet.
+          </div>
+          <div class="slice-checklist">
+            <div class="check-item"><div class="check-box"></div><span>Criar <code>DeleteScopeSheet.tsx</code> — modal com 3 opções e botão cancelar</span></div>
+            <div class="check-item"><div class="check-box"></div><span><code>[id].tsx</code> — ler <code>date</code> da rota (<code>useLocalSearchParams</code>); estado <code>showDeleteSheet</code>; <code>handleDeleteWithScope(scope)</code></span></div>
+            <div class="check-item"><div class="check-box"></div><span>Bifurcação: <code>transaction.seriesId</code> existe? → abre sheet : delete direto (avulsa, sem regressão)</span></div>
+            <div class="check-item"><div class="check-box"></div><span>Serviço passa <code>?scope=X&amp;date=Y</code> via Axios <code>params</code>, com <code>date</code> = <strong>a data da rota</strong> (ocorrência), nunca <code>transaction.date</code> (template)</span></div>
+          </div>
+          <div class="slice-tags">
+            <span class="pill pill-purple">DeleteScopeSheet</span>
+            <span class="pill pill-dim">[id].tsx</span>
+            <span class="pill pill-blue">Service</span>
+          </div>
+          <div class="callout blue" style="margin-top:10px;">
+            <div class="callout-title">Já existe um padrão — reaproveite</div>
+            O app já usa <code>@gorhom/bottom-sheet</code> (<code>BottomSheetModal</code> via <code>sheetRef</code>) em <code>features/tags/components/TagFormModal.tsx</code>. Siga esse mesmo padrão no <code>DeleteScopeSheet</code> em vez de criar um <code>Modal</code> do zero — mantém consistência e gestos. Cada opção tem label + subtítulo (ex: "Apenas este lançamento" · "Remove só a ocorrência desta data").
+          </div>
+          <div class="slice-footer" style="margin-top:12px;">
+            <span class="slice-effort">Funciona com o backend atual</span>
+            <span class="pill pill-purple">UX</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLICE 5 -->
+    <div class="tl-item">
+      <div class="tl-label">
+        <div class="tl-dot"></div>
+        <div class="tl-week">S5</div>
+        <div class="tl-time">~1 dia · Dia 7–8</div>
+      </div>
+      <div class="tl-cards">
+        <div class="slice-card app">
+          <div class="slice-title">Edição com escopo — interceptar submit</div>
+          <div class="slice-desc">
+            Ao tocar "Salvar alterações" em uma transação recorrente, exibir o sheet de escopo antes de confirmar. Os valores do formulário ficam em estado pendente enquanto o usuário escolhe o escopo.
+          </div>
+          <div class="slice-checklist">
+            <div class="check-item"><div class="check-box"></div><span><code>[id].tsx</code> — <code>pendingValues</code> como estado; <code>handleSubmit</code> bifurca para o sheet se <code>seriesId</code> existe</span></div>
+            <div class="check-item"><div class="check-box"></div><span>Criar <code>EditScopeSheet.tsx</code> (reaproveita a lista de opções do DeleteScopeSheet)</span></div>
+            <div class="check-item"><div class="check-box"></div><span><code>useUpdateTransaction</code> — aceitar <code>scope</code> e <code>instanceDate</code> (a data da rota) opcionais</span></div>
+            <div class="check-item"><div class="check-box"></div><span><code>transactions.service.ts</code> — <code>updateTransaction</code> manda <code>scope</code>/<code>instance_date</code> no <strong>corpo do PATCH</strong> (≠ delete, que usa query)</span></div>
+          </div>
+          <div class="slice-tags">
+            <span class="pill pill-purple">EditScopeSheet</span>
+            <span class="pill pill-dim">[id].tsx</span>
+            <span class="pill pill-blue">useUpdateTransaction</span>
+          </div>
+          <div class="callout green" style="margin-top:10px;">
+            <div class="callout-title">Desbloqueado — backend pronto</div>
+            <code>UpdateRecurring</code> já implementa os 3 escopos em <code>internal/store/transactions.go</code>. O antigo GAP 01 está fechado; este slice pode ser feito logo após o Slice 3 (que entrega o <code>date</code> da ocorrência na rota).
+          </div>
+          <div class="callout amber" style="margin-top:8px;">
+            <div class="callout-title">Detalhe sutil — scope "single" no update</div>
+            O backend cria uma exceção para a ocorrência original E insere uma transação avulsa nova com os valores atualizados. O app não recebe o novo ID — o <code>router.back()</code> após o sucesso é seguro porque o cache é invalidado e a listagem se atualiza. Lembre: <code>all</code> só propaga <code>type</code>/<code>amount</code>/<code>description</code> (não a <code>date</code>).
+          </div>
+          <div class="slice-footer" style="margin-top:12px;">
+            <span class="slice-effort">Backend pronto · sem bloqueio</span>
+            <span class="pill pill-green">Desbloqueado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     VIEW 3 — CÓDIGO-CHAVE
+     ═══════════════════════════════════════════ -->
+<div class="view" id="view-code">
+<div class="page">
+
+  <div class="page-hero">
+    <div class="page-title">Código-chave</div>
+    <div class="page-sub">As peças mais propensas a errar — leia antes de implementar cada slice</div>
+  </div>
+
+  <!-- SECTION 1: TYPES -->
+  <div class="block">
+    <div class="block-header">
+      <span class="pill pill-blue">Slice 1</span>
+      <span class="block-title" style="margin-left:8px;">types/api.ts — novos tipos e campos</span>
+    </div>
+    <div class="block-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">
+        <code>RecurrenceType</code> e <code>RecurrenceScope</code> (usado por delete <em>e</em> update). Atualizar <code>ApiTransaction</code>, <code>ApiCreateTransactionPayload</code> e <code>ApiUpdateTransactionPayload</code>. O delete leva o escopo na <strong>query</strong> (<code>ApiDeleteScopeParams</code>); o update leva no <strong>corpo</strong> (<code>scope</code> + <code>instance_date</code>).
+      </p>
+      <div class="file-label">src/features/transactions/types/api.ts</div>
+      <pre><span class="t-c">// Tipos compartilhados (escopo serve para delete E update)</span>
+<span class="t-k">export type</span> <span class="t-t">RecurrenceType</span>  = <span class="t-s">"none"</span> | <span class="t-s">"daily"</span> | <span class="t-s">"weekly"</span> | <span class="t-s">"monthly"</span> | <span class="t-s">"yearly"</span>;
+<span class="t-k">export type</span> <span class="t-t">RecurrenceScope</span> = <span class="t-s">"single"</span> | <span class="t-s">"following"</span> | <span class="t-s">"all"</span>;
+
+<span class="t-k">export interface</span> <span class="t-t">ApiTransaction</span> {
+  id:          <span class="t-t">string</span>;
+  type:        <span class="t-t">TransactionType</span>;
+  amount:      <span class="t-t">number</span>;
+  description: <span class="t-t">string</span>;
+  date:        <span class="t-t">string</span>;
+  created_at:  <span class="t-t">string</span>;
+  updated_at:  <span class="t-t">string</span>;
+  user_id:     <span class="t-t">string</span>;
+  tags?:       <span class="t-t">ApiTagRef</span>[];
+  <span class="t-new">recurrence:           RecurrenceType;    // novo — sempre presente</span>
+  <span class="t-new">series_id?:           string;            // novo — presente se recorrente</span>
+  <span class="t-new">recurrence_end_date?: string;            // novo — "YYYY-MM-DD" ou undefined</span>
+}
+
+<span class="t-k">export interface</span> <span class="t-t">ApiCreateTransactionPayload</span> {
+  type:        <span class="t-t">TransactionType</span>;
+  amount:      <span class="t-t">number</span>;
+  description: <span class="t-t">string</span>;
+  date:        <span class="t-t">string</span>;
+  <span class="t-new">recurrence?:           RecurrenceType;   // novo — omitido = "none" no backend</span>
+  <span class="t-new">recurrence_end_date?:  string;           // novo — backend já aceita "YYYY-MM-DD"</span>
+}
+
+<span class="t-c">// UPDATE: escopo vai no CORPO do PATCH</span>
+<span class="t-k">export interface</span> <span class="t-t">ApiUpdateTransactionPayload</span> {
+  type?:        <span class="t-t">TransactionType</span>;
+  amount?:      <span class="t-t">number</span>;
+  description?: <span class="t-t">string</span>;
+  date?:        <span class="t-t">string</span>;
+  <span class="t-new">scope?:         RecurrenceScope;        // novo — só recorrentes</span>
+  <span class="t-new">instance_date?: string;                 // novo — data da ocorrência (single/following)</span>
+}
+
+<span class="t-c">// DELETE: escopo vai na QUERY STRING (chave literal "date")</span>
+<span class="t-new">export interface ApiDeleteScopeParams {</span>
+<span class="t-new">  scope: RecurrenceScope;</span>
+<span class="t-new">  date?: string;  // "YYYY-MM-DD" — obrigatório para "single" e "following"</span>
+<span class="t-new">}</span></pre>
+    </div>
+  </div>
+
+  <!-- SECTION 2: DOMAIN + MAPPER -->
+  <div class="block" style="margin-top:16px;">
+    <div class="block-header">
+      <span class="pill pill-green">Slice 1</span>
+      <span class="block-title" style="margin-left:8px;">domain.ts + mappers.ts — domínio e conversão</span>
+    </div>
+    <div class="block-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">
+        O mapper é o único ponto de conversão API → domínio. Ao adicionar campos aqui, eles aparecem em todo lugar que usa <code>Transaction</code>. O <code>recurrence ?? "none"</code> garante compatibilidade caso o backend omita o campo (transações antigas antes da migration).
+      </p>
+
+      <div class="file-label">src/features/transactions/types/domain.ts</div>
+      <pre><span class="t-k">import type</span> { <span class="t-t">TransactionType</span>, <span class="t-new">RecurrenceType</span> } <span class="t-k">from</span> <span class="t-s">"./api"</span>;
+
+<span class="t-k">export interface</span> <span class="t-t">Transaction</span> {
+  id:          <span class="t-t">string</span>;
+  type:        <span class="t-t">TransactionType</span>;
+  amount:      <span class="t-t">number</span>;
+  description: <span class="t-t">string</span>;
+  date:        <span class="t-t">string</span>;
+  createdAt:   <span class="t-t">string</span>;
+  updatedAt:   <span class="t-t">string</span>;
+  userId:      <span class="t-t">string</span>;
+  tags:        <span class="t-t">TagRef</span>[];
+  <span class="t-new">recurrence:           RecurrenceType;    // novo</span>
+  <span class="t-new">seriesId?:            string;            // novo</span>
+  <span class="t-new">recurrenceEndDate?:   string;            // novo</span>
+  <span class="t-new">occurrenceKey:        string;            // novo — chave única p/ keyExtractor</span>
+}
+
+<span class="t-k">export interface</span> <span class="t-t">FormValues</span> {
+  type:       <span class="t-t">TransactionType</span>;
+  amountCents:<span class="t-t">number</span>;
+  description:<span class="t-t">string</span>;
+  date:       <span class="t-t">string</span>;
+  <span class="t-new">recurrence: RecurrenceType;              // novo — default "none"</span>
+}</pre>
+
+      <div class="file-label" style="margin-top:20px;">src/lib/mappers.ts</div>
+      <pre><span class="t-k">export function</span> <span class="t-fn">mapApiTransaction</span>(raw: <span class="t-t">ApiTransaction</span>): <span class="t-t">Transaction</span> {
+  <span class="t-k">const</span> date = raw.date.split(<span class="t-s">"T"</span>)[<span class="t-n">0</span>];
+  <span class="t-k">return</span> {
+    id:          raw.id,
+    type:        raw.type,
+    amount:      raw.amount,
+    description: raw.description,
+    date,
+    createdAt:   raw.created_at,
+    updatedAt:   raw.updated_at,
+    userId:      raw.user_id,
+    tags: (raw.tags ?? []).map((t) => ({ id: t.id, name: t.name, color: t.color })),
+    <span class="t-new">recurrence:         raw.recurrence ?? "none",  // novo</span>
+    <span class="t-new">seriesId:           raw.series_id,             // novo</span>
+    <span class="t-new">recurrenceEndDate:  raw.recurrence_end_date,   // novo</span>
+    <span class="t-new">occurrenceKey:      raw.series_id ? `${raw.series_id}:${date}` : raw.id,  // novo</span>
+  };
+}</pre>
+      <div class="callout blue" style="margin-top:12px;">
+        <div class="callout-title">Por que <code>?? "none"</code> no recurrence?</div>
+A migration <code>000008</code> tem <code>DEFAULT 'none'</code> e o backend já inclui <code>recurrence</code> no RETURNING e nos Scans, então toda resposta traz o campo. O fallback <code>?? "none"</code> é cinto-e-suspensório barato: protege contra respostas antigas em cache ou variações de contrato sem custo.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: SERVICE -->
+  <div class="block" style="margin-top:16px;">
+    <div class="block-header">
+      <span class="pill pill-blue">Slice 1 + 4</span>
+      <span class="block-title" style="margin-left:8px;">transactions.service.ts — delete e update com escopo</span>
+    </div>
+    <div class="block-body">
+      <div class="callout red" style="margin-bottom:16px;">
+        <div class="callout-title">Correção em relação à 1ª versão do plano</div>
+        O delete e o update <strong>não</strong> usam o mesmo mecanismo. <code>deleteTransaction</code> manda o escopo na <strong>query</strong> (<code>{ params }</code> do Axios → <code>?scope=…&amp;date=…</code>). Já <code>updateTransaction</code> manda <code>scope</code> e <code>instance_date</code> dentro do <strong>corpo</strong> do <code>PATCH</code> — é assim que o handler Go lê (<code>UpdateTransactionPayload.Scope</code> / <code>.InstanceDate</code>).
+      </div>
+      <div class="file-label">src/features/transactions/services/transactions.service.ts</div>
+      <pre><span class="t-c">// DELETE → escopo na QUERY STRING</span>
+<span class="t-k">export async function</span> <span class="t-fn">deleteTransaction</span>(
+  id: <span class="t-t">string</span>,
+  <span class="t-new">params?: ApiDeleteScopeParams,</span>
+): <span class="t-t">Promise</span>&lt;<span class="t-t">void</span>&gt; {
+  <span class="t-k">await</span> apiClient.delete(`/v1/transactions/${id}`, <span class="t-new">{ params }</span>);
+}
+
+<span class="t-c">// UPDATE → scope e instance_date fazem parte do PAYLOAD (corpo)</span>
+<span class="t-k">export async function</span> <span class="t-fn">updateTransaction</span>(
+  id: <span class="t-t">string</span>,
+  payload: <span class="t-t">ApiUpdateTransactionPayload</span>,  <span class="t-new">// já inclui scope?/instance_date?</span>
+): <span class="t-t">Promise</span>&lt;<span class="t-t">Transaction</span>&gt; {
+  <span class="t-k">const</span> response = <span class="t-k">await</span> apiClient.patch&lt;<span class="t-t">ApiResponse</span>&lt;<span class="t-t">ApiTransaction</span>&gt;&gt;(
+    `/v1/transactions/${id}`,
+    payload,  <span class="t-new">// ← sem { params }; o escopo viaja no corpo</span>
+  );
+  <span class="t-k">return</span> <span class="t-fn">mapApiTransaction</span>(response.data.data);
+}</pre>
+    </div>
+  </div>
+
+  <!-- SECTION 4: [id].tsx handleDelete -->
+  <div class="block" style="margin-top:16px;">
+    <div class="block-header">
+      <span class="pill pill-purple">Slice 4</span>
+      <span class="block-title" style="margin-left:8px;">app/transaction/[id].tsx — handleDelete com escopo</span>
+    </div>
+    <div class="block-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">
+        O <code>handleDelete</code> atual chama <code>remove(id)</code> diretamente. A nova lógica bifurca: se <code>seriesId</code> existe, abre o sheet; caso contrário mantém o comportamento atual (zero regressão para avulsas). ⚠️ A data enviada é a <code>date</code> <strong>da rota</strong> (a ocorrência que o usuário tocou), porque <code>transaction.date</code> aqui é a data do <em>template</em>, não da ocorrência.
+      </p>
+      <div class="file-label">app/transaction/[id].tsx — handleDelete atualizado</div>
+      <pre><span class="t-new">const { id, date: occurrenceDate } = useLocalSearchParams&lt;{</span>
+<span class="t-new">  id: string; date?: string;</span>
+<span class="t-new">}&gt;();</span>
+<span class="t-new">const [showDeleteSheet, setShowDeleteSheet] = useState(false);</span>
+
+<span class="t-k">function</span> <span class="t-fn">handleDelete</span>() {
+  <span class="t-new">if (transaction.seriesId) {</span>
+  <span class="t-new">  setShowDeleteSheet(true);  // abre sheet de escopo</span>
+  <span class="t-new">  return;</span>
+  <span class="t-new">}</span>
+  <span class="t-c">// avulsa — comportamento original mantido</span>
+  remove({ id }, { onSuccess: handleDeleteSuccess });
+}
+
+<span class="t-new">function handleDeleteWithScope(scope: RecurrenceScope) {</span>
+<span class="t-new">  remove(</span>
+<span class="t-new">    { id, scope, date: occurrenceDate },  // ← data da OCORRÊNCIA (rota)</span>
+<span class="t-new">    {</span>
+<span class="t-new">      onSuccess: () => {</span>
+<span class="t-new">        setShowDeleteSheet(false);</span>
+<span class="t-new">        handleDeleteSuccess();</span>
+<span class="t-new">      },</span>
+<span class="t-new">    },</span>
+<span class="t-new">  );</span>
+<span class="t-new">}</span>
+
+<span class="t-k">function</span> <span class="t-fn">handleDeleteSuccess</span>() {
+  router.back();
+  invalidate();
+  queryClient.removeQueries({ queryKey: queryKeys.transaction(userId, id) });
+}
+
+<span class="t-c">// No JSX, adicionar após o TransactionForm:</span>
+<span class="t-new">&lt;DeleteScopeSheet</span>
+<span class="t-new">  visible={showDeleteSheet}</span>
+<span class="t-new">  isPending={isDeleting}</span>
+<span class="t-new">  onClose={() =&gt; setShowDeleteSheet(false)}</span>
+<span class="t-new">  onConfirm={handleDeleteWithScope}</span>
+<span class="t-new">/&gt;</span></pre>
+
+      <div class="callout amber" style="margin-top:12px;">
+        <div class="callout-title">Atualizar useDeleteTransaction</div>
+        O hook atualmente recebe <code>id: string</code>. Precisa aceitar <code>&#123; id, scope?, date? &#125;</code> para repassar ao serviço:
+      </div>
+      <div class="file-label" style="margin-top:8px;">src/features/transactions/hooks/useDeleteTransaction.ts</div>
+      <pre><span class="t-k">export function</span> <span class="t-fn">useDeleteTransaction</span>() {
+  <span class="t-k">return</span> useMutation({
+    mutationFn: ({
+      id,
+      <span class="t-new">scope,</span>
+      <span class="t-new">date,</span>
+    }: {
+      id: <span class="t-t">string</span>;
+      <span class="t-new">scope?: RecurrenceScope;</span>
+      <span class="t-new">date?: string;</span>
+    }) =>
+      <span class="t-fn">deleteTransaction</span>(id, scope ? { scope, date } : <span class="t-t">undefined</span>),
+  });
+}</pre>
+    </div>
+  </div>
+
+  <!-- SECTION 5: DeleteScopeSheet -->
+  <div class="block" style="margin-top:16px;">
+    <div class="block-header">
+      <span class="pill pill-purple">Slice 4</span>
+      <span class="block-title" style="margin-left:8px;">DeleteScopeSheet — interface do componente</span>
+    </div>
+    <div class="block-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">
+        O componente recebe <code>onConfirm(scope)</code> e decide qual opção o usuário escolheu. A lógica de qual chamada API fazer fica no <code>[id].tsx</code> — o sheet é apenas UI. Por baixo, montar sobre <code>BottomSheetModal</code> (<code>@gorhom/bottom-sheet</code>) seguindo <code>TagFormModal</code>; a prop <code>visible</code> abaixo é o contrato lógico — internamente o componente faz <code>present()</code>/<code>dismiss()</code> no <code>sheetRef</code>.
+      </p>
+      <div class="file-label">src/features/transactions/components/DeleteScopeSheet.tsx</div>
+      <pre><span class="t-k">import type</span> { <span class="t-t">RecurrenceScope</span> } <span class="t-k">from</span> <span class="t-s">"../types"</span>;
+
+<span class="t-k">interface</span> <span class="t-t">DeleteScopeSheetProps</span> {
+  visible:   <span class="t-t">boolean</span>;
+  isPending: <span class="t-t">boolean</span>;
+  onClose:   () => <span class="t-t">void</span>;
+  onConfirm: (scope: <span class="t-t">RecurrenceScope</span>) => <span class="t-t">void</span>;
+}
+
+<span class="t-c">// Opções a exibir no sheet:</span>
+<span class="t-k">const</span> OPTIONS: { scope: <span class="t-t">RecurrenceScope</span>; label: <span class="t-t">string</span>; desc: <span class="t-t">string</span> }[] = [
+  { scope: <span class="t-s">"single"</span>,    label: <span class="t-s">"Apenas este lançamento"</span>,      desc: <span class="t-s">"Remove só a ocorrência desta data"</span> },
+  { scope: <span class="t-s">"following"</span>, label: <span class="t-s">"Este e os próximos"</span>,          desc: <span class="t-s">"Encerra a série a partir desta data"</span> },
+  { scope: <span class="t-s">"all"</span>,       label: <span class="t-s">"Todos os lançamentos"</span>,        desc: <span class="t-s">"Remove toda a série recorrente"</span> },
+];</pre>
+      <div class="callout blue" style="margin-top:12px;">
+        <div class="callout-title">Insight — separação de responsabilidades</div>
+        Perceba como o componente <em>não sabe</em> qual chamada API fazer — ele apenas chama <code>onConfirm(scope)</code>. Isso o torna reutilizável para o <code>EditScopeSheet</code> do Slice 5 (mesmas opções, lógica diferente no pai).
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     VIEW 4 — RISCOS
+     ═══════════════════════════════════════════ -->
+<div class="view" id="view-risks">
+<div class="page">
+
+  <div class="page-hero">
+    <div class="page-title">Riscos &amp; Questões Abertas</div>
+    <div class="page-sub">Riscos técnicos e de UX para o ciclo atual</div>
+  </div>
+
+  <!-- RISK TABLE -->
+  <div class="block" style="margin-bottom:16px;">
+    <div class="block-header">
+      <div class="block-icon" style="background:rgba(255,92,114,.12);">⚠️</div>
+      <span class="block-title">Tabela de Riscos</span>
+    </div>
+    <table class="risk-table">
+      <thead>
+        <tr>
+          <th>Risco</th>
+          <th>Área</th>
+          <th>Sev</th>
+          <th>Mitigação</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>GetByID</code> devolve a data do <strong>template</strong>, não da ocorrência tocada — escopos <code>single</code>/<code>following</code> agiriam na data errada</td>
+          <td><span class="pill pill-purple">App</span></td>
+          <td><span class="sev sev-high">HIGH</span></td>
+          <td>Propagar a <code>date</code> da ocorrência pela navegação (<code>/transaction/[id]?date=…</code>) e usar essa data — nunca <code>transaction.date</code> da tela de edição — nos params/body de escopo.</td>
+        </tr>
+        <tr>
+          <td><code>keyExtractor={item.id}</code> quebra com ocorrências diárias/semanais: mesma série gera vários itens com o <em>mesmo</em> <code>id</code> no mês</td>
+          <td><span class="pill pill-green">React Native</span></td>
+          <td><span class="sev sev-high">HIGH</span></td>
+          <td>Usar <code>occurrenceKey</code> (<code>seriesId:date</code>) no <code>keyExtractor</code> de <code>day/[date].tsx</code> e <code>tags/[id].tsx</code>.</td>
+        </tr>
+        <tr>
+          <td>ID compartilhado entre ocorrências da mesma série — delete/edit sem <code>date</code> afeta o template inteiro</td>
+          <td><span class="pill pill-purple">App</span></td>
+          <td><span class="sev sev-high">HIGH</span></td>
+          <td>Enviar sempre a <code>date</code> da ocorrência (vinda da rota) nos escopos <code>single</code>/<code>following</code>: query <code>?date=</code> no delete, <code>instance_date</code> no corpo do update.</td>
+        </tr>
+        <tr>
+          <td>Invalidação de cache: mês com ocorrências expandidas virtuais não sobrevive a delete <code>all</code></td>
+          <td><span class="pill pill-green">React Query</span></td>
+          <td><span class="sev sev-high">HIGH</span></td>
+          <td>Chamar <code>invalidate()</code> existente (invalida cache do mês inteiro). O React Query re-fetcha e o <code>generate_series</code> não retorna mais a série.</td>
+        </tr>
+        <tr>
+          <td>Scope <code>single</code> no update cria nova transação — app não recebe o novo ID</td>
+          <td><span class="pill pill-purple">App</span> <span class="pill pill-amber">UX</span></td>
+          <td><span class="sev sev-med">MED</span></td>
+          <td><code>router.back()</code> + invalidação de cache é suficiente. O usuário retorna para a lista, que se atualiza com a nova transação avulsa.</td>
+        </tr>
+        <tr>
+          <td>Formulário sem campo <code>recurrence_end_date</code> — séries sem fim previsível</td>
+          <td><span class="pill pill-amber">UX</span></td>
+          <td><span class="sev sev-med">MED</span></td>
+          <td>Aceitável para MVP. Adicionar "data de término" pode ser uma feature futura. O scope <code>following</code> e <code>all</code> cobrem o caso de querer encerrar.</td>
+        </tr>
+        <tr>
+          <td>RecurrenceSelector ausente do <code>TransactionForm</code> em modo <code>edit</code> — usuário não pode mudar recorrência</td>
+          <td><span class="pill pill-amber">UX</span></td>
+          <td><span class="sev sev-low">LOW</span></td>
+          <td>Decisão intencional de MVP: recorrência é definida na criação. Para mudar, use scope <code>all</code> no edit e recrie se necessário. Documentar como limitação conhecida.</td>
+        </tr>
+        <tr>
+          <td>Respostas antigas em cache sem o campo <code>recurrence</code> (migration 000008 já aplicada)</td>
+          <td><span class="pill pill-blue">API Compat</span></td>
+          <td><span class="sev sev-low">LOW</span></td>
+          <td>O mapper usa <code>raw.recurrence ?? "none"</code> como fallback. A migration adiciona <code>DEFAULT 'none'</code> — todas as linhas antigas já têm o valor correto no banco.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- OPEN QUESTIONS -->
+  <div class="block" style="margin-bottom:16px;">
+    <div class="block-header">
+      <div class="block-icon" style="background:rgba(77,126,255,.12);">❓</div>
+      <span class="block-title">Questões em Aberto</span>
+    </div>
+    <div class="block-body">
+      <div class="oq-list">
+        <div class="oq-item">
+          <span class="oq-em">🎨</span>
+          <div>
+            <div class="oq-title">Qual padrão de bottom sheet usar?</div>
+            <div class="oq-body"><strong>Resolvido:</strong> o app já depende de <code>@gorhom/bottom-sheet</code> (<code>^5.2.14</code>) e o usa em <code>TagFormModal</code> com <code>BottomSheetModal</code> + <code>sheetRef</code>. Reaproveitar esse padrão é a escolha consistente para os sheets de escopo.</div>
+            <div class="oq-decide">✓ Definido — seguir o padrão do TagFormModal</div>
+          </div>
+        </div>
+        <div class="oq-item">
+          <span class="oq-em">🔁</span>
+          <div>
+            <div class="oq-title">O RecurrenceSelector deve aparecer no modo edit?</div>
+            <div class="oq-body">Para transações avulsas em edit, faz sentido permitir torná-las recorrentes? Isso muda o comportamento do backend — seria um update que adiciona <code>recurrence</code> e <code>series_id</code>. Complexidade adicional vs. UX conveniente.</div>
+            <div class="oq-decide">→ Decidir antes do Slice 5 · sugestão: não para MVP</div>
+          </div>
+        </div>
+        <div class="oq-item">
+          <span class="oq-em">📅</span>
+          <div>
+            <div class="oq-title">Expor <code>recurrence_end_date</code> no formulário de criação?</div>
+            <div class="oq-body">O <strong>backend já aceita</strong> <code>recurrence_end_date</code> no create — é só decisão de UI. Permitir definir quando a série termina (ex: "assinar por 12 meses") aumenta a qualidade, mas adiciona um campo. A ausência é segura: séries sem fim são encerradas via scope <code>following</code>/<code>all</code>.</div>
+            <div class="oq-decide">→ Decidir antes do Slice 2 · sugestão: fora do MVP, mas é low-hanging fruit</div>
+          </div>
+        </div>
+        <div class="oq-item">
+          <span class="oq-em">⚡</span>
+          <div>
+            <div class="oq-title">Badge de recorrência deve mostrar o tipo (mensal, semanal)?</div>
+            <div class="oq-body">O ícone <code>Repeat</code> é simples e claro. Uma alternativa é mostrar um texto curto como "Mensal" ou "Semanal" ao lado do ícone. Impacto na densidade da linha — considerar o layout atual de <code>TransactionItem</code>.</div>
+            <div class="oq-decide">→ Decidir antes do Slice 3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALIDAÇÃO MANUAL -->
+  <div class="block">
+    <div class="block-header">
+      <div class="block-icon" style="background:rgba(45,216,122,.12);">✅</div>
+      <span class="block-title">Validação manual (não há test suite no app)</span>
+    </div>
+    <div class="block-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">
+        O backend já está implantado, então a verificação é toda no app. Como o repo não tem testes automatizados, rode <code>bun run lint</code> e valide manualmente os cenários abaixo contra a API real:
+      </p>
+      <div class="gap-grid">
+        <div class="gap-card" style="border-left:3px solid var(--green);">
+          <span class="gap-em">🔁</span>
+          <div>
+            <div class="gap-title">Criar série mensal</div>
+            <div class="gap-desc">Criar uma recorrente mensal e navegar pelos meses: a ocorrência aparece em cada mês com a mesma descrição/valor. Avulsa criada sem escolher recorrência continua igual.</div>
+          </div>
+        </div>
+        <div class="gap-card" style="border-left:3px solid var(--green);">
+          <span class="gap-em">🔑</span>
+          <div>
+            <div class="gap-title">Diária no mês (chaves)</div>
+            <div class="gap-desc">Criar uma recorrente <em>diária</em> e abrir um dia / a lista de uma tag: nenhum warning de "duplicate key" no console (prova que o <code>occurrenceKey</code> está em uso).</div>
+          </div>
+        </div>
+        <div class="gap-card" style="border-left:3px solid var(--amber);">
+          <span class="gap-em">🗑️</span>
+          <div>
+            <div class="gap-title">Delete por escopo</div>
+            <div class="gap-desc">"Apenas este" remove só a ocorrência tocada (confirma o <code>date</code> certo da rota); "este e os próximos" preserva as anteriores; "todos" some com a série inteira.</div>
+          </div>
+        </div>
+        <div class="gap-card" style="border-left:3px solid var(--amber);">
+          <span class="gap-em">✏️</span>
+          <div>
+            <div class="gap-title">Edit por escopo</div>
+            <div class="gap-desc">"Apenas este" vira uma avulsa nova na data tocada (a série segue intacta); "todos" propaga tipo/valor/descrição (não a data). Saldos do mês batem após cada operação.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;color:var(--dim);font-size:12px;margin-top:24px;font-family:var(--mono);">
+    finance-app · plano de implementação · recorrência v2 · backend implementado (migration 000008)
+  </div>
+
+</div>
+</div>
+
+
+<script>
+  function show(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    document.getElementById('btn-' + name).classList.add('active');
+  }
+</script>
+</body>
+</html>

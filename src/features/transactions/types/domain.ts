@@ -1,4 +1,4 @@
-import type { TransactionType } from "./api";
+import type { RecurrenceType, TransactionType } from "./api";
 
 /** Tipos usados internamente pelo app — campos normalizados, datas sem timezone. */
 
@@ -18,6 +18,12 @@ export interface Transaction {
   updatedAt: string;
   userId: string;
   tags: TagRef[];
+  recurrence: RecurrenceType;
+  seriesId?: string; // id da série recorrente (ausente em avulsas)
+  recurrenceEndDate?: string; // "YYYY-MM-DD" ou ausente
+  sourceSeriesId?: string; // série de origem, se for avulsa editada via "single"
+  sourceOccurrenceDate?: string; // "YYYY-MM-DD" — data original da ocorrência substituída
+  occurrenceKey: string; // chave única por ocorrência p/ keyExtractor
 }
 
 export interface DayBalance {
@@ -45,4 +51,6 @@ export interface FormValues {
   amountCents: number;
   description: string;
   date: string; // "YYYY-MM-DD"
+  recurrence?: RecurrenceType; // default "none" — coletado no form a partir do Slice 2
+  recurrenceEndDate?: string; // "YYYY-MM-DD" — data da última ocorrência (opcional)
 }

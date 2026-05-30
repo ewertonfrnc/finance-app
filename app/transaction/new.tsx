@@ -5,7 +5,6 @@ import { TransactionForm } from "@/src/components/transactions/TransactionForm";
 import { Screen } from "@/src/components/ui/Screen";
 import { TagField } from "@/src/features/tags/components/TagField";
 import { useInvalidateTagData } from "@/src/features/tags/hooks/useInvalidateTagData";
-import { useSetTransactionTags } from "@/src/features/tags/hooks/useSetTransactionTags";
 import { useTagPickerSync } from "@/src/features/tags/hooks/useTagPickerSync";
 import { useCreateTransaction } from "@/src/features/transactions/hooks/useCreateTransaction";
 import { useInvalidateTransactionData } from "@/src/features/transactions/hooks/useInvalidateTransactionData";
@@ -20,7 +19,6 @@ export default function NewTransactionScreen() {
   }>();
   const router = useRouter();
   const { mutate: create, isPending } = useCreateTransaction();
-  const { mutateAsync: setTags } = useSetTransactionTags();
   const invalidate = useInvalidateTransactionData();
   const invalidateTags = useInvalidateTagData();
   const initialDate =
@@ -47,12 +45,12 @@ export default function NewTransactionScreen() {
         amount: values.amountCents,
         description: values.description,
         date: values.date,
+        tags: selectedTagIds.length > 0 ? selectedTagIds : undefined,
+        recurrence: values.recurrence,
+        recurrence_end_date: values.recurrenceEndDate,
       },
       {
-        onSuccess: async (data) => {
-          if (selectedTagIds.length > 0) {
-            await setTags({ transactionId: data.id, tagIds: selectedTagIds });
-          }
+        onSuccess: async () => {
           await Promise.all([invalidate(), invalidateTags()]);
           router.back();
         },
@@ -67,12 +65,13 @@ export default function NewTransactionScreen() {
         initialValues={{ date: initialDate }}
         onSubmit={handleSubmit}
         isLoading={isPending}
-      >
-        <TagField
-          selectedTagIds={selectedTagIds}
-          onChangeTagIds={setSelectedTagIds}
-        />
-      </TransactionForm>
+        tagField={
+          <TagField
+            selectedTagIds={selectedTagIds}
+            onChangeTagIds={setSelectedTagIds}
+          />
+        }
+      />
     </Screen>
   );
 }

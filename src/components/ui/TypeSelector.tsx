@@ -44,7 +44,6 @@ const PILL_COLORS = {
   },
 } as const;
 
-
 export function TypeSelector({ value, onChange }: TypeSelectorProps) {
   const scheme = useColorScheme();
   const palette = PILL_COLORS[scheme === "dark" ? "dark" : "light"];
@@ -71,11 +70,11 @@ export function TypeSelector({ value, onChange }: TypeSelectorProps) {
   }
 
   return (
-    <View className="bg-surface-secondary flex-row gap-1 rounded-2xl p-1.5">
+    <View className="bg-surface-secondary border-surface-tertiary flex-row gap-1 rounded-4xl border px-1.5 py-2.5">
       {/* Sliding pill background */}
       <Animated.View
         style={pillStyle}
-        className="absolute top-1.5 bottom-1.5 rounded-xl"
+        className="absolute top-1.5 bottom-1.5 rounded-4xl"
       />
 
       {TYPES.map((type, i) => {

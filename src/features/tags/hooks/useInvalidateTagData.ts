@@ -17,15 +17,8 @@ export function useInvalidateTagData() {
     }
 
     return Promise.all([
-      queryClient.refetchQueries({
-        predicate: (q) => {
-          const key = q.queryKey;
-          return (
-            key[0] === "tags" &&
-            key[1] === (userId ?? "anonymous") &&
-            !key.includes("transactions")
-          );
-        },
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.tagsAll(userId),
       }),
       queryClient.invalidateQueries({
         queryKey: queryKeys.transactionsAll(userId),

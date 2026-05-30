@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { useRouter } from "expo-router";
-import { ArrowLeft, X } from "lucide-react-native";
+import { ArrowLeft, Repeat, X } from "lucide-react-native";
 import { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -15,8 +15,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CurrencyInput } from "@/src/components/ui/CurrencyInput";
 import { DateField } from "@/src/components/ui/DateField";
 import { TypeSelector } from "@/src/components/ui/TypeSelector";
+import { RecurrenceEndField } from "@/src/features/transactions/components/RecurrenceEndField";
+import { RecurrenceSelector } from "@/src/features/transactions/components/RecurrenceSelector";
 import type {
   FormValues,
+  RecurrenceType,
   TransactionType,
 } from "@/src/features/transactions/types";
 
@@ -27,17 +30,19 @@ interface TransactionFormProps {
   onDelete?: () => void;
   isLoading?: boolean;
   isDeleting?: boolean;
+  tagField?: React.ReactNode;
+  header?: React.ReactNode;
   children?: React.ReactNode;
 }
 
 const TITLE = { new: "Novo lançamento", edit: "Editar lançamento" } as const;
 const SUBMIT_LABEL = { new: "Lançar", edit: "Salvar alterações" } as const;
 
-const TYPE_LABEL_CLASS: Record<TransactionType, string> = {
-  diario: "text-warning",
-  saida: "text-danger",
-  entrada: "text-success",
-  economia: "text-accent",
+const TYPE_DOT_CLASS: Record<TransactionType, string> = {
+  diario: "bg-warning",
+  saida: "bg-danger",
+  entrada: "bg-success",
+  economia: "bg-accent",
 };
 
 export function TransactionForm({
@@ -47,6 +52,8 @@ export function TransactionForm({
   onDelete,
   isLoading = false,
   isDeleting = false,
+  tagField,
+  header,
   children,
 }: TransactionFormProps) {
   const router = useRouter();
@@ -64,16 +71,35 @@ export function TransactionForm({
   const [date, setDate] = useState(
     initialValues?.date ?? format(new Date(), "yyyy-MM-dd"),
   );
+  const [recurrence, setRecurrence] = useState<RecurrenceType>(
+    initialValues?.recurrence ?? "none",
+  );
+  const [recurrenceEndDate, setRecurrenceEndDate] = useState<
+    string | undefined
+  >(initialValues?.recurrenceEndDate);
 
   const canSubmit = amountCents > 0 && description.trim().length > 0;
 
+  function handleRecurrenceChange(next: RecurrenceType) {
+    setRecurrence(next);
+    // Sem recorrência não faz sentido manter uma data de término.
+    if (next === "none") setRecurrenceEndDate(undefined);
+  }
+
   function handleSubmit() {
     if (!canSubmit || isLoading) return;
-    onSubmit({ type, amountCents, description, date });
+    onSubmit({
+      type,
+      amountCents,
+      description,
+      date,
+      recurrence,
+      recurrenceEndDate: recurrence === "none" ? undefined : recurrenceEndDate,
+    });
   }
 
   return (
-    <KeyboardAvoidingView className="bg-background flex-1" behavior="padding">
+    <KeyboardAvoidingView className="bg-surface flex-1" behavior="padding">
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-4">
         <Pressable onPress={() => router.back()} hitSlop={8}>
@@ -91,8 +117,10 @@ export function TransactionForm({
         className="flex-1 px-4"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        contentContainerClassName="gap-8 pb-8"
+        contentContainerClassName="gap-6 pb-8"
       >
+        {header}
+
         {/* Tipo */}
         <View className="gap-2">
           <Text className="text-muted text-xs font-semibold tracking-widest">
@@ -103,11 +131,12 @@ export function TransactionForm({
 
         {/* Valor */}
         <View className="gap-2">
-          <Text
-            className={`text-xs font-semibold tracking-widest ${TYPE_LABEL_CLASS[type]}`}
-          >
-            VALOR
-          </Text>
+          <View className="flex-row items-center gap-1.5">
+            <View className={`h-2 w-2 rounded-full ${TYPE_DOT_CLASS[type]}`} />
+            <Text className="text-muted text-xs font-semibold tracking-widest">
+              VALOR
+            </Text>
+          </View>
           <CurrencyInput
             value={amountCents}
             onValueChange={setAmountCents}
@@ -134,6 +163,8 @@ export function TransactionForm({
           </Text>
         </View>
 
+        {tagField}
+
         {/* Data */}
         <View className="gap-2">
           <Text className="text-muted text-xs font-semibold tracking-widest">
@@ -141,6 +172,32 @@ export function TransactionForm({
           </Text>
           <DateField value={date} onChange={setDate} />
         </View>
+
+        {/* Recorrência — só na criação (no modo edit o escopo é tratado à parte) */}
+        {mode === "new" && (
+          <View className="gap-3">
+            <View className="flex-row items-center justify-between">
+              <View className="flex-row items-center gap-1.5">
+                <Repeat size={13} className="text-muted" />
+                <Text className="text-muted text-xs font-semibold tracking-widest">
+                  RECORRÊNCIA
+                </Text>
+              </View>
+              <Text className="text-muted text-xs">opcional</Text>
+            </View>
+            <RecurrenceSelector
+              value={recurrence}
+              onChange={handleRecurrenceChange}
+            />
+            {recurrence !== "none" && (
+              <RecurrenceEndField
+                value={recurrenceEndDate}
+                startDate={date}
+                onChange={setRecurrenceEndDate}
+              />
+            )}
+          </View>
+        )}
 
         {children}
       </ScrollView>

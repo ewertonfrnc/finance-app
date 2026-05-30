@@ -7,19 +7,29 @@ import { TransactionForm } from "@/src/components/transactions/TransactionForm";
 import { Screen } from "@/src/components/ui/Screen";
 import { TagField } from "@/src/features/tags/components/TagField";
 import { useInvalidateTagData } from "@/src/features/tags/hooks/useInvalidateTagData";
-import { useSetTransactionTags } from "@/src/features/tags/hooks/useSetTransactionTags";
 import { useTagPickerSync } from "@/src/features/tags/hooks/useTagPickerSync";
+import { DeleteScopeSheet } from "@/src/features/transactions/components/DeleteScopeSheet";
+import { EditScopeSheet } from "@/src/features/transactions/components/EditScopeSheet";
+import { SeriesBadge } from "@/src/features/transactions/components/SeriesBadge";
+import { SeriesOriginNotice } from "@/src/features/transactions/components/SeriesOriginNotice";
+import { formatRecurrenceLabel } from "@/src/features/transactions/constants";
 import { useDeleteTransaction } from "@/src/features/transactions/hooks/useDeleteTransaction";
 import { useInvalidateTransactionData } from "@/src/features/transactions/hooks/useInvalidateTransactionData";
 import { useTransaction } from "@/src/features/transactions/hooks/useTransaction";
 import { useUpdateTransaction } from "@/src/features/transactions/hooks/useUpdateTransaction";
-import type { FormValues } from "@/src/features/transactions/types";
+import type {
+  FormValues,
+  RecurrenceScope,
+} from "@/src/features/transactions/types";
 import { queryKeys } from "@/src/lib/queryKeys";
 import { useAuthStore } from "@/src/stores/useAuthStore";
 import { useTagPickerStore } from "@/src/stores/useTagPickerStore";
 
 export default function EditTransactionScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, date: occurrenceDate } = useLocalSearchParams<{
+    id: string;
+    date?: string;
+  }>();
   const router = useRouter();
   const queryClient = useQueryClient();
   const userId = useAuthStore((s) => s.userId);
@@ -27,12 +37,18 @@ export default function EditTransactionScreen() {
   const { data: transaction, isLoading } = useTransaction(id);
   const { mutate: update, isPending: isUpdating } = useUpdateTransaction();
   const { mutate: remove, isPending: isDeleting } = useDeleteTransaction();
-  const { mutateAsync: setTags } = useSetTransactionTags();
   const invalidate = useInvalidateTransactionData();
   const invalidateTags = useInvalidateTagData();
 
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const tagsInitialized = useRef(false);
+
+  const [showDeleteSheet, setShowDeleteSheet] = useState(false);
+  const [showEditSheet, setShowEditSheet] = useState(false);
+  const [pendingValues, setPendingValues] = useState<FormValues | null>(null);
+
+  const isRecurring = Boolean(transaction && transaction.recurrence !== "none");
+  const effectiveOccurrenceDate = occurrenceDate ?? transaction?.date;
 
   useEffect(() => {
     if (transaction && !tagsInitialized.current) {
@@ -45,7 +61,7 @@ export default function EditTransactionScreen() {
 
   useTagPickerSync(tagsInitialized, setSelectedTagIds);
 
-  function handleSubmit(values: FormValues) {
+  function submitUpdate(values: FormValues, scope?: RecurrenceScope) {
     update(
       {
         id,
@@ -54,28 +70,72 @@ export default function EditTransactionScreen() {
           amount: values.amountCents,
           description: values.description,
           date: values.date,
+          // Tags viajam no próprio PATCH: o backend decide o row alvo conforme o
+          // scope (single/following criam novo row e tagueiam ele; "all" e avulsa
+          // tagueiam o que permanece). Evita taguear o template antigo.
+          tags: selectedTagIds,
+          // Escopo viaja no CORPO do PATCH (≠ delete, que usa query).
+          // instance_date = data da ocorrência da rota, não a do template.
+          ...(scope ? { scope, instance_date: effectiveOccurrenceDate } : {}),
         },
       },
       {
         onSuccess: async () => {
-          await setTags({ transactionId: id, tagIds: selectedTagIds });
-          await Promise.all([invalidate(), invalidateTags()]);
+          await Promise.all([
+            invalidate(),
+            invalidateTags(),
+            // Detalhe do row editado (avulsa/"all") pode ter tags stale.
+            queryClient.invalidateQueries({
+              queryKey: queryKeys.transaction(userId, id),
+            }),
+          ]);
+          setShowEditSheet(false);
           router.back();
         },
       },
     );
   }
 
-  function handleDelete() {
-    remove(id, {
-      onSuccess: async () => {
-        router.back();
-        await invalidate();
-        queryClient.removeQueries({
-          queryKey: queryKeys.transaction(userId, id),
-        });
-      },
+  function handleSubmit(values: FormValues) {
+    if (isRecurring) {
+      setPendingValues(values);
+      setShowEditSheet(true);
+      return;
+    }
+    submitUpdate(values);
+  }
+
+  function handleUpdateWithScope(scope: RecurrenceScope) {
+    if (pendingValues) submitUpdate(pendingValues, scope);
+  }
+
+  async function handleDeleteSuccess() {
+    router.back();
+    await Promise.all([invalidate(), invalidateTags()]);
+    queryClient.removeQueries({
+      queryKey: queryKeys.transaction(userId, id),
     });
+  }
+
+  function handleDelete() {
+    if (isRecurring) {
+      setShowDeleteSheet(true);
+      return;
+    }
+    remove({ id }, { onSuccess: handleDeleteSuccess });
+  }
+
+  function handleDeleteWithScope(scope: RecurrenceScope) {
+    // date = a ocorrência da rota; nunca transaction.date (template).
+    remove(
+      { id, params: { scope, date: effectiveOccurrenceDate } },
+      {
+        onSuccess: () => {
+          setShowDeleteSheet(false);
+          return handleDeleteSuccess();
+        },
+      },
+    );
   }
 
   if (isLoading || !transaction) {
@@ -102,12 +162,40 @@ export default function EditTransactionScreen() {
         onDelete={handleDelete}
         isLoading={isUpdating}
         isDeleting={isDeleting}
+        header={
+          isRecurring ? (
+            <SeriesBadge
+              recurrence={transaction.recurrence}
+              endDate={transaction.recurrenceEndDate}
+            />
+          ) : null
+        }
+        tagField={
+          <TagField
+            selectedTagIds={selectedTagIds}
+            onChangeTagIds={setSelectedTagIds}
+          />
+        }
       >
-        <TagField
-          selectedTagIds={selectedTagIds}
-          onChangeTagIds={setSelectedTagIds}
-        />
+        {transaction.sourceSeriesId ? <SeriesOriginNotice /> : null}
       </TransactionForm>
+
+      {showDeleteSheet ? (
+        <DeleteScopeSheet
+          isPending={isDeleting}
+          recurrenceLabel={formatRecurrenceLabel(transaction.recurrence)}
+          onClose={() => setShowDeleteSheet(false)}
+          onConfirm={handleDeleteWithScope}
+        />
+      ) : null}
+      {showEditSheet ? (
+        <EditScopeSheet
+          isPending={isUpdating}
+          recurrenceLabel={formatRecurrenceLabel(transaction.recurrence)}
+          onClose={() => setShowEditSheet(false)}
+          onConfirm={handleUpdateWithScope}
+        />
+      ) : null}
     </Screen>
   );
 }

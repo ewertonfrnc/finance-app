@@ -1,3 +1,4 @@
+import { Repeat } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 
 import { TagBadge } from "@/src/features/tags/components/TagBadge";
@@ -29,7 +30,8 @@ export function TransactionItem({
 }: TransactionItemProps) {
   const { type, amount, description } = transaction;
 
-  const hasSubline = showDate || transaction.tags.length > 0;
+  const isRecurring = transaction.recurrence !== "none";
+  const hasSubline = showDate || isRecurring || transaction.tags.length > 0;
 
   return (
     <Pressable
@@ -48,6 +50,7 @@ export function TransactionItem({
 
         {hasSubline && (
           <View className="mt-1 flex-row flex-wrap items-center gap-1">
+            {isRecurring && <Repeat size={12} className="text-muted" />}
             {showDate && (
               <Text className="text-muted text-xs">
                 {formatDayHeader(transaction.date)}

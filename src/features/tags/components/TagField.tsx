@@ -23,6 +23,8 @@ const FREQUENTES_COUNT = 4;
 export function TagField({ selectedTagIds, onChangeTagIds }: TagFieldProps) {
   const scheme = useColorScheme();
   const mutedColor = scheme === "dark" ? "#6b8c78" : "#9ca3af";
+  const chipSurfaceColor = scheme === "dark" ? "#263D33" : "#FFFFFF";
+  const chipBorderColor = scheme === "dark" ? "#3D5549" : "#E5E7EB";
   const router = useRouter();
 
   const { selectedYear, selectedMonth } = useDateStore();
@@ -51,9 +53,9 @@ export function TagField({ selectedTagIds, onChangeTagIds }: TagFieldProps) {
   }
 
   return (
-    <View className="gap-2">
-      <View className="gap-1">
-        <View className="flex-row items-center gap-1.5">
+    <View className="gap-3">
+      <View className="gap-1.5">
+        <View className="flex-row items-center justify-between">
           <Text className="text-muted text-xs font-semibold tracking-widest">
             TAG
           </Text>
@@ -62,17 +64,28 @@ export function TagField({ selectedTagIds, onChangeTagIds }: TagFieldProps) {
 
         <Pressable
           onPress={openPicker}
-          className="flex-row items-center gap-2"
+          className="border-surface-tertiary min-h-8 flex-row items-center gap-2 border-b-2 pb-2"
         >
-          <View className="flex-1 flex-row flex-wrap gap-1">
+          <View className="min-h-7 flex-1 flex-row flex-wrap items-center gap-1">
             {selectedTags.length === 0 ? (
-              <Text className="text-muted text-sm">Sem tag</Text>
+              <View className="min-h-7 justify-center">
+                <Text className="text-muted text-sm">Sem tag</Text>
+              </View>
             ) : (
               selectedTags.map((t) => (
-                <View
+                <Pressable
                   key={t.id}
-                  style={{ backgroundColor: t.color + "33" }}
-                  className="flex-row items-center gap-1 rounded-full px-2 py-0.5"
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    toggleTag(t.id);
+                  }}
+                  hitSlop={4}
+                  style={{
+                    backgroundColor: t.color + "33",
+                    borderColor: t.color + "44",
+                    borderWidth: 1,
+                  }}
+                  className="min-h-7 flex-row items-center gap-1 rounded-full px-2 py-0.5"
                 >
                   <View
                     style={{ backgroundColor: t.color }}
@@ -81,16 +94,8 @@ export function TagField({ selectedTagIds, onChangeTagIds }: TagFieldProps) {
                   <Text className="text-foreground text-[10px] font-medium">
                     {t.name}
                   </Text>
-                  <Pressable
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      toggleTag(t.id);
-                    }}
-                    hitSlop={4}
-                  >
-                    <X size={10} color={mutedColor} />
-                  </Pressable>
-                </View>
+                  <X size={10} color={mutedColor} />
+                </Pressable>
               ))
             )}
           </View>
@@ -99,39 +104,42 @@ export function TagField({ selectedTagIds, onChangeTagIds }: TagFieldProps) {
       </View>
 
       {frequentes.length > 0 && (
-        <View className="gap-2">
+        <View className="gap-1.5">
           <Text className="text-muted text-[10px] font-semibold tracking-widest">
             FREQUENTES
           </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View className="flex-row items-center gap-2">
-              {frequentes.map((t) => {
-                const selected = selectedTagIds.includes(t.id);
-                return (
-                  <Pressable
-                    key={t.id}
-                    onPress={() => toggleTag(t.id)}
-                    style={{
-                      backgroundColor: t.color + (selected ? "55" : "22"),
-                      borderWidth: selected ? 1.5 : 1,
-                      borderColor: selected ? t.color : t.color + "44",
-                    }}
-                    className="flex-row items-center gap-1 rounded-full px-2.5 py-1"
-                  >
-                    <View
-                      style={{ backgroundColor: t.color }}
-                      className="h-1.5 w-1.5 rounded-full"
-                    />
-                    <Text className="text-foreground text-xs font-medium">
-                      {t.name}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-              <Pressable onPress={openPicker} hitSlop={8}>
-                <Text className="text-muted text-xs">Ver todas</Text>
-              </Pressable>
-            </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            contentContainerClassName="flex-row items-center gap-2 pr-4"
+          >
+            {frequentes.map((t) => {
+              const selected = selectedTagIds.includes(t.id);
+              return (
+                <Pressable
+                  key={t.id}
+                  onPress={() => toggleTag(t.id)}
+                  style={{
+                    backgroundColor: chipSurfaceColor,
+                    borderWidth: 1,
+                    borderColor: selected ? t.color : chipBorderColor,
+                  }}
+                  className="flex-row items-center gap-1 rounded-full px-2.5 py-1"
+                >
+                  <View
+                    style={{ backgroundColor: t.color }}
+                    className="h-1.5 w-1.5 rounded-full"
+                  />
+                  <Text className="text-foreground text-xs font-medium">
+                    {t.name}
+                  </Text>
+                </Pressable>
+              );
+            })}
+            <Pressable onPress={openPicker} hitSlop={8}>
+              <Text className="text-muted text-xs">Ver todas</Text>
+            </Pressable>
           </ScrollView>
         </View>
       )}
