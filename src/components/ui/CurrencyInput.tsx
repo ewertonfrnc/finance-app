@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Pressable, TextInput, useColorScheme } from "react-native";
+import { Pressable, TextInput } from "react-native";
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -9,6 +9,7 @@ import Animated, {
 
 import type { TransactionType } from "@/src/features/transactions/types";
 import { formatBRL } from "@/src/lib/currency";
+import { CATEGORY_COLORS } from "@/src/lib/designTokens";
 
 interface CurrencyInputProps {
   value: number; // centavos
@@ -16,45 +17,27 @@ interface CurrencyInputProps {
   type?: TransactionType;
 }
 
-// Hex approximations of the oklch tokens from global.css
-const COLORS = {
-  light: {
-    diario: "#CBA122", // oklch(0.75 0.13 85)
-    saida: "#D64E45", // oklch(0.62 0.16 15)
-    entrada: "#355E45", // oklch(0.42 0.06 155)
-    economia: "#1E3D2B", // oklch(0.25 0.04 160)
-  },
-  dark: {
-    diario: "#C89F22", // oklch(0.75 0.12 85)
-    saida: "#E65A4A", // oklch(0.65 0.18 15)
-    entrada: "#4C8A62", // oklch(0.55 0.08 155)
-    economia: "#5AB87A", // oklch(0.72 0.16 155)
-  },
-} as const;
-
 export function CurrencyInput({
   value,
   onValueChange,
   type = "diario",
 }: CurrencyInputProps) {
   const inputRef = useRef<TextInput>(null);
-  const scheme = useColorScheme();
-  const palette = COLORS[scheme === "dark" ? "dark" : "light"];
 
-  const fromColor = useSharedValue(palette[type]);
-  const toColor = useSharedValue(palette[type]);
+  const fromColor = useSharedValue(CATEGORY_COLORS[type].dot);
+  const toColor = useSharedValue(CATEGORY_COLORS[type].dot);
   const progress = useSharedValue(1);
   const prevType = useRef<TransactionType>(type);
   const opacity = useSharedValue(value === 0 ? 0.35 : 1);
 
   useEffect(() => {
     if (prevType.current === type) return;
-    fromColor.value = palette[prevType.current];
-    toColor.value = palette[type];
+    fromColor.value = CATEGORY_COLORS[prevType.current].dot;
+    toColor.value = CATEGORY_COLORS[type].dot;
     progress.value = 0;
     progress.value = withTiming(1, { duration: 300 });
     prevType.current = type;
-  }, [type, palette, fromColor, toColor, progress]);
+  }, [type, fromColor, toColor, progress]);
 
   const isEmpty = value === 0;
   useEffect(() => {

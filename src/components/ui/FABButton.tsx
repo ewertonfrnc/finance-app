@@ -1,5 +1,7 @@
 import { Plus } from "lucide-react-native";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, useColorScheme } from "react-native";
+
+import { colorsForScheme, DS_RADIUS, DS_SHADOWS } from "@/src/lib/designTokens";
 
 interface FABButtonProps {
   onPress: () => void;
@@ -7,9 +9,16 @@ interface FABButtonProps {
 }
 
 export function FABButton({ onPress, bottom = 80 }: FABButtonProps) {
+  const scheme = useColorScheme();
+  const colors = colorsForScheme(scheme);
+
   return (
     <TouchableOpacity
-      style={[styles.fab, { bottom }]}
+      style={[
+        styles.fab,
+        DS_SHADOWS.fab,
+        { bottom, backgroundColor: colors.green, borderRadius: DS_RADIUS.pill },
+      ]}
       activeOpacity={0.85}
       onPress={onPress}
     >
@@ -26,14 +35,7 @@ const styles = StyleSheet.create({
     marginLeft: -26,
     width: 52,
     height: 52,
-    borderRadius: 26,
-    backgroundColor: "#1e3d2b",
     alignItems: "center",
     justifyContent: "center",
-    elevation: 6,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
   },
 });

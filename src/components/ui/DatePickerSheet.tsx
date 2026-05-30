@@ -19,6 +19,8 @@ import { Pressable, Text, View, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { capitalize, formatFullDate, formatIsoDate } from "@/src/lib/date";
+import { DATE_PICKER_COLORS, schemeKey } from "@/src/lib/designTokens";
+import { PrimaryButton } from "./PrimaryButton";
 import { renderSheetBackdrop } from "./SheetBackdrop";
 
 export interface DatePickerSheetRef {
@@ -33,30 +35,6 @@ interface DatePickerSheetProps {
   summaryLabel: string;
   onConfirm: (date: string) => void;
 }
-
-/** Paleta resolvida em JS — o tema do flash-calendar não aceita className. */
-const PALETTE = {
-  light: {
-    sheet: "#FFFFFF",
-    text: "#1A2620",
-    muted: "#6B7280",
-    disabled: "#C2CBC5",
-    activeBg: "#1E3D2B",
-    activeFg: "#FFFFFF",
-    summaryBg: "#F6FAF8",
-    summaryBorder: "#E0E8E3",
-  },
-  dark: {
-    sheet: "#1E2A24",
-    text: "#E8EDE9",
-    muted: "#8A9B92",
-    disabled: "#4A554E",
-    activeBg: "#5AB87A",
-    activeFg: "#0F1A14",
-    summaryBg: "#24362E",
-    summaryBorder: "#33483D",
-  },
-} as const;
 
 function monthLabel(monthId: string): string {
   return capitalize(format(fromDateId(monthId), "MMMM yyyy", { locale: ptBR }));
@@ -76,10 +54,7 @@ export const DatePickerSheet = forwardRef<
   const sheetRef = useRef<BottomSheetModal>(null);
   const { bottom } = useSafeAreaInsets();
   const scheme = useColorScheme();
-  const colors = useMemo(
-    () => PALETTE[scheme === "dark" ? "dark" : "light"],
-    [scheme],
-  );
+  const colors = useMemo(() => DATE_PICKER_COLORS[schemeKey(scheme)], [scheme]);
 
   // Estado provisório enquanto o sheet está aberto — só vira definitivo no Confirmar.
   const [draft, setDraft] = useState(() => fallbackDate(value, minDate));
@@ -196,14 +171,11 @@ export const DatePickerSheet = forwardRef<
               Cancelar
             </Text>
           </Pressable>
-          <Pressable
+          <PrimaryButton
+            label="Confirmar"
             onPress={confirm}
-            className="bg-foreground flex-1 items-center rounded-full py-3.5"
-          >
-            <Text className="text-background text-base font-semibold">
-              Confirmar
-            </Text>
-          </Pressable>
+            className="h-auto flex-1 py-3.5"
+          />
         </View>
       </BottomSheetView>
     </BottomSheetModal>

@@ -12,6 +12,7 @@ import { FlatList, Pressable, Text, View, useColorScheme } from "react-native";
 import { TransactionItem } from "@/src/components/transactions/TransactionItem";
 import { Screen } from "@/src/components/ui/Screen";
 import { TagFormModal } from "@/src/features/tags/components/TagFormModal";
+import { getTagColors } from "@/src/features/tags/constants";
 import { useTags } from "@/src/features/tags/hooks/useTags";
 import { useTagTransactions } from "@/src/features/tags/hooks/useTagTransactions";
 import { formatBRL } from "@/src/lib/currency";
@@ -38,6 +39,7 @@ export default function TagDetailScreen() {
   );
 
   const tag = tags.find((t) => t.id === id);
+  const tagColors = tag ? getTagColors(tag.color) : null;
 
   return (
     <Screen>
@@ -79,16 +81,17 @@ export default function TagDetailScreen() {
 
       {tag && (
         <View
-          style={{ backgroundColor: tag.color + "22" }}
+          style={{ backgroundColor: tagColors?.bg }}
           className="flex-row items-center gap-3 px-4 py-4"
         >
           <View
-            style={{ backgroundColor: tag.color }}
+            style={{ backgroundColor: tagColors?.dot }}
             className="h-3 w-3 rounded-full"
           />
           <View className="flex-1">
             <Text
               className="text-foreground text-sheet-title font-bold"
+              style={{ color: tagColors?.ink }}
               numberOfLines={1}
             >
               {tag.name}

@@ -14,7 +14,7 @@ import {
 
 import { Screen } from "@/src/components/ui/Screen";
 import { TagBadge } from "@/src/features/tags/components/TagBadge";
-import { TAG_COLOR_PALETTE, getTextColor } from "@/src/features/tags/constants";
+import { TAG_COLOR_PALETTE } from "@/src/features/tags/constants";
 import { useTagForm } from "@/src/features/tags/hooks/useTagForm";
 import { useTags } from "@/src/features/tags/hooks/useTags";
 import { useDateStore } from "@/src/stores/useDateStore";
@@ -141,10 +141,7 @@ export default function TagFormScreen() {
               className="flex-row items-center justify-between rounded-xl px-3 py-3"
               onPress={() => setColor(item.hex)}
             >
-              <Text
-                className="text-sm font-medium"
-                style={{ color: getTextColor(item.hex) }}
-              >
+              <Text className="text-sm font-medium" style={{ color: item.ink }}>
                 {item.label}
               </Text>
               {color === item.hex && <Check size={14} color="#333" />}

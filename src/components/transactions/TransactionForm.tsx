@@ -22,6 +22,7 @@ import type {
   RecurrenceType,
   TransactionType,
 } from "@/src/features/transactions/types";
+import { CATEGORY_COLORS } from "@/src/lib/designTokens";
 
 interface TransactionFormProps {
   mode: "new" | "edit";
@@ -37,13 +38,6 @@ interface TransactionFormProps {
 
 const TITLE = { new: "Novo lançamento", edit: "Editar lançamento" } as const;
 const SUBMIT_LABEL = { new: "Lançar", edit: "Salvar alterações" } as const;
-
-const TYPE_DOT_CLASS: Record<TransactionType, string> = {
-  diario: "bg-warning",
-  saida: "bg-danger",
-  entrada: "bg-success",
-  economia: "bg-accent",
-};
 
 export function TransactionForm({
   mode,
@@ -132,7 +126,10 @@ export function TransactionForm({
         {/* Valor */}
         <View className="gap-2">
           <View className="flex-row items-center gap-1.5">
-            <View className={`h-2 w-2 rounded-full ${TYPE_DOT_CLASS[type]}`} />
+            <View
+              style={{ backgroundColor: CATEGORY_COLORS[type].dot }}
+              className="h-2 w-2 rounded-full"
+            />
             <Text className="text-muted text-label font-semibold tracking-widest">
               VALOR
             </Text>

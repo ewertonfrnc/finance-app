@@ -21,6 +21,7 @@ import type {
   DayBalance,
   TransactionType,
 } from "@/src/features/transactions/types";
+import { getBalanceTierColors } from "@/src/lib/balanceTier";
 import { formatWeekday, isWeekend } from "@/src/lib/date";
 import { usePrivacyStore } from "@/src/stores/usePrivacyStore";
 import { CurrencyText } from "../ui/CurrencyText";
@@ -44,39 +45,6 @@ const CATEGORIES: { type: TransactionType; label: string }[] = [
 
 const TODAY = format(new Date(), "yyyy-MM-dd");
 const PRIVACY_MASK = "••••";
-
-type HealthLevel =
-  | "dark-green"
-  | "light-green"
-  | "yellow"
-  | "light-red"
-  | "dark-red";
-
-const HEALTH_COLORS = {
-  light: {
-    "dark-green": { bg: "#b8ecd4", text: "#114d36" },
-    "light-green": { bg: "#dbf4e7", text: "#185b43" },
-    yellow: { bg: "#f8edc8", text: "#73580f" },
-    "light-red": { bg: "#f8d9dd", text: "#852035" },
-    "dark-red": { bg: "#efbcc5", text: "#701529" },
-  },
-  dark: {
-    "dark-green": { bg: "#214f3c", text: "#baf5d7" },
-    "light-green": { bg: "#1a3f31", text: "#a6efca" },
-    yellow: { bg: "#493f25", text: "#f4d98e" },
-    "light-red": { bg: "#4a2b31", text: "#f8b8c3" },
-    "dark-red": { bg: "#5a2530", text: "#ffd2da" },
-  },
-} as const;
-
-// balance em centavos; limiares: 2000, 1000, 0, -500 reais
-function getHealthLevel(balance: number): HealthLevel {
-  if (balance >= 200000) return "dark-green";
-  if (balance >= 100000) return "light-green";
-  if (balance >= 0) return "yellow";
-  if (balance > -50000) return "light-red";
-  return "dark-red";
-}
 
 interface TransactionLinesProps {
   lines: { type: TransactionType; label: string }[];
@@ -202,9 +170,7 @@ export const DayRow = memo(function DayRow({
   );
 
   const scheme = useColorScheme();
-  const healthLevel = getHealthLevel(dayBalance.endBalance);
-  const colors =
-    HEALTH_COLORS[scheme === "dark" ? "dark" : "light"][healthLevel];
+  const colors = getBalanceTierColors(dayBalance.endBalance, scheme);
 
   const weekendDayBg = weekend
     ? scheme === "dark"
@@ -276,7 +242,7 @@ export const DayRow = memo(function DayRow({
         <Animated.View style={fadeStyle}>
           {displayHidden ? (
             <Text
-              style={{ color: colors.text }}
+              style={{ color: colors.ink }}
               className="font-mono-medium text-base"
             >
               {PRIVACY_MASK}
@@ -286,7 +252,7 @@ export const DayRow = memo(function DayRow({
               value={dayBalance.endBalance}
               variant="small"
               sign="neutral"
-              style={{ color: colors.text }}
+              style={{ color: colors.ink }}
             />
           )}
         </Animated.View>

@@ -1,5 +1,7 @@
 import { Text, View } from "react-native";
 
+import { getTagColors } from "../constants";
+
 interface TagBadgeProps {
   name: string;
   color: string;
@@ -8,23 +10,24 @@ interface TagBadgeProps {
 
 export function TagBadge({ name, color, size = "md" }: TagBadgeProps) {
   const isSmall = size === "sm";
+  const colors = getTagColors(color);
+
   return (
     <View
-      style={{ backgroundColor: color + "33" }}
+      style={{ backgroundColor: colors.bg }}
       className={`flex-row items-center gap-1 rounded-full ${
         isSmall ? "px-2 py-0.5" : "px-2.5 py-1"
       }`}
     >
       <View
-        style={{ backgroundColor: color }}
+        style={{ backgroundColor: colors.dot }}
         className={
           isSmall ? "h-1.5 w-1.5 rounded-full" : "h-2 w-2 rounded-full"
         }
       />
       <Text
-        className={`text-foreground font-medium ${
-          isSmall ? "text-[10px]" : "text-xs"
-        }`}
+        style={{ color: colors.ink }}
+        className={`font-medium ${isSmall ? "text-[10px]" : "text-xs"}`}
       >
         {name}
       </Text>

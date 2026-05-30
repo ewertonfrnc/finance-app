@@ -1,10 +1,22 @@
 import type { TransactionType } from "@/src/features/transactions/types";
 
-type Scheme = "light" | "dark";
+export type Scheme = "light" | "dark";
 type ColorTriple = {
   bg: string;
   ink: string;
   dot: string;
+};
+type DatePickerColors = {
+  sheet: string;
+  text: string;
+  muted: string;
+  disabled: string;
+  activeBg: string;
+  activeFg: string;
+  startBg: string;
+  startFg: string;
+  summaryBg: string;
+  summaryBorder: string;
 };
 
 export const DS_COLORS = {
@@ -167,6 +179,8 @@ export const TAG_PALETTE = [
   },
 ] as const;
 
+export type TagPaletteItem = (typeof TAG_PALETTE)[number];
+
 export const BALANCE_TIER_COLORS = {
   light: {
     darkGreen: { bg: "#b8ecd4", ink: "#114d36" },
@@ -184,6 +198,37 @@ export const BALANCE_TIER_COLORS = {
   },
 } as const;
 
+export const DATE_PICKER_COLORS: Record<Scheme, DatePickerColors> = {
+  light: {
+    sheet: DS_COLORS.light.bg,
+    text: DS_COLORS.light.text,
+    muted: DS_COLORS.light.mute,
+    disabled: DS_COLORS.light.faint,
+    activeBg: DS_COLORS.light.green,
+    activeFg: DS_COLORS.light.bg,
+    startBg: DS_COLORS.light.greenTint,
+    startFg: DS_COLORS.light.green,
+    summaryBg: DS_COLORS.light.surface,
+    summaryBorder: DS_COLORS.light.hair,
+  },
+  dark: {
+    sheet: DS_COLORS.dark.surface,
+    text: DS_COLORS.dark.text,
+    muted: DS_COLORS.dark.mute,
+    disabled: DS_COLORS.dark.hairStrong,
+    activeBg: DS_COLORS.dark.green,
+    activeFg: "#0f1a14",
+    startBg: DS_COLORS.dark.greenTint,
+    startFg: DS_COLORS.dark.green,
+    summaryBg: DS_COLORS.dark.canvasBg,
+    summaryBorder: DS_COLORS.dark.hair,
+  },
+};
+
 export function colorsForScheme(scheme: Scheme | null | undefined) {
   return DS_COLORS[scheme === "dark" ? "dark" : "light"];
+}
+
+export function schemeKey(scheme: Scheme | null | undefined): Scheme {
+  return scheme === "dark" ? "dark" : "light";
 }

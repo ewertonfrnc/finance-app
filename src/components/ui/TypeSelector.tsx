@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Pressable, Text, View, useColorScheme } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -8,6 +8,7 @@ import Animated, {
 
 import type { TransactionType } from "@/src/features/transactions/types";
 import { SPRING } from "@/src/lib/animations";
+import { CATEGORY_COLORS } from "@/src/lib/designTokens";
 
 interface TypeSelectorProps {
   value: TransactionType;
@@ -21,33 +22,7 @@ const TYPES: { value: TransactionType; label: string }[] = [
   { value: "economia", label: "Economia" },
 ];
 
-const TYPE_COLORS: Record<TransactionType, { dot: string; text: string }> = {
-  diario: { dot: "bg-warning", text: "text-warning" },
-  saida: { dot: "bg-danger", text: "text-danger" },
-  entrada: { dot: "bg-success", text: "text-success" },
-  economia: { dot: "bg-accent", text: "text-accent" },
-};
-
-// Pill background hex — matches CurrencyInput's COLORS palette
-const PILL_COLORS = {
-  light: {
-    diario: "#CBA12226",
-    saida: "#D64E4526",
-    entrada: "#355E4526",
-    economia: "#1E3D2B26",
-  },
-  dark: {
-    diario: "#C89F2226",
-    saida: "#E65A4A26",
-    entrada: "#4C8A6226",
-    economia: "#5AB87A26",
-  },
-} as const;
-
 export function TypeSelector({ value, onChange }: TypeSelectorProps) {
-  const scheme = useColorScheme();
-  const palette = PILL_COLORS[scheme === "dark" ? "dark" : "light"];
-
   const chipLayouts = useRef<{ x: number; width: number }[]>([]);
   const initialized = useRef(false);
 
@@ -57,7 +32,7 @@ export function TypeSelector({ value, onChange }: TypeSelectorProps) {
   const pillStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: pillX.value }],
     width: pillW.value,
-    backgroundColor: palette[value],
+    backgroundColor: CATEGORY_COLORS[value].bg,
   }));
 
   function handlePress(index: number, type: TransactionType) {
@@ -79,7 +54,7 @@ export function TypeSelector({ value, onChange }: TypeSelectorProps) {
 
       {TYPES.map((type, i) => {
         const active = value === type.value;
-        const colors = TYPE_COLORS[type.value];
+        const colors = CATEGORY_COLORS[type.value];
 
         return (
           <Pressable
@@ -99,10 +74,12 @@ export function TypeSelector({ value, onChange }: TypeSelectorProps) {
             }}
           >
             <View
-              className={`h-2 w-2 rounded-full ${active ? colors.dot : "bg-muted"}`}
+              style={active ? { backgroundColor: colors.dot } : undefined}
+              className={`h-2 w-2 rounded-full ${active ? "" : "bg-muted"}`}
             />
             <Text
-              className={`text-sm font-semibold ${active ? colors.text : "text-muted"}`}
+              style={active ? { color: colors.ink } : undefined}
+              className={`text-sm font-semibold ${active ? "" : "text-muted"}`}
             >
               {type.label}
             </Text>

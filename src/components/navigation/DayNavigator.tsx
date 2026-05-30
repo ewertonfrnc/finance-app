@@ -5,7 +5,9 @@ import {
   ChevronRight,
   Plus,
 } from "lucide-react-native";
-import { Pressable, Text, View, useColorScheme } from "react-native";
+import { Text, View, useColorScheme } from "react-native";
+
+import { IconButton } from "../ui/IconButton";
 
 interface DayNavigatorProps {
   date: string; // "2026-05-05"
@@ -28,20 +30,10 @@ export function DayNavigator({
 
   return (
     <View className="flex-row items-center justify-between px-4 py-3">
-      <Pressable
-        onPress={onBack}
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-      >
-        <ArrowLeft size={20} color={mutedColor} />
-      </Pressable>
+      <IconButton Icon={ArrowLeft} color={mutedColor} onPress={onBack} />
 
       <View className="flex-row items-center gap-1">
-        <Pressable
-          onPress={onPrev}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <ChevronLeft size={20} color={mutedColor} />
-        </Pressable>
+        <IconButton Icon={ChevronLeft} color={mutedColor} onPress={onPrev} />
 
         <View className="items-center px-2">
           <Text className="text-foreground text-month font-semibold">
@@ -52,20 +44,16 @@ export function DayNavigator({
           </Text>
         </View>
 
-        <Pressable
-          onPress={onNext}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <ChevronRight size={20} color={mutedColor} />
-        </Pressable>
+        <IconButton Icon={ChevronRight} color={mutedColor} onPress={onNext} />
       </View>
 
-      <Pressable
+      <IconButton
+        Icon={Plus}
+        color={accentColor}
+        size={22}
+        strokeWidth={2.5}
         onPress={onAdd}
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-      >
-        <Plus size={22} color={accentColor} strokeWidth={2.5} />
-      </Pressable>
+      />
     </View>
   );
 }

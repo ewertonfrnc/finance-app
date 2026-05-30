@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { TAG_COLOR_PALETTE, getTextColor } from "../constants";
+import { TAG_COLOR_PALETTE } from "../constants";
 import { useTagForm } from "../hooks/useTagForm";
 import type { Tag } from "../types";
 import { TagBadge } from "./TagBadge";
@@ -160,10 +160,7 @@ export function TagFormModal({
               className="flex-row items-center justify-between rounded-xl px-3 py-3"
               onPress={() => setColor(item.hex)}
             >
-              <Text
-                className="text-sm font-medium"
-                style={{ color: getTextColor(item.hex) }}
-              >
+              <Text className="text-sm font-medium" style={{ color: item.ink }}>
                 {item.label}
               </Text>
               {color === item.hex && <Check size={14} color="#333" />}
