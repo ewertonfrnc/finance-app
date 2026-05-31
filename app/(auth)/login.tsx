@@ -167,6 +167,15 @@ export default function LoginScreen() {
 
           <Button
             variant="ghost"
+            onPress={() => router.push("/(auth)/forgot-password")}
+          >
+            <Button.Label className="text-muted text-sm">
+              Esqueceu a senha?
+            </Button.Label>
+          </Button>
+
+          <Button
+            variant="ghost"
             onPress={() => router.replace("/(onboarding)")}
           >
             <Button.Label className="text-muted text-sm">

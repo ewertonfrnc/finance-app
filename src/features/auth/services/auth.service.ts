@@ -60,6 +60,17 @@ export async function register(
   };
 }
 
+export async function forgotPassword(email: string): Promise<void> {
+  await apiClient.post("/v1/auth/forgot-password", { email });
+}
+
+export async function resetPassword(
+  token: string,
+  password: string,
+): Promise<void> {
+  await apiClient.post("/v1/auth/reset-password", { token, password });
+}
+
 export async function login(payload: ApiLoginPayload): Promise<AuthResult> {
   const response = await apiClient.post<ApiResponse<ApiLoginResponse>>(
     "/v1/auth/login",
