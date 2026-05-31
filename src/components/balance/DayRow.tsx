@@ -175,11 +175,7 @@ export const DayRow = memo(function DayRow({
       : dsColors.text;
   const weekdayColor = isFuture ? dsColors.futureMute : dsColors.mute;
 
-  const weekendDayBg = weekend
-    ? scheme === "dark"
-      ? "rgba(120, 100, 60, 0.25)"
-      : "rgba(200, 160, 60, 0.13)"
-    : undefined;
+  const weekendDayBg = weekend ? dsColors.weekendBg : undefined;
 
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);

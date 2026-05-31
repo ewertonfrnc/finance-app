@@ -20,7 +20,7 @@ import { useOnboardingStore } from "@/src/stores/useOnboardingStore";
 const G = DS_COLORS.light;
 const BG = G.greenDeep;
 const INK = "#ffffff";
-const INK_MUTED = "rgba(255,255,255,0.55)";
+const INK_MUTED = DS_COLORS.dark.mute;
 
 export default function SaldoScreen() {
   const router = useRouter();

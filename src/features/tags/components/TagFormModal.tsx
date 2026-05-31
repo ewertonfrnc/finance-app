@@ -114,7 +114,7 @@ export function TagFormModal({
               </Pressable>
             )}
             <Pressable onPress={() => sheetRef.current?.dismiss()}>
-              <X size={18} color="#888888" />
+              <X size={18} color={c.mute} />
             </Pressable>
           </View>
         </View>
@@ -160,7 +160,7 @@ export function TagFormModal({
                 width: "48%",
                 borderWidth: 2,
                 borderColor:
-                  color === item.hex ? "rgba(0,0,0,0.25)" : "transparent",
+                  color === item.hex ? c.overlayStandard : "transparent",
               }}
               className="flex-row items-center justify-between rounded-xl px-3 py-3"
               onPress={() => setColor(item.hex)}
@@ -168,7 +168,7 @@ export function TagFormModal({
               <Text className="text-sm font-medium" style={{ color: item.ink }}>
                 {item.label}
               </Text>
-              {color === item.hex && <Check size={14} color="#333" />}
+              {color === item.hex && <Check size={14} color={item.ink} />}
             </Pressable>
           ))}
         </View>

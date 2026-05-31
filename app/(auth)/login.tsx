@@ -8,17 +8,21 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useColorScheme,
 } from "react-native";
 import Animated from "react-native-reanimated";
 
 import { Screen } from "@/src/components/ui/Screen";
 import { useLogin } from "@/src/features/auth/hooks/useLogin";
+import { colorsForScheme } from "@/src/lib/designTokens";
 import { loginSchema } from "@/src/features/auth/schemas";
 import { useSpinAnimation } from "@/src/lib/animations";
 import { Button } from "heroui-native";
 
 export default function LoginScreen() {
   const router = useRouter();
+  const scheme = useColorScheme();
+  const muteColor = colorsForScheme(scheme).mute;
   const { mutate: login, isPending, error } = useLogin();
 
   const [email, setEmail] = useState("");
@@ -83,7 +87,7 @@ export default function LoginScreen() {
                 value={email}
                 onChangeText={setEmail}
                 placeholder="seu@email.com"
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor={muteColor}
                 autoCapitalize="none"
                 keyboardType="email-address"
                 returnKeyType="next"
@@ -111,7 +115,7 @@ export default function LoginScreen() {
                   value={password}
                   onChangeText={setPassword}
                   placeholder="Sua senha"
-                  placeholderTextColor="#9ca3af"
+                  placeholderTextColor={muteColor}
                   secureTextEntry={!showPassword}
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit}
@@ -123,9 +127,9 @@ export default function LoginScreen() {
                   activeOpacity={0.7}
                 >
                   {showPassword ? (
-                    <EyeOff size={18} color="#9ca3af" />
+                    <EyeOff size={18} color={muteColor} />
                   ) : (
-                    <Eye size={18} color="#9ca3af" />
+                    <Eye size={18} color={muteColor} />
                   )}
                 </TouchableOpacity>
               </View>

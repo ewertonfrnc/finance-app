@@ -9,6 +9,7 @@ import {
   useColorScheme,
 } from "react-native";
 
+import { colorsForScheme } from "@/src/lib/designTokens";
 import { useDateStore } from "@/src/stores/useDateStore";
 import { useTagPickerStore } from "@/src/stores/useTagPickerStore";
 import { useTags } from "../hooks/useTags";
@@ -22,9 +23,7 @@ const FREQUENTES_COUNT = 4;
 
 export function TagField({ selectedTagIds, onChangeTagIds }: TagFieldProps) {
   const scheme = useColorScheme();
-  const mutedColor = scheme === "dark" ? "#6b8c78" : "#9ca3af";
-  const chipSurfaceColor = scheme === "dark" ? "#263D33" : "#FFFFFF";
-  const chipBorderColor = scheme === "dark" ? "#3D5549" : "#E5E7EB";
+  const c = colorsForScheme(scheme);
   const router = useRouter();
 
   const { selectedYear, selectedMonth } = useDateStore();
@@ -94,12 +93,12 @@ export function TagField({ selectedTagIds, onChangeTagIds }: TagFieldProps) {
                   <Text className="text-foreground text-[10px] font-medium">
                     {t.name}
                   </Text>
-                  <X size={10} color={mutedColor} />
+                  <X size={10} color={c.mute} />
                 </Pressable>
               ))
             )}
           </View>
-          <ChevronRight size={16} color={mutedColor} />
+          <ChevronRight size={16} color={c.mute} />
         </Pressable>
       </View>
 
@@ -121,9 +120,9 @@ export function TagField({ selectedTagIds, onChangeTagIds }: TagFieldProps) {
                   key={t.id}
                   onPress={() => toggleTag(t.id)}
                   style={{
-                    backgroundColor: chipSurfaceColor,
+                    backgroundColor: c.bg,
                     borderWidth: 1,
-                    borderColor: selected ? t.color : chipBorderColor,
+                    borderColor: selected ? t.color : c.hair,
                   }}
                   className="flex-row items-center gap-1 rounded-full px-2.5 py-1"
                 >

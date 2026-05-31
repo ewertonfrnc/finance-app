@@ -17,6 +17,7 @@ import { TagFlag } from "@/src/features/tags/components/TagFlag";
 import { TagFormModal } from "@/src/features/tags/components/TagFormModal";
 import { useTags } from "@/src/features/tags/hooks/useTags";
 import type { TagWithTotal } from "@/src/features/tags/types";
+import { colorsForScheme } from "@/src/lib/designTokens";
 import { useDateStore } from "@/src/stores/useDateStore";
 
 interface TagRowProps {
@@ -88,7 +89,7 @@ export default function TagsScreen() {
   const router = useRouter();
   const { toast } = useToast();
   const scheme = useColorScheme();
-  const iconColor = scheme === "dark" ? "#6b8c78" : "#7a9485";
+  const iconColor = colorsForScheme(scheme).mute;
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
