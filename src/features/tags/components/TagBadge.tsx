@@ -14,7 +14,11 @@ export function TagBadge({ name, color, size = "md" }: TagBadgeProps) {
 
   return (
     <View
-      style={{ backgroundColor: colors.bg }}
+      style={{
+        backgroundColor: colors.bg + "33",
+        borderColor: colors.bg + "44",
+        borderWidth: 1,
+      }}
       className={`flex-row items-center gap-1 rounded-full ${
         isSmall ? "px-2 py-0.5" : "px-2.5 py-1"
       }`}

@@ -1,6 +1,6 @@
 import { format, parseISO } from "date-fns";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useToast } from "heroui-native";
+import { Separator, useToast } from "heroui-native";
 import { useMemo, useState } from "react";
 import {
   FlatList,
@@ -340,12 +340,9 @@ export default function DayScreen() {
             ))}
           </ScrollView>
         </GestureDetector>
-        <Text className="text-muted shrink-0 text-sm">
-          {filtered.length} lançamento{filtered.length !== 1 ? "s" : ""}
-        </Text>
       </View>
 
-      <View className="bg-surface-secondary mx-4 h-px" />
+      <Separator />
 
       <GestureDetector gesture={swipeGesture}>
         <Animated.View
@@ -383,9 +380,7 @@ export default function DayScreen() {
                 }}
               />
             )}
-            ItemSeparatorComponent={() => (
-              <View className="bg-surface-secondary mx-4 h-px" />
-            )}
+            ItemSeparatorComponent={() => <Separator />}
             contentContainerClassName="pb-8"
           />
         </Animated.View>
