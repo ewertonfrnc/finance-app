@@ -7,6 +7,32 @@
 
 ---
 
+## Status atual em 2026-06-04
+
+O fluxo do app está implementado e integrado com a API.
+
+| Parte | Estado observado |
+| --- | --- |
+| Link "Esqueceu a senha?" | Implementado em `app/(auth)/login.tsx`. |
+| Tela de solicitação | Implementada em `app/(auth)/forgot-password.tsx`. |
+| Tela de nova senha | Implementada em `app/(auth)/reset-password.tsx`. |
+| Service e hooks | Implementados em `auth.service.ts`, `useForgotPassword` e `useResetPassword`. |
+| Schemas Zod | Implementados em `src/features/auth/schemas.ts`. |
+| Deep link | `app.json` usa scheme `financeapp`, não `finance`. |
+
+Diferenças do plano original:
+
+- O backend envia um link intermediário `GET /v1/auth/redirect-reset?token=...`, que então direciona para o deep link do app.
+- O scheme real do app é `financeapp`.
+
+Pendências restantes:
+
+- Validar manualmente abertura do deep link no Android/iOS.
+- Ajustar exemplos deste documento caso a URL pública da API/deep link mude por ambiente.
+- Adicionar testes automatizados ou smoke checks do fluxo.
+
+---
+
 ## Visão geral do fluxo
 
 ```
@@ -17,7 +43,8 @@
   ← 202 Accepted (sempre, mesmo se email não existe — evita enumeração)
 
 [Usuário clica no link no email]
-  → finance://reset-password?token=<plain-token>
+  → GET /v1/auth/redirect-reset?token=<plain-token>
+  → financeapp://reset-password?token=<plain-token>
   → App abre tela "Cria uma senha nova"
 
   → POST /v1/auth/reset-password { token, password }
@@ -121,7 +148,7 @@ export MAILTRAP_HOST=sandbox.smtp.mailtrap.io
 export MAILTRAP_PORT=2525
 export MAILTRAP_USER=<user do Mailtrap>
 export MAILTRAP_PASS=<pass do Mailtrap>
-export FRONTEND_URL=finance://   # prefixo do deep link
+export FRONTEND_URL=financeapp://   # prefixo do deep link
 ```
 
 ### 1.7 Wiring em `cmd/api/main.go`
@@ -284,12 +311,12 @@ curl -X POST localhost:8080/v1/auth/reset-password \
 ```json
 {
   "expo": {
-    "scheme": "finance"
+    "scheme": "financeapp"
   }
 }
 ```
 
-Isso habilita o deep link `finance://reset-password?token=xxx`.
+Isso habilita o deep link `financeapp://reset-password?token=xxx`.
 
 ### 3.2 Estrutura de arquivos novos
 
@@ -436,7 +463,7 @@ bun run lint
 # 1. Abrir app → login → "Esqueceu a senha?"
 # 2. Digitar email cadastrado → "Enviar link"
 # 3. Verificar email no Mailtrap inbox
-# 4. Copiar token do link → abrir reset-password?token=<token> no simulador
+# 4. Copiar token do link → abrir financeapp://reset-password?token=<token> no simulador
 # 5. Digitar senhas que não batem → ver mensagem "As senhas não batem."
 # 6. Digitar senhas corretas → "Confirmar nova senha"
 # 7. Ver tela "Senha redefinida" → "Entrar agora"
@@ -461,8 +488,8 @@ bun run lint
 
 | Questão | Decidir antes de |
 |---------|-----------------|
-| O link no email deve abrir o app direto (deep link) ou uma página web intermediária? | Slice 3 |
+| O link no email deve abrir o app direto (deep link) ou uma página web intermediária? | Decidido: página intermediária no backend. |
 | Limitar N tentativas de `forgot-password` por email/IP? | Slice 2 (pode ser pós-MVP) |
-| Invalidar tokens antigos quando um novo é gerado? (`DELETE WHERE user_id = $1` antes do INSERT) | Slice 2 |
+| Invalidar tokens antigos quando um novo é gerado? (`DELETE WHERE user_id = $1` antes do INSERT) | Decidido e implementado no backend. |
 
 > Recomendação para a última questão: **sim**, deletar tokens anteriores do mesmo usuário antes de criar o novo. Evita acúmulo e garante que apenas o link mais recente funciona.

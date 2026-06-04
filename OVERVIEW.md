@@ -19,7 +19,18 @@ Este app Expo/React Native resolve um problema específico de finanças pessoais
 - Tema visual: tipografia custom com fontes Inter/JetBrains Mono carregadas no bootstrap; paleta declarada como design tokens globais.
 - Infra mobile: `react-native-gesture-handler`, `react-native-safe-area-context`, `react-native-reanimated` e `react-native-screens` sustentam gestos, layout seguro e animações.
 - Estado offline/local DB: não há SQLite, sync offline ou event sourcing; a fonte de verdade é o backend HTTP.
-- Scaffold residual: a pasta `app-example/` e algumas dependências do template Expo permanecem no repositório, mas não participam do fluxo principal do app atual.
+- Deep link configurado com scheme `financeapp` em `app.json`.
+
+## Status atual do plano em 2026-06-04
+
+| Área | Estado |
+| --- | --- |
+| Onboarding, auth e saldos | Implementados. |
+| Transações simples e recorrentes | Implementadas, incluindo scopes de edição/exclusão. |
+| Tags | Implementadas na aba, detalhe, formulário e picker de transações. |
+| Recuperação de senha | Implementada com telas e integração HTTP. |
+| Totais | Pendente; a aba ainda renderiza placeholder. |
+| Testes automatizados | Ainda ausentes. |
 
 ## Fluxo de cada tela em Mermaid
 
@@ -103,6 +114,31 @@ flowchart TD
   D -->|Erro| E["Mostra erro retornado pela API"]
   D -->|Sucesso| F["Hook grava token no auth store"]
   F --> G["replace para /(tabs)"]
+  A --> H["Esqueceu a senha?"]
+  H --> I["push para /(auth)/forgot-password"]
+```
+
+### Recuperação de senha (`app/(auth)/forgot-password.tsx`)
+
+```mermaid
+flowchart TD
+  A["Usuário informa e-mail"] --> B["Validação local com Zod"]
+  B -->|Válido| C["useForgotPassword envia POST /v1/auth/forgot-password"]
+  C -->|Sucesso| D["Mostra estado enviado e countdown de reenvio"]
+  D --> E["Usuário abre link do email"]
+  E --> F["Deep link abre /(auth)/reset-password?token=..."]
+```
+
+### Nova senha (`app/(auth)/reset-password.tsx`)
+
+```mermaid
+flowchart TD
+  A["Recebe token via params"] --> B["Usuário informa e confirma senha"]
+  B --> C["Validação local com Zod"]
+  C -->|Inválido| D["Mostra erro de senha"]
+  C -->|Válido| E["useResetPassword envia POST /v1/auth/reset-password"]
+  E -->|Sucesso| F["Mostra sucesso"]
+  F --> G["replace para /(auth)/login"]
 ```
 
 ### Container das abas (`app/(tabs)/_layout.tsx`)
@@ -137,7 +173,35 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-  A["Usuário abre a aba Tags"] --> B["Renderiza placeholder estático"]
+  A["Usuário abre a aba Tags"] --> B["Lê mês selecionado do date store"]
+  B --> C["useTags busca /v1/tags?year&month"]
+  C --> D["Renderiza lista com total mensal por tag"]
+  D --> E["Busca local filtra por nome"]
+  D --> F["Toque em + abre formulário de criação"]
+  D --> G["Toque em tag abre /tags/:id"]
+```
+
+### Detalhe da tag (`app/tags/[id].tsx`)
+
+```mermaid
+flowchart TD
+  A["Recebe :id pela rota"] --> B["useTags encontra dados da tag"]
+  A --> C["useTagTransactions busca transações do mês"]
+  B --> D["Mostra cabeçalho colorido e total mensal"]
+  C --> E["Lista transações tagueadas"]
+  D --> F["Editar abre TagFormModal"]
+  D --> G["+ cria transação com tag pré-selecionada"]
+```
+
+### Picker de tags (`app/tags/pick.tsx`)
+
+```mermaid
+flowchart TD
+  A["Abre seletor de tags"] --> B["Lê pendingTagIds no store"]
+  B --> C["Lista tags do mês"]
+  C --> D["Usuário marca/desmarca tags"]
+  D --> E["Store mantém seleção pendente"]
+  E --> F["Volta para formulário de transação"]
 ```
 
 ### Menu (`app/(tabs)/menu.tsx`)
@@ -170,7 +234,7 @@ flowchart TD
 ```mermaid
 flowchart TD
   A["Abre modal de novo lançamento"] --> B["TransactionForm inicializa tipo e data"]
-  B --> C["Usuário define tipo, valor, descrição e data"]
+  B --> C["Usuário define tipo, valor, descrição, tags, data e recorrência"]
   C --> D["useCreateTransaction envia POST /v1/transactions"]
   D -->|Sucesso| E["router.back"]
 ```
@@ -182,10 +246,18 @@ flowchart TD
   A["Recebe :id pela rota"] --> B["useTransaction busca detalhe"]
   B -->|Loading| C["Mostra spinner"]
   B -->|Sucesso| D["Preenche TransactionForm"]
-  D -->|Salvar alterações| E["useUpdateTransaction envia PATCH"]
-  D -->|Excluir lançamento| F["useDeleteTransaction envia DELETE"]
-  E --> G["router.back"]
-  F --> G
+  D -->|Salvar alterações| E{"É recorrente?"}
+  E -->|Não| F["useUpdateTransaction envia PATCH"]
+  E -->|Sim| G["EditScopeSheet escolhe single/following/all"]
+  G --> H["PATCH com scope e instance_date"]
+  D -->|Excluir lançamento| I{"É recorrente?"}
+  I -->|Não| J["useDeleteTransaction envia DELETE"]
+  I -->|Sim| K["DeleteScopeSheet escolhe single/following/all"]
+  K --> L["DELETE com scope e date"]
+  F --> M["router.back"]
+  H --> M
+  J --> M
+  L --> M
 ```
 
 ## Dependências externas e para que servem

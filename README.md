@@ -1,50 +1,51 @@
-# Welcome to your Expo app 👋
+# finance-app
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App mobile Expo/React Native para finanças pessoais, integrado ao `finance-api`.
 
-## Get started
+O fluxo principal cobre onboarding, cadastro/login, saldos mensais, lançamentos, recorrência, tags, menu e recuperação de senha. A aba Totais ainda está pendente e permanece como placeholder.
 
-1. Install dependencies
+## Stack
 
-   ```bash
-   npm install
-   ```
+- Expo 54, React 19, React Native 0.81 e TypeScript strict.
+- Expo Router com rotas em `app/`.
+- Bun como gerenciador de pacotes (`bun.lock`).
+- React Query para dados remotos.
+- Zustand para estado local de auth, onboarding, data selecionada, privacidade e picker de tags.
+- Axios centralizado em `src/services/client.ts`.
+- Uniwind/Tailwind CSS 4 para estilos.
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Comandos
 
 ```bash
-npm run reset-project
+bun install
+bun run start
+bun run android
+bun run ios
+bun run web
+bun run lint
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Não há suíte de testes automatizada configurada neste projeto.
 
-## Learn more
+## Estado das telas
 
-To learn more about developing your project with Expo, look at the following resources:
+| Tela/fluxo | Estado |
+| --- | --- |
+| Onboarding | Implementado |
+| Cadastro/login | Implementado |
+| Recuperação de senha | Implementado |
+| Saldos mensais | Implementado |
+| Detalhe do dia | Implementado |
+| Criar/editar/excluir transação | Implementado |
+| Recorrência de transações | Implementado |
+| Tags e picker de tags | Implementado |
+| Menu/logout | Implementado |
+| Totais | Pendente; `app/(tabs)/totais.tsx` ainda é placeholder |
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Próximos passos do app
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. Implementar a aba Totais depois do backend expor `GET /v1/summary?year=YYYY`.
+2. Criar `src/features/totais` com service, hooks, types e mappers.
+3. Adicionar as telas de detalhe de Totais.
+4. Validar deep link de recuperação de senha em Android/iOS.
+5. Adicionar testes ou ao menos smoke checks automatizados para auth, transações, tags e recuperação de senha.
