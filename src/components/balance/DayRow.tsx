@@ -245,7 +245,7 @@ export const DayRow = memo(function DayRow({
           borderBottomWidth: 2,
           borderBottomColor: dsColors.hair,
         }}
-        className={`items-end justify-center px-2.5 ${isProjectionOnly ? "opacity-50" : ""}`}
+        className={`items-end justify-center px-2.5`}
       >
         <Animated.View style={fadeStyle}>
           {displayHidden ? (
