@@ -149,7 +149,7 @@ export default function EditTransactionScreen() {
   }
 
   return (
-    <Screen>
+    <Screen className="bg-ds-surface">
       <TransactionForm
         mode="edit"
         initialValues={{
@@ -157,6 +157,8 @@ export default function EditTransactionScreen() {
           amountCents: transaction.amount,
           description: transaction.description,
           date: transaction.date,
+          recurrence: transaction.recurrence,
+          recurrenceEndDate: transaction.recurrenceEndDate,
         }}
         onSubmit={handleSubmit}
         onDelete={handleDelete}
@@ -172,6 +174,7 @@ export default function EditTransactionScreen() {
         }
         tagField={
           <TagField
+            variant="compact"
             selectedTagIds={selectedTagIds}
             onChangeTagIds={setSelectedTagIds}
           />

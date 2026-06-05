@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { ChevronRight, X } from "lucide-react-native";
+import { ChevronRight, Tag, X } from "lucide-react-native";
 import { useMemo } from "react";
 import {
   Pressable,
@@ -17,11 +17,16 @@ import { useTags } from "../hooks/useTags";
 interface TagFieldProps {
   selectedTagIds: string[];
   onChangeTagIds: (tagIds: string[]) => void;
+  variant?: "default" | "compact";
 }
 
 const FREQUENTES_COUNT = 4;
 
-export function TagField({ selectedTagIds, onChangeTagIds }: TagFieldProps) {
+export function TagField({
+  selectedTagIds,
+  onChangeTagIds,
+  variant = "default",
+}: TagFieldProps) {
   const scheme = useColorScheme();
   const c = colorsForScheme(scheme);
   const router = useRouter();
@@ -49,6 +54,58 @@ export function TagField({ selectedTagIds, onChangeTagIds }: TagFieldProps) {
   function openPicker() {
     useTagPickerStore.getState().set(selectedTagIds);
     router.push("/tags/pick");
+  }
+
+  if (variant === "compact") {
+    return (
+      <Pressable
+        onPress={openPicker}
+        className="min-h-20 flex-row items-center gap-4 px-4 py-3"
+      >
+        <View className="bg-ds-green-tint h-11 w-11 items-center justify-center rounded-control">
+          <Tag size={20} className="text-ds-green" />
+        </View>
+
+        <View className="min-w-0 flex-1">
+          <Text className="text-muted text-label font-bold tracking-[2px]">
+            TAG
+          </Text>
+          <View className="mt-1 min-h-7 flex-row flex-wrap items-center gap-1">
+            {selectedTags.length === 0 ? (
+              <Text className="text-faint text-input font-bold">Sem tag</Text>
+            ) : (
+              selectedTags.map((t) => (
+                <Pressable
+                  key={t.id}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    toggleTag(t.id);
+                  }}
+                  hitSlop={4}
+                  style={{
+                    backgroundColor: t.color + "33",
+                    borderColor: t.color + "44",
+                    borderWidth: 1,
+                  }}
+                  className="min-h-7 flex-row items-center gap-1 rounded-full px-2 py-0.5"
+                >
+                  <View
+                    style={{ backgroundColor: t.color }}
+                    className="h-1.5 w-1.5 rounded-full"
+                  />
+                  <Text className="text-foreground text-xs font-bold">
+                    {t.name}
+                  </Text>
+                  <X size={10} color={c.mute} />
+                </Pressable>
+              ))
+            )}
+          </View>
+        </View>
+
+        <ChevronRight size={18} color={c.mute} />
+      </Pressable>
+    );
   }
 
   return (

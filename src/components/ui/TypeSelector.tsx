@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -35,37 +35,44 @@ export function TypeSelector({ value, onChange }: TypeSelectorProps) {
     backgroundColor: CATEGORY_COLORS[value].bg,
   }));
 
-  function handlePress(index: number, type: TransactionType) {
-    const layout = chipLayouts.current[index];
-    if (layout) {
+  useEffect(() => {
+    const activeIndex = TYPES.findIndex((type) => type.value === value);
+    const layout = chipLayouts.current[activeIndex];
+
+    if (!layout) return;
+
+    if (initialized.current) {
       pillX.value = withSpring(layout.x, SPRING);
       pillW.value = withSpring(layout.width, SPRING);
+      return;
     }
-    onChange(type);
-  }
+
+    pillX.value = layout.x;
+    pillW.value = layout.width;
+    initialized.current = true;
+  }, [pillW, pillX, value]);
 
   return (
-    <View className="bg-surface-secondary border-surface-tertiary flex-row gap-1 rounded-4xl border px-1.5 py-2.5">
-      {/* Sliding pill background */}
+    <View className="relative min-h-11 flex-row items-center justify-between">
       <Animated.View
+        pointerEvents="none"
         style={pillStyle}
-        className="absolute top-1.5 bottom-1.5 rounded-4xl"
+        className="absolute top-0 bottom-0 rounded-full"
       />
 
-      {TYPES.map((type, i) => {
+      {TYPES.map((type, index) => {
         const active = value === type.value;
         const colors = CATEGORY_COLORS[type.value];
 
         return (
           <Pressable
             key={type.value}
-            onPress={() => handlePress(i, type.value)}
-            className="flex-1 flex-row items-center justify-center gap-1.5 py-2"
-            onLayout={(e) => {
-              const { x, width } = e.nativeEvent.layout;
-              chipLayouts.current[i] = { x, width };
+            onPress={() => onChange(type.value)}
+            className="z-10 min-h-11 flex-row items-center justify-center gap-1.5 rounded-full px-2.5"
+            onLayout={(event) => {
+              const { x, width } = event.nativeEvent.layout;
+              chipLayouts.current[index] = { x, width };
 
-              // Set initial position without animation
               if (!initialized.current && active) {
                 pillX.value = x;
                 pillW.value = width;
@@ -75,11 +82,12 @@ export function TypeSelector({ value, onChange }: TypeSelectorProps) {
           >
             <View
               style={active ? { backgroundColor: colors.dot } : undefined}
-              className={`h-2 w-2 rounded-full ${active ? "" : "bg-muted"}`}
+              className={`h-2 w-2 rounded-full ${active ? "" : "bg-muted/40"}`}
             />
             <Text
               style={active ? { color: colors.ink } : undefined}
-              className={`text-sm font-semibold ${active ? "" : "text-muted"}`}
+              className={`text-sm font-bold ${active ? "" : "text-muted"}`}
+              numberOfLines={1}
             >
               {type.label}
             </Text>

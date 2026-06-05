@@ -15,12 +15,14 @@ interface CurrencyInputProps {
   value: number; // centavos
   onValueChange: (cents: number) => void;
   type?: TransactionType;
+  showUnderline?: boolean;
 }
 
 export function CurrencyInput({
   value,
   onValueChange,
   type = "diario",
+  showUnderline = true,
 }: CurrencyInputProps) {
   const inputRef = useRef<TextInput>(null);
 
@@ -74,7 +76,9 @@ export function CurrencyInput({
       >
         {formatBRL(value)}
       </Animated.Text>
-      <Animated.View style={animatedBgStyle} className="mt-2 h-0.5" />
+      {showUnderline ? (
+        <Animated.View style={animatedBgStyle} className="mt-2 h-0.5" />
+      ) : null}
       <TextInput
         ref={inputRef}
         value={String(value)}
