@@ -67,7 +67,6 @@ export default function NewTransactionScreen() {
         isLoading={isPending}
         tagField={
           <TagField
-            variant="compact"
             selectedTagIds={selectedTagIds}
             onChangeTagIds={setSelectedTagIds}
           />
