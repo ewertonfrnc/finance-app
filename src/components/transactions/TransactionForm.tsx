@@ -1,15 +1,23 @@
-import { format } from "date-fns";
+import { subDays } from "date-fns";
 import { useRouter } from "expo-router";
-import { ArrowLeft, Repeat, X } from "lucide-react-native";
-import { useState } from "react";
+import {
+  ArrowLeft,
+  Calendar,
+  Repeat,
+  Tag,
+  X,
+} from "lucide-react-native";
+import { useMemo, useState } from "react";
 import {
   KeyboardAvoidingView,
   Pressable,
-  ScrollView,
   Text,
   TextInput,
   View,
+  useColorScheme,
 } from "react-native";
+import { Accordion, AccordionLayoutTransition } from "heroui-native";
+import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CurrencyInput } from "@/src/components/ui/CurrencyInput";
@@ -17,12 +25,14 @@ import { DateField } from "@/src/components/ui/DateField";
 import { TypeSelector } from "@/src/components/ui/TypeSelector";
 import { RecurrenceEndField } from "@/src/features/transactions/components/RecurrenceEndField";
 import { RecurrenceSelector } from "@/src/features/transactions/components/RecurrenceSelector";
+import { formatRecurrenceLabel } from "@/src/features/transactions/constants";
 import type {
   FormValues,
   RecurrenceType,
   TransactionType,
 } from "@/src/features/transactions/types";
-import { CATEGORY_COLORS } from "@/src/lib/designTokens";
+import { formatFullDate, formatIsoDate } from "@/src/lib/date";
+import { CATEGORY_COLORS, colorsForScheme } from "@/src/lib/designTokens";
 
 interface TransactionFormProps {
   mode: "new" | "edit";
@@ -32,12 +42,122 @@ interface TransactionFormProps {
   isLoading?: boolean;
   isDeleting?: boolean;
   tagField?: React.ReactNode;
+  tagSummary?: string;
   header?: React.ReactNode;
   children?: React.ReactNode;
 }
 
 const TITLE = { new: "Novo lançamento", edit: "Editar lançamento" } as const;
 const SUBMIT_LABEL = { new: "Lançar", edit: "Salvar alterações" } as const;
+
+type DetailId = "tag" | "date" | "recurrence";
+
+interface DetailRowProps {
+  label: string;
+  value: string;
+  icon: React.ComponentType<{ size?: number; color?: string }>;
+  iconColor: string;
+}
+
+interface DatePreset {
+  label: string;
+  value: string;
+}
+
+interface DatePresetButtonProps {
+  label: string;
+  active: boolean;
+  accentColor: string;
+  onPress: () => void;
+}
+
+function DetailRow({
+  label,
+  value,
+  icon: Icon,
+  iconColor,
+}: DetailRowProps) {
+  return (
+    <View className="min-h-9 flex-1 flex-row items-center gap-3">
+      <Icon size={16} color={iconColor} />
+      <Text className="text-muted text-label flex-1 font-semibold tracking-widest opacity-80">
+        {label}
+      </Text>
+      <Text
+        className="text-muted max-w-[48%] text-right text-sm font-medium opacity-75"
+        numberOfLines={1}
+      >
+        {value}
+      </Text>
+    </View>
+  );
+}
+
+function DetailSeparator() {
+  return <View className="bg-surface-tertiary ml-7 h-px opacity-45" />;
+}
+
+function DetailIndicator({ color }: { color: string }) {
+  return (
+    <Accordion.Indicator
+      iconProps={{ size: 16, color }}
+      animation={{ rotation: { value: [-90, 0] } }}
+    />
+  );
+}
+
+function DatePresetButton({
+  label,
+  active,
+  accentColor,
+  onPress,
+}: DatePresetButtonProps) {
+  return (
+    <Pressable
+      onPress={onPress}
+      className="border-surface-tertiary rounded-full border px-3 py-1.5"
+      style={
+        active
+          ? {
+              backgroundColor: `${accentColor}22`,
+              borderColor: accentColor,
+            }
+          : undefined
+      }
+    >
+      <Text
+        className="text-muted text-xs font-medium"
+        style={active ? { color: accentColor } : undefined}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+function formatDateSummary(date: string, presets: DatePreset[]): string {
+  return (
+    presets.find((preset) => preset.value === date)?.label ??
+    formatFullDate(date)
+  );
+}
+
+function isDetailId(value: string): value is DetailId {
+  return value === "tag" || value === "date" || value === "recurrence";
+}
+
+function RecurrenceEndSummary({ endDate }: { endDate?: string }) {
+  return (
+    <View className="border-ds-green-soft gap-2 border-l-2 pl-3">
+      <Text className="text-muted text-label font-semibold tracking-widest">
+        TERMINA EM
+      </Text>
+      <Text className="text-muted text-base">
+        {endDate ? formatFullDate(endDate) : "Sem data — repete pra sempre"}
+      </Text>
+    </View>
+  );
+}
 
 export function TransactionForm({
   mode,
@@ -47,11 +167,14 @@ export function TransactionForm({
   isLoading = false,
   isDeleting = false,
   tagField,
+  tagSummary = "Sem tag",
   header,
   children,
 }: TransactionFormProps) {
   const router = useRouter();
   const { bottom } = useSafeAreaInsets();
+  const scheme = useColorScheme();
+  const c = colorsForScheme(scheme);
 
   const [type, setType] = useState<TransactionType>(
     initialValues?.type ?? "diario",
@@ -63,7 +186,7 @@ export function TransactionForm({
     initialValues?.description ?? "",
   );
   const [date, setDate] = useState(
-    initialValues?.date ?? format(new Date(), "yyyy-MM-dd"),
+    initialValues?.date ?? formatIsoDate(new Date()),
   );
   const [recurrence, setRecurrence] = useState<RecurrenceType>(
     initialValues?.recurrence ?? "none",
@@ -71,8 +194,21 @@ export function TransactionForm({
   const [recurrenceEndDate, setRecurrenceEndDate] = useState<
     string | undefined
   >(initialValues?.recurrenceEndDate);
+  const [expandedDetail, setExpandedDetail] = useState<DetailId | null>(null);
 
   const canSubmit = amountCents > 0 && description.trim().length > 0;
+  const typeAccentColor = CATEGORY_COLORS[type].dot;
+  const datePresets = useMemo<DatePreset[]>(() => {
+    const now = new Date();
+    return [
+      { label: "Hoje", value: formatIsoDate(now) },
+      { label: "Ontem", value: formatIsoDate(subDays(now, 1)) },
+      { label: "Anteontem", value: formatIsoDate(subDays(now, 2)) },
+    ];
+  }, []);
+  const recurrenceSummary =
+    formatRecurrenceLabel(recurrence) || "Não repete";
+  const showRecurrenceDetail = mode === "new" || recurrence !== "none";
 
   function handleRecurrenceChange(next: RecurrenceType) {
     setRecurrence(next);
@@ -107,7 +243,8 @@ export function TransactionForm({
         </Pressable>
       </View>
 
-      <ScrollView
+      <Animated.ScrollView
+        layout={AccordionLayoutTransition}
         className="flex-1 px-4"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -160,44 +297,116 @@ export function TransactionForm({
           </Text>
         </View>
 
-        {tagField}
-
-        {/* Data */}
-        <View className="gap-2">
-          <Text className="text-muted text-label font-semibold tracking-widest">
-            DATA
-          </Text>
-          <DateField value={date} onChange={setDate} />
-        </View>
-
-        {/* Recorrência — só na criação (no modo edit o escopo é tratado à parte) */}
-        {mode === "new" && (
-          <View className="gap-3">
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center gap-1.5">
-                <Repeat size={13} className="text-muted" />
-                <Text className="text-muted text-label font-semibold tracking-widest">
-                  RECORRÊNCIA
-                </Text>
-              </View>
-              <Text className="text-muted text-xs">opcional</Text>
-            </View>
-            <RecurrenceSelector
-              value={recurrence}
-              onChange={handleRecurrenceChange}
-            />
-            {recurrence !== "none" && (
-              <RecurrenceEndField
-                value={recurrenceEndDate}
-                startDate={date}
-                onChange={setRecurrenceEndDate}
-              />
-            )}
+        <Accordion
+          selectionMode="single"
+          value={expandedDetail ?? undefined}
+          onValueChange={(value: string | string[] | undefined) => {
+            if (typeof value === "string" && isDetailId(value)) {
+              setExpandedDetail(value);
+              return;
+            }
+            setExpandedDetail(null);
+          }}
+          hideSeparator
+          animation={{
+            layout: { value: AccordionLayoutTransition },
+          }}
+        >
+          <View className="flex-row items-center justify-between pb-1.5">
+            <Text className="text-muted text-label font-semibold tracking-widest opacity-80">
+              DETALHES
+            </Text>
+            <Text className="text-muted text-xs opacity-65">opcional</Text>
           </View>
-        )}
+          <View className="bg-surface-tertiary h-px opacity-45" />
+
+          {tagField ? (
+            <Accordion.Item value="tag">
+              <Accordion.Trigger className="min-h-11 px-0 py-2">
+                <DetailRow
+                  label="TAG"
+                  value={tagSummary}
+                  icon={Tag}
+                  iconColor={c.mute}
+                />
+                <DetailIndicator color={c.mute} />
+              </Accordion.Trigger>
+              <Accordion.Content className="px-0 pb-0">
+                <View className="py-2.5 pl-7">
+                  {tagField}
+                </View>
+              </Accordion.Content>
+              <DetailSeparator />
+            </Accordion.Item>
+          ) : null}
+
+          <Accordion.Item value="date">
+            <Accordion.Trigger className="min-h-11 px-0 py-2">
+              <DetailRow
+                label="DATA"
+                value={formatDateSummary(date, datePresets)}
+                icon={Calendar}
+                iconColor={c.mute}
+              />
+              <DetailIndicator color={c.mute} />
+            </Accordion.Trigger>
+            <Accordion.Content className="px-0 pb-0">
+              <View className="gap-2.5 py-2.5 pl-7">
+                <DateField value={date} onChange={setDate} />
+                <View className="flex-row flex-wrap gap-2">
+                  {datePresets.map((preset) => (
+                    <DatePresetButton
+                      key={preset.value}
+                      label={preset.label}
+                      active={date === preset.value}
+                      accentColor={typeAccentColor}
+                      onPress={() => setDate(preset.value)}
+                    />
+                  ))}
+                </View>
+              </View>
+            </Accordion.Content>
+            {showRecurrenceDetail ? <DetailSeparator /> : null}
+          </Accordion.Item>
+
+          {showRecurrenceDetail && (
+            <Accordion.Item value="recurrence">
+              <Accordion.Trigger className="min-h-11 px-0 py-2">
+                <DetailRow
+                  label="RECORRÊNCIA"
+                  value={recurrenceSummary}
+                  icon={Repeat}
+                  iconColor={c.mute}
+                />
+                <DetailIndicator color={c.mute} />
+              </Accordion.Trigger>
+              <Accordion.Content className="px-0 pb-0">
+                {mode === "new" ? (
+                  <View className="gap-2.5 py-2.5 pl-7">
+                    <RecurrenceSelector
+                      value={recurrence}
+                      onChange={handleRecurrenceChange}
+                    />
+                    {recurrence !== "none" && (
+                      <RecurrenceEndField
+                        value={recurrenceEndDate}
+                        startDate={date}
+                        onChange={setRecurrenceEndDate}
+                      />
+                    )}
+                  </View>
+                ) : (
+                  <View className="py-2.5 pl-7">
+                    <RecurrenceEndSummary endDate={recurrenceEndDate} />
+                  </View>
+                )}
+              </Accordion.Content>
+            </Accordion.Item>
+          )}
+        </Accordion>
 
         {children}
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Footer */}
       <View className="gap-3 px-4 pt-4" style={{ paddingBottom: bottom || 16 }}>

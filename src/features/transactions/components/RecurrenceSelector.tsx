@@ -35,7 +35,7 @@ export function RecurrenceSelector({
           <Pressable
             key={option.value}
             onPress={() => onChange(option.value)}
-            className={`flex-row items-center gap-1.5 rounded-full px-3.5 py-2 ${
+            className={`flex-row items-center gap-1 rounded-full px-3 py-1.5 ${
               active
                 ? "bg-ds-green-tint border border-ds-hair-strong"
                 : "bg-surface border border-surface-tertiary"
@@ -43,12 +43,12 @@ export function RecurrenceSelector({
           >
             {showIcon && (
               <Repeat
-                size={13}
+                size={12}
                 className={active ? "text-ds-green" : "text-muted/70"}
               />
             )}
             <Text
-              className={`text-sm font-semibold ${
+              className={`text-xs font-medium ${
                 active ? "text-ds-green" : "text-muted"
               }`}
             >

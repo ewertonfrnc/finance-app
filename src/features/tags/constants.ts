@@ -33,3 +33,22 @@ export function getTextColor(hex: string): string {
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return luminance > 0.5 ? "#333333" : "#FFFFFF";
 }
+
+export function formatTagSelectionSummary(
+  selectedTagIds: string[],
+  tags: { id: string; name: string }[],
+): string {
+  if (selectedTagIds.length === 0) return "Sem tag";
+
+  const selectedNames = selectedTagIds
+    .map((id) => tags.find((tag) => tag.id === id)?.name)
+    .filter((name): name is string => Boolean(name));
+
+  if (selectedNames.length === 0) {
+    return selectedTagIds.length === 1 ? "1 tag" : `${selectedTagIds.length} tags`;
+  }
+
+  if (selectedNames.length <= 2) return selectedNames.join(", ");
+
+  return `${selectedNames[0]} +${selectedNames.length - 1}`;
+}

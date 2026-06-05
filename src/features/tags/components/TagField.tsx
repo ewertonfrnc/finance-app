@@ -17,11 +17,16 @@ import { useTags } from "../hooks/useTags";
 interface TagFieldProps {
   selectedTagIds: string[];
   onChangeTagIds: (tagIds: string[]) => void;
+  showHeader?: boolean;
 }
 
 const FREQUENTES_COUNT = 4;
 
-export function TagField({ selectedTagIds, onChangeTagIds }: TagFieldProps) {
+export function TagField({
+  selectedTagIds,
+  onChangeTagIds,
+  showHeader = true,
+}: TagFieldProps) {
   const scheme = useColorScheme();
   const c = colorsForScheme(scheme);
   const router = useRouter();
@@ -54,12 +59,14 @@ export function TagField({ selectedTagIds, onChangeTagIds }: TagFieldProps) {
   return (
     <View className="gap-3">
       <View className="gap-1.5">
-        <View className="flex-row items-center justify-between">
-          <Text className="text-muted text-xs font-semibold tracking-widest">
-            TAG
-          </Text>
-          <Text className="text-muted text-[10px]">opcional</Text>
-        </View>
+        {showHeader ? (
+          <View className="flex-row items-center justify-between">
+            <Text className="text-muted text-xs font-semibold tracking-widest">
+              TAG
+            </Text>
+            <Text className="text-muted text-[10px]">opcional</Text>
+          </View>
+        ) : null}
 
         <Pressable
           onPress={openPicker}

@@ -20,7 +20,9 @@ export function SeriesBadge({ recurrence, endDate }: SeriesBadgeProps) {
 
   return (
     <View className="border-ds-hair-strong bg-ds-green-tint flex-row items-start gap-2 rounded-xl border px-3 py-2.5">
-      <Repeat size={15} className="text-ds-green mt-0.5" />
+      <View className="bg-background rounded-full p-1">
+        <Repeat size={15} className="text-ds-green mt-0.5" />
+      </View>
       <View className="flex-1">
         <Text className="text-ds-green text-xs font-semibold">
           Lançamento recorrente{label ? ` · ${label}` : ""}

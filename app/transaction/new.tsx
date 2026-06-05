@@ -4,12 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { TransactionForm } from "@/src/components/transactions/TransactionForm";
 import { Screen } from "@/src/components/ui/Screen";
 import { TagField } from "@/src/features/tags/components/TagField";
+import { formatTagSelectionSummary } from "@/src/features/tags/constants";
 import { useInvalidateTagData } from "@/src/features/tags/hooks/useInvalidateTagData";
 import { useTagPickerSync } from "@/src/features/tags/hooks/useTagPickerSync";
+import { useTags } from "@/src/features/tags/hooks/useTags";
 import { useCreateTransaction } from "@/src/features/transactions/hooks/useCreateTransaction";
 import { useInvalidateTransactionData } from "@/src/features/transactions/hooks/useInvalidateTransactionData";
 import type { FormValues } from "@/src/features/transactions/types";
 import { isIsoDate } from "@/src/lib/date";
+import { useDateStore } from "@/src/stores/useDateStore";
 import { useTagPickerStore } from "@/src/stores/useTagPickerStore";
 
 export default function NewTransactionScreen() {
@@ -21,6 +24,8 @@ export default function NewTransactionScreen() {
   const { mutate: create, isPending } = useCreateTransaction();
   const invalidate = useInvalidateTransactionData();
   const invalidateTags = useInvalidateTagData();
+  const { selectedYear, selectedMonth } = useDateStore();
+  const { data: tags = [] } = useTags(selectedYear, selectedMonth);
   const initialDate =
     typeof date === "string" && isIsoDate(date) ? date : undefined;
 
@@ -37,6 +42,8 @@ export default function NewTransactionScreen() {
   }, []);
 
   useTagPickerSync(initialized, setSelectedTagIds);
+
+  const tagSummary = formatTagSelectionSummary(selectedTagIds, tags);
 
   function handleSubmit(values: FormValues) {
     create(
@@ -65,10 +72,12 @@ export default function NewTransactionScreen() {
         initialValues={{ date: initialDate }}
         onSubmit={handleSubmit}
         isLoading={isPending}
+        tagSummary={tagSummary}
         tagField={
           <TagField
             selectedTagIds={selectedTagIds}
             onChangeTagIds={setSelectedTagIds}
+            showHeader={false}
           />
         }
       />

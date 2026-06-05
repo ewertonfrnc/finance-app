@@ -6,8 +6,10 @@ import { ActivityIndicator, View } from "react-native";
 import { TransactionForm } from "@/src/components/transactions/TransactionForm";
 import { Screen } from "@/src/components/ui/Screen";
 import { TagField } from "@/src/features/tags/components/TagField";
+import { formatTagSelectionSummary } from "@/src/features/tags/constants";
 import { useInvalidateTagData } from "@/src/features/tags/hooks/useInvalidateTagData";
 import { useTagPickerSync } from "@/src/features/tags/hooks/useTagPickerSync";
+import { useTags } from "@/src/features/tags/hooks/useTags";
 import { DeleteScopeSheet } from "@/src/features/transactions/components/DeleteScopeSheet";
 import { EditScopeSheet } from "@/src/features/transactions/components/EditScopeSheet";
 import { SeriesBadge } from "@/src/features/transactions/components/SeriesBadge";
@@ -21,6 +23,7 @@ import type {
   FormValues,
   RecurrenceScope,
 } from "@/src/features/transactions/types";
+import { useDateStore } from "@/src/stores/useDateStore";
 import { queryKeys } from "@/src/lib/queryKeys";
 import { useAuthStore } from "@/src/stores/useAuthStore";
 import { useTagPickerStore } from "@/src/stores/useTagPickerStore";
@@ -33,8 +36,10 @@ export default function EditTransactionScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const userId = useAuthStore((s) => s.userId);
+  const { selectedYear, selectedMonth } = useDateStore();
 
   const { data: transaction, isLoading } = useTransaction(id);
+  const { data: tags = [] } = useTags(selectedYear, selectedMonth);
   const { mutate: update, isPending: isUpdating } = useUpdateTransaction();
   const { mutate: remove, isPending: isDeleting } = useDeleteTransaction();
   const invalidate = useInvalidateTransactionData();
@@ -138,6 +143,11 @@ export default function EditTransactionScreen() {
     );
   }
 
+  const tagSummary = formatTagSelectionSummary(selectedTagIds, [
+    ...tags,
+    ...(transaction?.tags ?? []),
+  ]);
+
   if (isLoading || !transaction) {
     return (
       <Screen>
@@ -157,11 +167,14 @@ export default function EditTransactionScreen() {
           amountCents: transaction.amount,
           description: transaction.description,
           date: transaction.date,
+          recurrence: transaction.recurrence,
+          recurrenceEndDate: transaction.recurrenceEndDate,
         }}
         onSubmit={handleSubmit}
         onDelete={handleDelete}
         isLoading={isUpdating}
         isDeleting={isDeleting}
+        tagSummary={tagSummary}
         header={
           isRecurring ? (
             <SeriesBadge
@@ -174,6 +187,7 @@ export default function EditTransactionScreen() {
           <TagField
             selectedTagIds={selectedTagIds}
             onChangeTagIds={setSelectedTagIds}
+            showHeader={false}
           />
         }
       >
