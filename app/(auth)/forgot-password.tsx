@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { Lock, Mail } from "lucide-react-native";
+import { ChevronLeft, Lock, Mail } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -12,12 +12,15 @@ import {
   useColorScheme,
 } from "react-native";
 
-import { colorsForScheme } from "@/src/lib/designTokens";
+import { Screen } from "@/src/components/ui/Screen";
+import { colorsForScheme, DS_COLORS } from "@/src/lib/designTokens";
 import { forgotPasswordSchema } from "@/src/features/auth/schemas";
 import { useForgotPassword } from "@/src/features/auth/hooks/useForgotPassword";
 import { Button } from "heroui-native";
 
 type Status = "idle" | "sent";
+const SUCCESS_COLORS = DS_COLORS.dark;
+const SUCCESS_BUTTON = DS_COLORS.light.bg;
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -30,7 +33,11 @@ export default function ForgotPasswordScreen() {
   const [countdown, setCountdown] = useState(47);
 
   const inputRef = useRef<TextInput>(null);
-  const { mutate: sendForgotPassword, isPending, error: sendError } = useForgotPassword();
+  const {
+    mutate: sendForgotPassword,
+    isPending,
+    error: sendError,
+  } = useForgotPassword();
 
   const parseResult = forgotPasswordSchema.safeParse({ email });
   const isValid = parseResult.success;
@@ -78,49 +85,73 @@ export default function ForgotPasswordScreen() {
 
   if (status === "sent") {
     return (
-      <View className="flex-1" style={{ backgroundColor: "#062015" }}>
+      <Screen style={{ backgroundColor: SUCCESS_COLORS.greenDeep }}>
         <KeyboardAvoidingView className="flex-1" behavior="padding">
           <ScrollView
             className="flex-1 px-6"
-            contentContainerStyle={{ paddingTop: 64, paddingBottom: 32, flexGrow: 1 }}
+            contentContainerStyle={{
+              paddingTop: 64,
+              paddingBottom: 32,
+              flexGrow: 1,
+            }}
             showsVerticalScrollIndicator={false}
           >
             {/* Ícone */}
             <View
               className="mb-8 h-14 w-14 items-center justify-center rounded-2xl"
-              style={{ backgroundColor: "rgba(255,255,255,0.08)" }}
+              style={{ backgroundColor: SUCCESS_COLORS.greenTint }}
             >
-              <Mail size={26} color="rgba(255,255,255,0.75)" strokeWidth={1.6} />
+              <Mail size={26} color={SUCCESS_COLORS.text} strokeWidth={1.6} />
             </View>
 
             {/* Heading */}
             <Text
               className="mb-4 font-bold"
-              style={{ color: "#e8ede9", fontSize: 32, lineHeight: 38 }}
+              style={{ color: SUCCESS_COLORS.text, fontSize: 32, lineHeight: 38 }}
             >
               {"Dá uma olhada\nno seu e-mail."}
             </Text>
 
             {/* Descrição */}
-            <Text style={{ color: "rgba(255,255,255,0.55)", fontSize: 15, marginBottom: 4 }}>
+            <Text
+              style={{
+                color: SUCCESS_COLORS.mute,
+                fontSize: 15,
+                marginBottom: 4,
+              }}
+            >
               Mandamos um link de redefinição pra
             </Text>
             <Text
-              style={{ color: "#e8ede9", fontSize: 15, fontWeight: "600", marginBottom: 24 }}
+              style={{
+                color: SUCCESS_COLORS.text,
+                fontSize: 15,
+                fontWeight: "600",
+                marginBottom: 24,
+              }}
             >
               {email}
             </Text>
 
             {/* Info box */}
             <View
-              className="rounded-2xl px-4 py-4"
-              style={{ backgroundColor: "rgba(255,255,255,0.07)" }}
+              className="rounded-2xl border px-4 py-4"
+              style={{
+                backgroundColor: SUCCESS_COLORS.greenTint,
+                borderColor: SUCCESS_COLORS.hairStrong,
+              }}
             >
               <View className="flex-row items-start gap-3">
-                <Text style={{ color: "rgba(255,255,255,0.55)", marginTop: 1 }}>•</Text>
-                <Text style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, flex: 1 }}>
+                <Text style={{ color: SUCCESS_COLORS.mute, marginTop: 1 }}>
+                  •
+                </Text>
+                <Text
+                  style={{ color: SUCCESS_COLORS.mute, fontSize: 14, flex: 1 }}
+                >
                   O link expira em{" "}
-                  <Text style={{ color: "#e8ede9", fontWeight: "600" }}>15 minutos</Text>
+                  <Text style={{ color: SUCCESS_COLORS.text, fontWeight: "600" }}>
+                    15 minutos
+                  </Text>
                   . Não achou? Verifique a caixa de spam.
                 </Text>
               </View>
@@ -135,13 +166,15 @@ export default function ForgotPasswordScreen() {
               className="h-14 items-center justify-center rounded-4xl"
               style={{
                 borderWidth: 1.5,
-                borderColor: canResend ? "#e8ede9" : "rgba(255,255,255,0.25)",
+                borderColor: canResend
+                  ? SUCCESS_BUTTON
+                  : SUCCESS_COLORS.hairStrong,
               }}
               activeOpacity={0.75}
             >
               <Text
                 style={{
-                  color: canResend ? "#e8ede9" : "rgba(255,255,255,0.4)",
+                  color: canResend ? SUCCESS_BUTTON : SUCCESS_COLORS.faint,
                   fontWeight: "600",
                   fontSize: 16,
                 }}
@@ -157,7 +190,7 @@ export default function ForgotPasswordScreen() {
             >
               <Text
                 style={{
-                  color: "rgba(255,255,255,0.55)",
+                  color: SUCCESS_COLORS.text,
                   fontSize: 14,
                   textDecorationLine: "underline",
                 }}
@@ -167,12 +200,12 @@ export default function ForgotPasswordScreen() {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
-      </View>
+      </Screen>
     );
   }
 
   return (
-    <View className="bg-background flex-1">
+    <Screen className="bg-background">
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -190,7 +223,7 @@ export default function ForgotPasswordScreen() {
             hitSlop={12}
             activeOpacity={0.7}
           >
-            <Text className="text-foreground text-xl">{"‹"}</Text>
+            <ChevronLeft size={22} color={colors.text} strokeWidth={2} />
           </TouchableOpacity>
 
           {/* Ícone */}
@@ -202,11 +235,15 @@ export default function ForgotPasswordScreen() {
           </View>
 
           {/* Heading */}
-          <Text className="text-foreground mb-3 font-bold" style={{ fontSize: 32, lineHeight: 38 }}>
+          <Text
+            className="text-foreground mb-3 font-bold"
+            style={{ fontSize: 32, lineHeight: 38 }}
+          >
             {"Esqueceu\na senha?"}
           </Text>
           <Text className="text-muted mb-8" style={{ fontSize: 15 }}>
-            Sem estresse. Manda seu e-mail que a gente te envia um link pra criar uma senha nova.
+            Sem estresse. Manda seu e-mail que a gente te envia um link pra
+            criar uma senha nova.
           </Text>
 
           {/* Campo */}
@@ -249,23 +286,25 @@ export default function ForgotPasswordScreen() {
         <View className="gap-3 px-6 pb-4">
           <Button
             onPress={handleSend}
-            isDisabled={isPending || (!isValid && submitted)}
-            className={`h-14 rounded-4xl ${isValid ? "bg-foreground" : "bg-surface-secondary"}`}
+            isDisabled={!isValid || isPending}
+            className={`h-14 rounded-4xl ${isValid ? "bg-ds-canvas-bg" : "bg-surface-tertiary"}`}
           >
             <Button.Label>
-              <Text className={`font-semibold ${isValid ? "text-background" : "text-muted"}`}>
+              <Text
+                className={`font-semibold ${isValid ? "text-foreground" : "text-muted"}`}
+              >
                 Enviar link
               </Text>
             </Button.Label>
           </Button>
 
           <Button variant="ghost" onPress={() => router.back()}>
-            <Button.Label className="text-muted text-sm">
+            <Button.Label className="text-link text-sm underline">
               Voltar pro login
             </Button.Label>
           </Button>
         </View>
       </KeyboardAvoidingView>
-    </View>
+    </Screen>
   );
 }

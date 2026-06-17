@@ -15,7 +15,7 @@ export function BalanceBar({ value, maxAbsValue }: BalanceBarProps) {
     <View style={{ width: MAX_WIDTH }} className="justify-center">
       <View
         style={{ width }}
-        className={`h-2 rounded-full ${value < 0 ? "bg-danger" : "bg-success"}`}
+        className={`h-2 rounded-full ${value < 0 ? "bg-danger" : "bg-accent"}`}
       />
     </View>
   );

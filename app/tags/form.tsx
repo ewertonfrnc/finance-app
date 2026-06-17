@@ -5,7 +5,6 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -14,7 +13,10 @@ import {
 
 import { Screen } from "@/src/components/ui/Screen";
 import { TagBadge } from "@/src/features/tags/components/TagBadge";
-import { TAG_COLOR_PALETTE, getTagColors } from "@/src/features/tags/constants";
+import {
+  getTagColors,
+  getTagPaletteForScheme,
+} from "@/src/features/tags/constants";
 import { useTagForm } from "@/src/features/tags/hooks/useTagForm";
 import { useTags } from "@/src/features/tags/hooks/useTags";
 import { colorsForScheme } from "@/src/lib/designTokens";
@@ -31,6 +33,7 @@ export default function TagFormScreen() {
   const scheme = useColorScheme();
   const c = colorsForScheme(scheme);
   const mutedColor = c.mute;
+  const tagPalette = getTagPaletteForScheme(scheme);
 
   const { selectedYear, selectedMonth } = useDateStore();
   const { data: tags = [] } = useTags(selectedYear, selectedMonth);
@@ -69,7 +72,7 @@ export default function TagFormScreen() {
   }
 
   return (
-    <Screen>
+    <Screen className="bg-background">
       <View className="flex-row items-center justify-between px-4 py-4">
         <Text className="text-foreground text-sheet-title font-bold">
           {isEdit ? "Editar tag" : "Criar tag"}
@@ -93,7 +96,7 @@ export default function TagFormScreen() {
         </View>
       </View>
 
-      <View className="bg-surface-secondary h-px" />
+      <View className="bg-separator h-px" />
 
       <ScrollView contentContainerClassName="px-6 pt-6 pb-10">
         <Text className="text-muted text-label mb-2 font-semibold tracking-wider uppercase">
@@ -106,6 +109,7 @@ export default function TagFormScreen() {
             borderBottomColor: hasError ? c.red : c.hairStrong,
           }}
           placeholder="Como vamos chamar essa tag?"
+          placeholderTextColor={c.faint}
           value={name}
           onChangeText={setName}
           autoCorrect={false}
@@ -114,7 +118,7 @@ export default function TagFormScreen() {
         />
         <View className="mt-1 mb-6 flex-row items-center justify-between">
           {hasError ? (
-            <Text className="text-xs text-red-500">
+            <Text className="text-danger text-xs">
               Dê um nome pra continuar
             </Text>
           ) : (
@@ -130,23 +134,28 @@ export default function TagFormScreen() {
           <Text className="text-muted text-xs">Toque pra escolher</Text>
         </View>
         <View className="mb-6 flex-row flex-wrap gap-2">
-          {TAG_COLOR_PALETTE.map((item) => (
+          {tagPalette.map((item) => (
             <Pressable
               key={item.hex}
               style={{
-                backgroundColor: item.hex,
+                backgroundColor: c.surface,
                 width: "48%",
                 borderWidth: 2,
-                borderColor:
-                  color === item.hex ? "rgba(0,0,0,0.25)" : "transparent",
+                borderColor: color === item.hex ? c.text : item.dot,
               }}
               className="flex-row items-center justify-between rounded-xl px-3 py-3"
               onPress={() => setColor(item.hex)}
             >
-              <Text className="text-sm font-medium" style={{ color: item.ink }}>
-                {item.label}
-              </Text>
-              {color === item.hex && <Check size={14} color="#333" />}
+              <View className="flex-row items-center gap-2">
+                <View
+                  style={{ backgroundColor: item.dot }}
+                  className="h-2 w-2 rounded-full"
+                />
+                <Text className="text-foreground text-sm font-medium">
+                  {item.label}
+                </Text>
+              </View>
+              {color === item.hex && <Check size={14} color={c.text} />}
             </Pressable>
           ))}
         </View>
@@ -163,11 +172,11 @@ export default function TagFormScreen() {
         </View>
 
         <Pressable
-          className="bg-foreground mb-3 items-center rounded-xl py-3.5"
+          className="bg-ds-canvas-bg mb-3 items-center rounded-xl py-3.5"
           onPress={handleSubmit}
           disabled={isPending}
         >
-          <Text className="text-background text-sm font-semibold">
+          <Text className="text-foreground text-sm font-semibold">
             {isPending ? "Salvando..." : isEdit ? "Salvar" : "Criar"}
           </Text>
         </Pressable>
@@ -182,14 +191,17 @@ export default function TagFormScreen() {
         animationType="fade"
         onRequestClose={() => setShowDeleteConfirm(false)}
       >
-        <View style={[styles.modalContainer, { backgroundColor: c.overlayDelete }]}>
+        <View
+          className="flex-1 justify-end"
+          style={{ backgroundColor: c.overlayDelete }}
+        >
           <Pressable
-            style={StyleSheet.absoluteFillObject}
+            className="absolute inset-0"
             onPress={() => setShowDeleteConfirm(false)}
           />
           <View className="bg-background rounded-t-3xl px-6 pt-6 pb-10">
             <View className="mb-4 flex-row items-center gap-3">
-              <TagBadge name={tag?.name ?? ""} color={tag?.color ?? "#ccc"} />
+              <TagBadge name={tag?.name ?? ""} color={tag?.color ?? c.hair} />
             </View>
 
             <Text className="text-foreground text-sheet-title mb-2 font-bold">
@@ -201,7 +213,7 @@ export default function TagFormScreen() {
                 <View
                   style={{
                     backgroundColor: tag?.color
-                      ? getTagColors(tag.color).dot
+                      ? getTagColors(tag.color, scheme).dot
                       : c.hair,
                   }}
                   className="h-1.5 w-1.5 rounded-full"
@@ -218,7 +230,7 @@ export default function TagFormScreen() {
 
             <View className="flex-row gap-3">
               <Pressable
-                className="flex-1 items-center rounded-full border border-gray-200 py-3.5"
+                className="border-separator flex-1 items-center rounded-full border py-3.5"
                 onPress={() => setShowDeleteConfirm(false)}
                 disabled={isDeleting}
               >
@@ -230,7 +242,7 @@ export default function TagFormScreen() {
                 onPress={confirmDelete}
                 disabled={isDeleting}
               >
-                <Text className="text-sm font-semibold text-white">
+                <Text className="text-danger-foreground text-sm font-semibold">
                   {isDeleting ? "Excluindo..." : "Excluir tag"}
                 </Text>
               </Pressable>
@@ -241,11 +253,3 @@ export default function TagFormScreen() {
     </Screen>
   );
 }
-
-// overlay color is scheme-dependent; see modalOverlayColor below
-const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-});

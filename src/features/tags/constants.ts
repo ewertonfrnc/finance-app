@@ -1,14 +1,39 @@
-import { TAG_PALETTE } from "@/src/lib/designTokens";
+import { TAG_PALETTE, type Scheme, schemeKey } from "@/src/lib/designTokens";
 
 export const TAG_COLOR_PALETTE = TAG_PALETTE.map((item) => ({
   ...item,
   hex: item.bg,
 })) as ((typeof TAG_PALETTE)[number] & { hex: string })[];
 
-export function getTagColors(color: string) {
+const DARK_TAG_COLORS: Record<
+  (typeof TAG_PALETTE)[number]["key"],
+  { bg: string; ink: string; dot: string }
+> = {
+  gray: { bg: "#343a36", ink: "#d3d8d5", dot: "#8c938f" },
+  blue: { bg: "#0d4358", ink: "#9ed8f2", dot: "#59a9cc" },
+  yellow: { bg: "#4d430b", ink: "#ead56e", dot: "#c8ad31" },
+  green: { bg: "#075234", ink: "#85e0ad", dot: "#4fbe7c" },
+  red: { bg: "#642623", ink: "#f1a39e", dot: "#dc7972" },
+  purple: { bg: "#433460", ink: "#c9bbf1", dot: "#9d8ad1" },
+  pink: { bg: "#5d263e", ink: "#efabc2", dot: "#d780a0" },
+  brown: { bg: "#4b3322", ink: "#ddbd9f", dot: "#aa7e5f" },
+};
+
+export function getTagPaletteForScheme(scheme: Scheme | null | undefined) {
+  if (schemeKey(scheme) !== "dark") return TAG_COLOR_PALETTE;
+
+  return TAG_COLOR_PALETTE.map((item) => ({
+    ...item,
+    ...DARK_TAG_COLORS[item.key],
+  }));
+}
+
+export function getTagColors(color: string, scheme?: Scheme | null) {
+  const palette = getTagPaletteForScheme(scheme);
   return (
-    TAG_COLOR_PALETTE.find(
+    palette.find(
       (item) =>
+        item.hex.toLowerCase() === color.toLowerCase() ||
         item.bg.toLowerCase() === color.toLowerCase() ||
         item.dot.toLowerCase() === color.toLowerCase() ||
         item.ink.toLowerCase() === color.toLowerCase(),

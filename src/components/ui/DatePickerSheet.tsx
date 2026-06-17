@@ -19,7 +19,11 @@ import { Pressable, Text, View, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { capitalize, formatFullDate, formatIsoDate } from "@/src/lib/date";
-import { DATE_PICKER_COLORS, schemeKey } from "@/src/lib/designTokens";
+import {
+  colorsForScheme,
+  DATE_PICKER_COLORS,
+  schemeKey,
+} from "@/src/lib/designTokens";
 import { PrimaryButton } from "./PrimaryButton";
 import { renderSheetBackdrop } from "./SheetBackdrop";
 
@@ -55,6 +59,7 @@ export const DatePickerSheet = forwardRef<
   const { bottom } = useSafeAreaInsets();
   const scheme = useColorScheme();
   const colors = useMemo(() => DATE_PICKER_COLORS[schemeKey(scheme)], [scheme]);
+  const chromeColors = colorsForScheme(scheme);
 
   // Estado provisório enquanto o sheet está aberto — só vira definitivo no Confirmar.
   const [draft, setDraft] = useState(() => fallbackDate(value, minDate));
@@ -109,7 +114,7 @@ export const DatePickerSheet = forwardRef<
       backdropComponent={renderSheetBackdrop}
       bottomInset={bottom}
       backgroundStyle={{ backgroundColor: colors.sheet }}
-      handleIndicatorStyle={{ backgroundColor: colors.muted }}
+      handleIndicatorStyle={{ backgroundColor: chromeColors.dragHandle }}
     >
       <BottomSheetView className="px-5 pt-1 pb-6">
         <Text className="text-foreground text-sheet-title font-bold">

@@ -45,7 +45,7 @@ function LoadingBar() {
   return (
     <View style={{ height: 2, overflow: "hidden" }}>
       <Animated.View
-        className="bg-success h-full"
+        className="bg-accent h-full"
         style={[{ width: barWidth }, style]}
       />
     </View>
@@ -104,10 +104,14 @@ export function DayList({
 
   return (
     <View className="flex-1">
-      <View className="border-surface-secondary flex-row items-center border-b px-4 py-2">
-        <Text className="text-muted w-8 text-center text-xs">DIA</Text>
+      <View className="border-separator flex-row items-center border-b px-4 py-2">
+        <Text className="text-muted text-label w-8 text-center font-semibold tracking-widest">
+          DIA
+        </Text>
         <View className="flex-1" />
-        <Text className="text-muted text-xs">SALDO</Text>
+        <Text className="text-muted text-label font-semibold tracking-widest">
+          SALDO
+        </Text>
       </View>
 
       {isFetching && <LoadingBar />}

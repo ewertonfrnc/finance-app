@@ -28,7 +28,6 @@ export default function TagDetailScreen() {
   const router = useRouter();
   const scheme = useColorScheme();
   const c = colorsForScheme(scheme);
-  const mutedColor = c.mute;
   const accentColor = c.green;
 
   const { selectedYear, selectedMonth, goToPrevMonth, goToNextMonth } =
@@ -42,16 +41,16 @@ export default function TagDetailScreen() {
   );
 
   const tag = tags.find((t) => t.id === id);
-  const tagColors = tag ? getTagColors(tag.color) : null;
+  const tagColors = tag ? getTagColors(tag.color, scheme) : null;
 
   return (
-    <Screen>
+    <Screen className="bg-background">
       <View className="flex-row items-center justify-between px-4 py-3">
         <Pressable
           onPress={() => router.back()}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <ArrowLeft size={20} color={mutedColor} />
+          <ArrowLeft size={20} color={c.text} />
         </Pressable>
 
         <View className="flex-row items-center gap-1">
@@ -59,7 +58,7 @@ export default function TagDetailScreen() {
             onPress={goToPrevMonth}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <ChevronLeft size={20} color={mutedColor} />
+            <ChevronLeft size={20} color={c.text} />
           </Pressable>
           <Text className="text-foreground text-month px-2 font-semibold">
             {formatMonthHeader(selectedYear, selectedMonth)}
@@ -68,7 +67,7 @@ export default function TagDetailScreen() {
             onPress={goToNextMonth}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <ChevronRight size={20} color={mutedColor} />
+            <ChevronRight size={20} color={c.text} />
           </Pressable>
         </View>
 
@@ -84,8 +83,8 @@ export default function TagDetailScreen() {
 
       {tag && (
         <View
-          style={{ backgroundColor: tagColors?.bg }}
-          className="flex-row items-center gap-3 px-4 py-4"
+          style={{ borderLeftColor: tagColors?.dot }}
+          className="bg-surface-secondary border-separator flex-row items-center gap-3 border-y border-l-4 px-4 py-4"
         >
           <View
             style={{ backgroundColor: tagColors?.dot }}
@@ -94,14 +93,12 @@ export default function TagDetailScreen() {
           <View className="flex-1">
             <Text
               className="text-foreground text-sheet-title font-bold"
-              style={{ color: tagColors?.ink }}
               numberOfLines={1}
             >
               {tag.name}
             </Text>
             <Text
-              className="text-xs"
-              style={{ color: tagColors?.ink, opacity: 0.65 }}
+              className="text-muted text-xs"
             >
               {transactions.length} lançamento
               {transactions.length !== 1 ? "s" : ""} ·{" "}
@@ -112,12 +109,12 @@ export default function TagDetailScreen() {
             onPress={() => setShowEdit(true)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Pencil size={18} color={mutedColor} />
+            <Pencil size={18} color={accentColor} />
           </Pressable>
         </View>
       )}
 
-      <View className="bg-surface-secondary h-px" />
+      <View className="bg-separator h-px" />
 
       {showEdit && tag && (
         <TagFormModal
@@ -140,7 +137,7 @@ export default function TagDetailScreen() {
           />
         )}
         ItemSeparatorComponent={() => (
-          <View className="bg-surface-secondary mx-4 h-px" />
+          <View className="bg-separator mx-4 h-px" />
         )}
         ListEmptyComponent={() => (
           <View className="flex-1 items-center justify-center px-8 py-16">

@@ -45,10 +45,11 @@ export default function SaldosScreen() {
     goToNextMonth,
     goToCurrentMonth,
   } = useDateStore();
-  const { data: dailyBalances, isFetching, isPlaceholder } = useDailyBalances(
-    selectedYear,
-    selectedMonth,
-  );
+  const {
+    data: dailyBalances,
+    isFetching,
+    isPlaceholder,
+  } = useDailyBalances(selectedYear, selectedMonth);
   usePrefetchAdjacentBalances(selectedYear, selectedMonth);
   const router = useRouter();
   const {
@@ -83,7 +84,7 @@ export default function SaldosScreen() {
   );
 
   return (
-    <Screen>
+    <Screen className="bg-background">
       <MonthNavigator
         onPrev={goToPrevMonth}
         onNext={goToNextMonth}
@@ -92,7 +93,10 @@ export default function SaldosScreen() {
         isHidden={hideValues}
         onToggleHide={toggleHideValues}
       />
-      <View className="border-surface-secondary flex-row justify-between border-b px-4 pt-2">
+
+      {/* <BalanceSummaryHeader summary={monthSummary} /> */}
+
+      <View className="border-separator flex-row justify-between border-b px-4 pt-2">
         <Animated.View
           style={indicatorStyle}
           className="bg-accent absolute bottom-0 left-0 h-0.5"

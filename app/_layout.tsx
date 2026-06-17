@@ -9,10 +9,11 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { HeroUINativeProvider } from "heroui-native";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { colorsForScheme } from "@/src/lib/designTokens";
 import { useAuthHydration, useAuthStore } from "@/src/stores/useAuthStore";
 import "../global.css";
 
@@ -96,6 +97,8 @@ function QuerySessionSync() {
 }
 
 export default function RootLayout() {
+  const scheme = useColorScheme();
+  const colors = colorsForScheme(scheme);
   const hasHydrated = useAuthHydration();
   const [authResolved, setAuthResolved] = useState(false);
   const [loaded, error] = useFonts({
@@ -121,12 +124,17 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView className="flex-1">
+    <GestureHandlerRootView className="bg-background flex-1">
       <SafeAreaProvider>
         <BottomSheetModalProvider>
           <QueryClientProvider client={queryClient}>
             <HeroUINativeProvider>
-              <Stack screenOptions={{ headerShown: false }}>
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  contentStyle: { backgroundColor: colors.bg },
+                }}
+              >
                 <Stack.Screen name="(tabs)" />
                 <Stack.Screen name="(onboarding)" />
                 <Stack.Screen name="(auth)" />

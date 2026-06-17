@@ -97,6 +97,18 @@ code { font-family: var(--mono); font-size: 11px; background: oklch(0.96 0.005 1
 .toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; }
 .toc a { font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 14px; background: #fff; border: 1px solid var(--hair); color: var(--mute); transition: color .12s; }
 .toc a:hover { color: var(--text); }
+
+/* dark theme section — self-contained dark surfaces so swatches stay legible */
+.dark-sec { background: oklch(0.165 0.012 160); border-radius: 20px; padding: 28px 26px 30px; color: oklch(0.95 0.005 160); }
+.dark-sec .section-label { color: oklch(0.66 0.008 160); border-color: oklch(0.32 0.01 160); }
+.dark-sec .card { background: oklch(0.245 0.012 160); border-color: oklch(0.32 0.012 160); }
+.dark-sec .token-row, .dark-sec .tier-row, .dark-sec .type-row, .dark-sec .shape-row { border-color: oklch(0.32 0.012 160); }
+.dark-sec .token-name, .dark-sec .tier-name, .dark-sec .shape-name { color: oklch(0.92 0.005 160); }
+.dark-sec .token-value, .dark-sec .token-label, .dark-sec .tier-label, .dark-sec .type-meta, .dark-sec .tag-meta, .dark-sec .shape-use { color: oklch(0.66 0.008 160); }
+.dark-sec .token-swatch, .dark-sec .mini-swatch { border-color: rgba(255,255,255,0.14); }
+.dark-sec code { background: oklch(0.30 0.012 160); color: oklch(0.85 0.01 160); }
+.dark-sec .screen-table th { color: oklch(0.66 0.008 160); }
+.dark-sec .screen-table td { border-color: oklch(0.32 0.012 160); }
 </style>
 </head>
 <body>
@@ -115,6 +127,7 @@ code { font-family: var(--mono); font-size: 11px; background: oklch(0.96 0.005 1
     <a href="#tags">Paleta de tags</a>
     <a href="#shapes">Formas & sombras</a>
     <a href="#by-screen">Cores por tela</a>
+    <a href="#dark-theme">Tema escuro</a>
   </nav>
 
   <!-- FUNDAMENTOS -->
@@ -178,7 +191,7 @@ code { font-family: var(--mono); font-size: 11px; background: oklch(0.96 0.005 1
         <div class="type-meta">19px · w600 · ls -0.2 · month header</div>
       </div>
       <div class="type-row">
-        <div style="font-size:17px;font-weight:500;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="43352c202603262e222a2f6d202c2e">[email&#160;protected]</a></div>
+        <div style="font-size:17px;font-weight:500;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cdbba2aea88da8a0aca4a1e3aea2a0">[email&#160;protected]</a></div>
         <div class="type-meta">17px · w500 · input field</div>
       </div>
       <div class="type-row">
@@ -792,6 +805,262 @@ code { font-family: var(--mono); font-size: 11px; background: oklch(0.96 0.005 1
       </table>
     </div>
 
+  </section>
+
+  <!-- TEMA ESCURO -->
+  <section id="dark-theme">
+    <div class="dark-sec">
+      <div class="section-label">Tema escuro — espelha o tema dark do desktop</div>
+      <p style="font-size:13px;color:oklch(0.70 0.008 160);line-height:1.65;margin-bottom:22px;max-width:680px;">
+        Acionado por <code>FinTheme</code> (classe <code>body.fin-dark</code>); os tokens mobile são gerados por <code>mkMobileTokens(dark)</code> e trocados in-place. As escalas semânticas (saldo, categorias, tags) ganham variantes próprias — <code>SALDO_DARK</code>, <code>mkTypePalette(true)</code>, <code>TAG_PALETTE_DARK</code>. Hue mantido em <code>155–165</code>; no escuro o <em>fill</em> fica profundo e o <em>ink</em> fica claro (inverte a relação do tema claro).
+      </p>
+
+      <div class="grid2">
+        <div class="card">
+          <div style="font-size:12px;font-weight:600;color:oklch(0.66 0.008 160);margin-bottom:10px;">Superfícies</div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.165 0.012 160);"></div>
+            <div class="token-name">canvas/app bg</div>
+            <div class="token-value">oklch(0.165 0.012 160)</div>
+            <div class="token-label">Fundo do app/canvas</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.185 0.012 160);"></div>
+            <div class="token-name">pageBg</div>
+            <div class="token-value">oklch(0.185 0.012 160)</div>
+            <div class="token-label">Fundo de página (Configurações)</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.215 0.013 160);"></div>
+            <div class="token-name">bg</div>
+            <div class="token-value">oklch(0.215 0.013 160)</div>
+            <div class="token-label">Tela do telefone</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.245 0.012 160);"></div>
+            <div class="token-name">surface / card</div>
+            <div class="token-value">oklch(0.245 0.012 160)</div>
+            <div class="token-label">Card · header detalhe</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.30 0.035 158);"></div>
+            <div class="token-name">greenTint / greenChip</div>
+            <div class="token-value">oklch(0.30 0.035 158)</div>
+            <div class="token-label">Row selecionada · badge · chip</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:12px;font-weight:600;color:oklch(0.66 0.008 160);margin-bottom:10px;">Texto</div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.95 0.005 160);"></div>
+            <div class="token-name">text</div>
+            <div class="token-value">oklch(0.95 0.005 160)</div>
+            <div class="token-label">Texto principal</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.70 0.008 160);"></div>
+            <div class="token-name">mute</div>
+            <div class="token-value">oklch(0.70 0.008 160)</div>
+            <div class="token-label">Label · hint</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.55 0.01 160);"></div>
+            <div class="token-name">faint</div>
+            <div class="token-value">oklch(0.55 0.01 160)</div>
+            <div class="token-label">Placeholder · vazio</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.60 0.01 160);"></div>
+            <div class="token-name">future</div>
+            <div class="token-value">oklch(0.60 0.01 160)</div>
+            <div class="token-label">Dias futuros (V7/V8)</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.45 0.01 160);"></div>
+            <div class="token-name">futureMute</div>
+            <div class="token-value">oklch(0.45 0.01 160)</div>
+            <div class="token-label">Labels futuros (V7/V8)</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:12px;font-weight:600;color:oklch(0.66 0.008 160);margin-bottom:10px;">Divisórias & perigo</div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.30 0.01 160);"></div>
+            <div class="token-name">hair</div>
+            <div class="token-value">oklch(0.30 0.01 160)</div>
+            <div class="token-label">Divisória leve</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.40 0.012 160);"></div>
+            <div class="token-name">hairStrong</div>
+            <div class="token-value">oklch(0.40 0.012 160)</div>
+            <div class="token-label">Divisória reforçada</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.70 0.15 25);"></div>
+            <div class="token-name">danger</div>
+            <div class="token-value">oklch(0.70 0.15 25)</div>
+            <div class="token-label">Texto/ícone destrutivo</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.34 0.07 25);"></div>
+            <div class="token-name">dangerTint</div>
+            <div class="token-value">oklch(0.34 0.07 25)</div>
+            <div class="token-label">Fundo destrutivo suave</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:12px;font-weight:600;color:oklch(0.66 0.008 160);margin-bottom:10px;">Escala de verde</div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.32 0.05 162);"></div>
+            <div class="token-name">greenDeep</div>
+            <div class="token-value">oklch(0.32 0.05 162)</div>
+            <div class="token-label">Card hero (saldo onboarding)</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.78 0.11 160);"></div>
+            <div class="token-name">green ★</div>
+            <div class="token-value">oklch(0.78 0.11 160)</div>
+            <div class="token-label">Acento primário · FAB · ativo</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.70 0.11 158);"></div>
+            <div class="token-name">greenMid</div>
+            <div class="token-value">oklch(0.70 0.11 158)</div>
+            <div class="token-label">Entradas · sparkline fill</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.52 0.08 158);"></div>
+            <div class="token-name">greenSoft</div>
+            <div class="token-value">oklch(0.52 0.08 158)</div>
+            <div class="token-label">Linha dashed do sparkline</div>
+          </div>
+          <div class="token-row">
+            <div class="token-swatch" style="background:oklch(0.30 0.035 158);"></div>
+            <div class="token-name">greenTint</div>
+            <div class="token-value">oklch(0.30 0.035 158)</div>
+            <div class="token-label">Row selecionada · badge</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tiers escuros -->
+      <div class="card" style="margin-top:12px;">
+        <div style="font-size:12px;font-weight:600;color:oklch(0.66 0.008 160);margin-bottom:14px;">Tiers de saldo — <code>SALDO_DARK</code> (espelha TIERS_DARK do desktop)</div>
+        <div class="tier-row" style="border-bottom:2px solid oklch(0.32 0.012 160);">
+          <div class="tier-cell tier-label">Tier</div>
+          <div class="tier-cell tier-label">Faixa</div>
+          <div class="tier-cell tier-label">Fill</div>
+          <div class="tier-cell tier-label">Ink</div>
+          <div class="tier-cell tier-label">Preview</div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-cell"><span class="tier-name">darkGreen</span></div>
+          <div class="tier-cell" style="font-family:var(--mono);font-size:12px;">≥ R$ 2.000</div>
+          <div class="tier-cell"><code>#1a4a38</code></div>
+          <div class="tier-cell"><code>#96eec6</code></div>
+          <div class="tier-cell"><div class="tier-pill" style="background:#1a4a38;color:#96eec6;">R$ 2.506,26</div></div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-cell"><span class="tier-name">lightGreen</span></div>
+          <div class="tier-cell" style="font-family:var(--mono);font-size:12px;">R$ 1.000 – 1.999</div>
+          <div class="tier-cell"><code>#1e4032</code></div>
+          <div class="tier-cell"><code>#96e2be</code></div>
+          <div class="tier-cell"><div class="tier-pill" style="background:#1e4032;color:#96e2be;">R$ 1.267,00</div></div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-cell"><span class="tier-name">yellow</span></div>
+          <div class="tier-cell" style="font-family:var(--mono);font-size:12px;">R$ 0 – 999</div>
+          <div class="tier-cell"><code>#463c1e</code></div>
+          <div class="tier-cell"><code>#eed48e</code></div>
+          <div class="tier-cell"><div class="tier-pill" style="background:#463c1e;color:#eed48e;">R$ 567,80</div></div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-cell"><span class="tier-name">lightRed</span></div>
+          <div class="tier-cell" style="font-family:var(--mono);font-size:12px;">R$ −500 a −1</div>
+          <div class="tier-cell"><code>#46262d</code></div>
+          <div class="tier-cell"><code>#f0a2ae</code></div>
+          <div class="tier-cell"><div class="tier-pill" style="background:#46262d;color:#f0a2ae;">− R$ 120,00</div></div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-cell"><span class="tier-name">darkRed</span></div>
+          <div class="tier-cell" style="font-family:var(--mono);font-size:12px;">< − R$ 500</div>
+          <div class="tier-cell"><code>#4e2029</code></div>
+          <div class="tier-cell"><code>#f8b0ba</code></div>
+          <div class="tier-cell"><div class="tier-pill" style="background:#4e2029;color:#f8b0ba;">− R$ 820,00</div></div>
+        </div>
+        <div style="margin-top:16px;font-size:12px;font-weight:600;color:oklch(0.66 0.008 160);margin-bottom:8px;">V8 — stops do runway (<code>V8_STOPS_DARK</code>)</div>
+        <div style="height:24px;border-radius:8px;margin-bottom:10px;background:linear-gradient(to right,rgb(78,32,41),rgb(70,38,45),rgb(70,60,30),rgb(30,64,50),rgb(26,74,56));"></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);">
+          <span style="color:rgb(248,176,186);">darkRed</span>
+          <span style="color:rgb(240,162,174);">lightRed</span>
+          <span style="color:rgb(238,212,142);">yellow</span>
+          <span style="color:rgb(150,226,190);">lightGreen</span>
+          <span style="color:rgb(150,238,198);">darkGreen</span>
+        </div>
+      </div>
+
+      <!-- Categorias escuras -->
+      <div class="card" style="margin-top:12px;">
+        <div style="font-size:12px;font-weight:600;color:oklch(0.66 0.008 160);margin-bottom:14px;">Chips de categoria — <code>mkTypePalette(true)</code></div>
+        <div class="cat-row">
+          <div class="cat-chip" style="background:oklch(0.30 0.04 158);color:oklch(0.82 0.11 158);">
+            <div class="cat-dot" style="background:oklch(0.70 0.11 158);">↙</div>Entradas
+          </div>
+          <div class="cat-chip" style="background:oklch(0.30 0.05 30);color:oklch(0.80 0.12 30);">
+            <div class="cat-dot" style="background:oklch(0.68 0.15 30);">↗</div>Saídas
+          </div>
+          <div class="cat-chip" style="background:oklch(0.30 0.04 85);color:oklch(0.82 0.10 85);">
+            <div class="cat-dot" style="background:oklch(0.70 0.13 80);">D</div>Diários
+          </div>
+          <div class="cat-chip" style="background:oklch(0.30 0.05 235);color:oklch(0.80 0.10 235);">
+            <div class="cat-dot" style="background:oklch(0.70 0.12 235);">E</div>Economia
+          </div>
+        </div>
+      </div>
+
+      <!-- Tags escuras -->
+      <div class="card" style="margin-top:12px;">
+        <div style="font-size:12px;font-weight:600;color:oklch(0.66 0.008 160);margin-bottom:14px;">Paleta de tags — <code>TAG_PALETTE_DARK</code> (8 cores)</div>
+        <div class="tag-grid">
+          <div class="tag-card" style="background:oklch(0.32 0.006 160);border-color:oklch(0.82 0.006 160);">
+            <div class="tag-pill" style="background:oklch(0.32 0.006 160);color:oklch(0.82 0.006 160);"><div class="tag-dot" style="background:oklch(0.58 0.006 160);"></div>Cinza</div>
+            <div class="tag-meta">bg 0.32 0.006 160<br>ink 0.82 0.006 160<br>dot 0.58 0.006 160</div>
+          </div>
+          <div class="tag-card" style="background:oklch(0.33 0.06 235);border-color:oklch(0.82 0.09 235);">
+            <div class="tag-pill" style="background:oklch(0.33 0.06 235);color:oklch(0.82 0.09 235);"><div class="tag-dot" style="background:oklch(0.66 0.10 235);"></div>Azul</div>
+            <div class="tag-meta">bg 0.33 0.06 235<br>ink 0.82 0.09 235<br>dot 0.66 0.10 235</div>
+          </div>
+          <div class="tag-card" style="background:oklch(0.34 0.06 95);border-color:oklch(0.86 0.11 95);">
+            <div class="tag-pill" style="background:oklch(0.34 0.06 95);color:oklch(0.86 0.11 95);"><div class="tag-dot" style="background:oklch(0.72 0.11 95);"></div>Amarelo</div>
+            <div class="tag-meta">bg 0.34 0.06 95<br>ink 0.86 0.11 95<br>dot 0.72 0.11 95</div>
+          </div>
+          <div class="tag-card" style="background:oklch(0.32 0.07 158);border-color:oklch(0.84 0.11 158);">
+            <div class="tag-pill" style="background:oklch(0.32 0.07 158);color:oklch(0.84 0.11 158);"><div class="tag-dot" style="background:oklch(0.66 0.12 158);"></div>Verde</div>
+            <div class="tag-meta">bg 0.32 0.07 158<br>ink 0.84 0.11 158<br>dot 0.66 0.12 158</div>
+          </div>
+          <div class="tag-card" style="background:oklch(0.33 0.07 25);border-color:oklch(0.84 0.11 25);">
+            <div class="tag-pill" style="background:oklch(0.33 0.07 25);color:oklch(0.84 0.11 25);"><div class="tag-dot" style="background:oklch(0.66 0.11 25);"></div>Vermelho</div>
+            <div class="tag-meta">bg 0.33 0.07 25<br>ink 0.84 0.11 25<br>dot 0.66 0.11 25</div>
+          </div>
+          <div class="tag-card" style="background:oklch(0.34 0.07 295);border-color:oklch(0.84 0.10 295);">
+            <div class="tag-pill" style="background:oklch(0.34 0.07 295);color:oklch(0.84 0.10 295);"><div class="tag-dot" style="background:oklch(0.68 0.09 295);"></div>Roxo</div>
+            <div class="tag-meta">bg 0.34 0.07 295<br>ink 0.84 0.10 295<br>dot 0.68 0.09 295</div>
+          </div>
+          <div class="tag-card" style="background:oklch(0.34 0.07 355);border-color:oklch(0.85 0.09 355);">
+            <div class="tag-pill" style="background:oklch(0.34 0.07 355);color:oklch(0.85 0.09 355);"><div class="tag-dot" style="background:oklch(0.70 0.08 355);"></div>Rosa</div>
+            <div class="tag-meta">bg 0.34 0.07 355<br>ink 0.85 0.09 355<br>dot 0.70 0.08 355</div>
+          </div>
+          <div class="tag-card" style="background:oklch(0.32 0.04 60);border-color:oklch(0.82 0.06 60);">
+            <div class="tag-pill" style="background:oklch(0.32 0.04 60);color:oklch(0.82 0.06 60);"><div class="tag-dot" style="background:oklch(0.62 0.06 60);"></div>Marrom</div>
+            <div class="tag-meta">bg 0.32 0.04 60<br>ink 0.82 0.06 60<br>dot 0.62 0.06 60</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
 </div>

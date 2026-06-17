@@ -70,10 +70,10 @@ function EmptyState({ hasSearch, onCreatePress }: EmptyStateProps) {
         Crie tags para agrupar e visualizar seus lançamentos por categoria.
       </Text>
       <Pressable
-        className="bg-foreground mt-2 rounded-xl px-6 py-3"
+        className="bg-ds-canvas-bg mt-2 rounded-xl px-6 py-3"
         onPress={onCreatePress}
       >
-        <Text className="text-background text-sm font-semibold">
+        <Text className="text-foreground text-sm font-semibold">
           Criar minha primeira tag
         </Text>
       </Pressable>
@@ -89,7 +89,9 @@ export default function TagsScreen() {
   const router = useRouter();
   const { toast } = useToast();
   const scheme = useColorScheme();
-  const iconColor = colorsForScheme(scheme).mute;
+  const colors = colorsForScheme(scheme);
+  const iconColor = colors.mute;
+  const accentColor = colors.green;
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -113,7 +115,7 @@ export default function TagsScreen() {
   }
 
   return (
-    <Screen>
+    <Screen className="bg-background">
       <MonthNavigator onCalendarPress={() => router.navigate("/")} />
 
       <View className="gap-2 px-4 pb-2">
@@ -132,7 +134,7 @@ export default function TagsScreen() {
               onPress={openCreate}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Plus size={18} color={iconColor} />
+              <Plus size={18} color={accentColor} />
             </Pressable>
             <Pressable
               onPress={handleSortPress}
@@ -143,7 +145,7 @@ export default function TagsScreen() {
           </View>
         </View>
 
-        <View className="bg-surface-secondary flex-row items-center gap-2 rounded-xl px-3">
+        <View className="bg-surface-secondary border-separator flex-row items-center gap-2 rounded-xl border px-3">
           <Search size={16} color={iconColor} />
           <TextInput
             className="text-foreground flex-1 py-2.5 text-sm"
@@ -174,7 +176,7 @@ export default function TagsScreen() {
             />
           )}
           ItemSeparatorComponent={() => (
-            <View className="bg-surface-secondary mx-4 h-px" />
+            <View className="bg-separator mx-4 h-px" />
           )}
         />
       )}

@@ -13,9 +13,9 @@ export function PrimaryButton({
   className = "",
   ...props
 }: PrimaryButtonProps & { className?: string }) {
-  const enabledClass = tone === "dark" ? "bg-ds-bg" : "bg-foreground";
+  const enabledClass = tone === "dark" ? "bg-ds-bg" : "bg-ds-canvas-bg";
   const disabledClass = "bg-surface-tertiary";
-  const textClass = tone === "dark" ? "text-ds-green-deep" : "text-background";
+  const textClass = tone === "dark" ? "text-ds-green-deep" : "text-foreground";
 
   return (
     <Pressable

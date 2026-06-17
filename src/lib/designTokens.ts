@@ -22,8 +22,8 @@ type DatePickerColors = {
 export const DS_COLORS = {
   light: {
     bg: "#ffffff",
-    surface: "#f7faf8",
-    canvasBg: "#eef2f0",
+    surface: "#f7fbf9",
+    canvasBg: "#eff3f1",
     text: "#0e1310",
     mute: "#616462",
     faint: "#a2a5a3",
@@ -31,13 +31,14 @@ export const DS_COLORS = {
     futureMute: "#b5b8b6",
     hair: "#e5e9e7",
     hairStrong: "#ced2d0",
-    dragHandle: "#e0e0e0",
+    dragHandle: "#d7d7d7",
     weekendBg: "rgba(200, 160, 60, 0.13)",
     greenDeep: "#062015",
     green: "#103c28",
     greenMid: "#35835b",
     greenSoft: "#92c5a6",
     greenTint: "#dff5e7",
+    accentForeground: "#ffffff",
     red: "#bd413f",
     redStrong: "#b32228",
     redSoftBg: "#ffece9",
@@ -51,31 +52,32 @@ export const DS_COLORS = {
     overlayDelete: "rgba(15, 25, 20, 0.22)",
   },
   dark: {
-    bg: "#102219",
-    surface: "#1e2a24",
-    canvasBg: "#18251f",
-    text: "#e8ede9",
-    mute: "rgba(255, 255, 255, 0.55)",
-    faint: "rgba(255, 255, 255, 0.78)",
-    future: "#818884",
-    futureMute: "#b5b8b6",
-    hair: "#2e4037",
-    hairStrong: "rgba(255, 255, 255, 0.30)",
-    dragHandle: "rgba(255, 255, 255, 0.30)",
+    bg: "#141b17",
+    surface: "#1c221e",
+    canvasBg: "#0e1411",
+    text: "#ecefed",
+    mute: "#9aa09d",
+    faint: "#6d736f",
+    future: "#7b827e",
+    futureMute: "#515753",
+    hair: "#2a2f2c",
+    hairStrong: "#424a45",
+    dragHandle: "#424a45",
     weekendBg: "rgba(120, 100, 60, 0.25)",
-    greenDeep: "#062015",
-    green: "#5ab87a",
-    greenMid: "#4c8a62",
-    greenSoft: "#92c5a6",
-    greenTint: "rgba(255, 255, 255, 0.08)",
-    red: "#e65a4a",
-    redStrong: "#e65a4a",
-    redSoftBg: "#4a2b31",
-    redSoftText: "#f8b8c3",
-    redSoftSurface: "#2f2023",
+    greenDeep: "#183b2b",
+    green: "#73cd9f",
+    greenMid: "#5db384",
+    greenSoft: "#3d7757",
+    greenTint: "#1e3327",
+    accentForeground: "#0a100d",
+    red: "#ed756e",
+    redStrong: "#ed756e",
+    redSoftBg: "#572825",
+    redSoftText: "#ffaea6",
+    redSoftSurface: "#44241f",
     redRing: "#713b43",
-    amber: "#c89f22",
-    amberBg: "#493f25",
+    amber: "#baa44d",
+    amberBg: "#42370d",
     amberRing: "#725f34",
     overlayStandard: "rgba(0, 0, 0, 0.35)",
     overlayDelete: "rgba(15, 25, 20, 0.35)",
@@ -111,6 +113,13 @@ export const DS_SHADOWS = {
     shadowRadius: 20,
     elevation: 6,
   },
+  fabDark: {
+    shadowColor: "transparent",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
+  },
 } as const;
 
 export const DS_RADIUS = {
@@ -133,6 +142,20 @@ export const CATEGORY_COLORS: Record<TransactionType | "cartao", ColorTriple> =
     economia: { dot: "#1b8abd", bg: "#dbf3ff", ink: "#0b4e6c" },
     cartao: { dot: "#7457d1", bg: "#e4f7ec", ink: "#103c28" },
   };
+
+export const CATEGORY_COLORS_BY_SCHEME: Record<
+  Scheme,
+  Record<TransactionType | "cartao", ColorTriple>
+> = {
+  light: CATEGORY_COLORS,
+  dark: {
+    entrada: { dot: "#73cd9f", bg: "#1f3d2e", ink: "#d5f8e5" },
+    saida: { dot: "#ed756e", bg: "#432722", ink: "#ffd2cd" },
+    diario: { dot: "#baa44d", bg: "#3b3419", ink: "#f1df9b" },
+    economia: { dot: "#6fbde8", bg: "#203a4a", ink: "#c8ecff" },
+    cartao: { dot: "#b6a4ee", bg: "#3d3158", ink: "#e2d8ff" },
+  },
+};
 
 export const TAG_PALETTE = [
   {
@@ -192,11 +215,11 @@ export const BALANCE_TIER_COLORS = {
     darkRed: { bg: "#efbcc5", ink: "#701529" },
   },
   dark: {
-    darkGreen: { bg: "#214f3c", ink: "#baf5d7" },
-    lightGreen: { bg: "#1a3f31", ink: "#a6efca" },
-    yellow: { bg: "#493f25", ink: "#f4d98e" },
-    lightRed: { bg: "#4a2b31", ink: "#f8b8c3" },
-    darkRed: { bg: "#5a2530", ink: "#ffd2da" },
+    darkGreen: { bg: "#1a4a38", ink: "#96eec6" },
+    lightGreen: { bg: "#1e4032", ink: "#96e2be" },
+    yellow: { bg: "#463c1e", ink: "#eed48e" },
+    lightRed: { bg: "#46262d", ink: "#f0a2ae" },
+    darkRed: { bg: "#4e2029", ink: "#f8b0ba" },
   },
 } as const;
 
@@ -219,7 +242,7 @@ export const DATE_PICKER_COLORS: Record<Scheme, DatePickerColors> = {
     muted: DS_COLORS.dark.mute,
     disabled: DS_COLORS.dark.hairStrong,
     activeBg: DS_COLORS.dark.green,
-    activeFg: "#0f1a14",
+    activeFg: "#0a100d",
     startBg: DS_COLORS.dark.greenTint,
     startFg: DS_COLORS.dark.green,
     summaryBg: DS_COLORS.dark.canvasBg,
@@ -231,6 +254,14 @@ export function colorsForScheme(scheme: Scheme | null | undefined) {
   return DS_COLORS[scheme === "dark" ? "dark" : "light"];
 }
 
+export function categoryColorsForScheme(scheme: Scheme | null | undefined) {
+  return CATEGORY_COLORS_BY_SCHEME[schemeKey(scheme)];
+}
+
 export function schemeKey(scheme: Scheme | null | undefined): Scheme {
   return scheme === "dark" ? "dark" : "light";
+}
+
+export function fabShadowForScheme(scheme: Scheme | null | undefined) {
+  return schemeKey(scheme) === "dark" ? DS_SHADOWS.fabDark : DS_SHADOWS.fab;
 }

@@ -1,12 +1,13 @@
 import { ChevronRight, X } from "lucide-react-native";
 import { useRef } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, useColorScheme } from "react-native";
 
 import {
   DatePickerSheet,
   type DatePickerSheetRef,
 } from "@/src/components/ui/DatePickerSheet";
 import { formatFullDate } from "@/src/lib/date";
+import { colorsForScheme } from "@/src/lib/designTokens";
 
 interface RecurrenceEndFieldProps {
   /** Data da última ocorrência ("YYYY-MM-DD") ou indefinido = repete pra sempre. */
@@ -22,6 +23,8 @@ export function RecurrenceEndField({
   onChange,
 }: RecurrenceEndFieldProps) {
   const sheetRef = useRef<DatePickerSheetRef>(null);
+  const scheme = useColorScheme();
+  const colors = colorsForScheme(scheme);
 
   return (
     <View className="border-ds-green-soft gap-2 border-l-2 pl-3">
@@ -54,10 +57,10 @@ export function RecurrenceEndField({
             }}
             hitSlop={10}
           >
-            <X size={18} className="text-muted" />
+            <X size={18} color={colors.mute} />
           </Pressable>
         ) : (
-          <ChevronRight size={16} className="text-muted" />
+          <ChevronRight size={16} color={colors.mute} />
         )}
       </Pressable>
 

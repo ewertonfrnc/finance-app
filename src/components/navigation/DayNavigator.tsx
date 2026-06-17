@@ -27,15 +27,15 @@ export function DayNavigator({
 }: DayNavigatorProps) {
   const scheme = useColorScheme();
   const colors = colorsForScheme(scheme);
-  const mutedColor = colors.mute;
+  const navColor = colors.text;
   const accentColor = colors.green;
 
   return (
     <View className="flex-row items-center justify-between px-4 py-3">
-      <IconButton Icon={ArrowLeft} color={mutedColor} onPress={onBack} />
+      <IconButton Icon={ArrowLeft} color={navColor} onPress={onBack} />
 
       <View className="flex-row items-center gap-1">
-        <IconButton Icon={ChevronLeft} color={mutedColor} onPress={onPrev} />
+        <IconButton Icon={ChevronLeft} color={navColor} onPress={onPrev} />
 
         <View className="items-center px-2">
           <Text className="text-foreground text-month font-semibold">
@@ -46,7 +46,7 @@ export function DayNavigator({
           </Text>
         </View>
 
-        <IconButton Icon={ChevronRight} color={mutedColor} onPress={onNext} />
+        <IconButton Icon={ChevronRight} color={navColor} onPress={onNext} />
       </View>
 
       <IconButton

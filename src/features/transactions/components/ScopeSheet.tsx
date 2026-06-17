@@ -1,11 +1,12 @@
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
-import { AlertTriangle, ChevronRight, Repeat } from "lucide-react-native";
+import { ChevronRight, Repeat } from "lucide-react-native";
 import { useEffect, useRef } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { renderSheetBackdrop } from "@/src/components/ui/SheetBackdrop";
 import type { RecurrenceScope } from "@/src/features/transactions/types";
+import { colorsForScheme } from "@/src/lib/designTokens";
 
 const SNAP_POINTS = ["46%"];
 
@@ -41,6 +42,8 @@ export function ScopeSheet({
 }: ScopeSheetProps) {
   const sheetRef = useRef<BottomSheetModal>(null);
   const { bottom } = useSafeAreaInsets();
+  const scheme = useColorScheme();
+  const colors = colorsForScheme(scheme);
 
   useEffect(() => {
     sheetRef.current?.present();
@@ -53,12 +56,14 @@ export function ScopeSheet({
       enablePanDownToClose
       backdropComponent={renderSheetBackdrop}
       bottomInset={bottom}
+      backgroundStyle={{ backgroundColor: colors.surface }}
+      handleIndicatorStyle={{ backgroundColor: colors.dragHandle }}
       onDismiss={onClose}
     >
       <BottomSheetView className="px-5 pt-1 pb-6">
         {recurrenceLabel ? (
           <View className="bg-ds-green-tint mb-3 flex-row items-center gap-1.5 self-start rounded-full px-2.5 py-1">
-            <Repeat size={12} className="text-ds-green" />
+            <Repeat size={12} color={colors.green} />
             <Text className="text-ds-green text-xs font-semibold">
               {recurrenceLabel}
             </Text>
@@ -70,7 +75,7 @@ export function ScopeSheet({
         </Text>
 
         <View className="gap-2">
-          {options.map((option, index) => {
+          {options.map((option) => {
             const danger = option.tone === "danger";
             const warn = option.tone === "warn";
             return (
@@ -86,27 +91,6 @@ export function ScopeSheet({
                       : "border-surface-tertiary"
                 } ${isPending ? "opacity-50" : ""}`}
               >
-                <View
-                  className={`h-6 w-6 items-center justify-center rounded-full ${
-                    danger
-                      ? "bg-danger/15"
-                      : warn
-                        ? "bg-ds-amber-bg"
-                        : "bg-surface-secondary"
-                  }`}
-                >
-                  {warn ? (
-                    <AlertTriangle size={13} className="text-ds-amber" />
-                  ) : (
-                    <Text
-                      className={`text-xs font-semibold ${
-                        danger ? "text-danger" : "text-muted"
-                      }`}
-                    >
-                      {index + 1}
-                    </Text>
-                  )}
-                </View>
                 <View className="flex-1">
                   <Text
                     className={`text-base font-semibold ${
@@ -123,12 +107,12 @@ export function ScopeSheet({
                 </View>
                 <ChevronRight
                   size={18}
-                  className={
+                  color={
                     danger
-                      ? "text-danger"
+                      ? colors.red
                       : warn
-                        ? "text-ds-amber"
-                        : "text-muted"
+                        ? colors.amber
+                        : colors.mute
                   }
                 />
               </Pressable>

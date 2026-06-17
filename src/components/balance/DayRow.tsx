@@ -63,7 +63,7 @@ function TransactionLines({
   if (lines.length === 0) {
     return (
       <View className="flex-row items-center justify-between opacity-35">
-        <Text className="text-muted text-body-small">Sem lançamento</Text>
+        <Text className="text-muted text-body-small italic">Sem lançamento</Text>
         <CurrencyText value={0} variant="small" sign="neutral" />
       </View>
     );
@@ -176,6 +176,7 @@ export const DayRow = memo(function DayRow({
   const weekdayColor = isFuture ? dsColors.futureMute : dsColors.mute;
 
   const weekendDayBg = weekend ? dsColors.weekendBg : undefined;
+  const rowBg = isToday ? dsColors.greenTint : undefined;
 
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
@@ -200,7 +201,7 @@ export const DayRow = memo(function DayRow({
       onLongPress={handleLongPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
-      style={animatedStyle}
+      style={[animatedStyle, rowBg ? { backgroundColor: rowBg } : undefined]}
       className="flex-row items-stretch gap-3 rounded-lg pl-4"
     >
       <View

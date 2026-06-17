@@ -3,10 +3,10 @@ import {
   ArrowUpRight,
   type LucideIcon,
 } from "lucide-react-native";
-import { Text, View } from "react-native";
+import { Text, View, useColorScheme } from "react-native";
 
 import type { TransactionType } from "@/src/features/transactions/types";
-import { CATEGORY_COLORS } from "@/src/lib/designTokens";
+import { categoryColorsForScheme } from "@/src/lib/designTokens";
 
 type IconConfig = { kind: "icon"; Icon: LucideIcon };
 type TextConfig = { kind: "text"; label: string };
@@ -37,7 +37,8 @@ interface TypeBadgeProps {
 }
 
 export function TypeBadge({ type, size = "md" }: TypeBadgeProps) {
-  const colors = CATEGORY_COLORS[type];
+  const scheme = useColorScheme();
+  const colors = categoryColorsForScheme(scheme)[type];
   const config = TYPE_CONFIG[type];
   const { container, text, iconSize } = SIZE[size];
 

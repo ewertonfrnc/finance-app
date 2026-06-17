@@ -13,6 +13,7 @@ import { colorsForScheme } from "@/src/lib/designTokens";
 import { useDateStore } from "@/src/stores/useDateStore";
 import { useTagPickerStore } from "@/src/stores/useTagPickerStore";
 import { useTags } from "../hooks/useTags";
+import { getTagColors } from "../constants";
 
 interface TagFieldProps {
   selectedTagIds: string[];
@@ -64,7 +65,7 @@ export function TagField({
             <Text className="text-muted text-xs font-semibold tracking-widest">
               TAG
             </Text>
-            <Text className="text-muted text-[10px]">opcional</Text>
+            <Text className="text-muted text-step">opcional</Text>
           </View>
         ) : null}
 
@@ -78,31 +79,36 @@ export function TagField({
                 <Text className="text-muted text-sm">Sem tag</Text>
               </View>
             ) : (
-              selectedTags.map((t) => (
-                <Pressable
-                  key={t.id}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    toggleTag(t.id);
-                  }}
-                  hitSlop={4}
-                  style={{
-                    backgroundColor: t.color + "33",
-                    borderColor: t.color + "44",
-                    borderWidth: 1,
-                  }}
-                  className="min-h-7 flex-row items-center gap-1 rounded-full px-2 py-0.5"
-                >
-                  <View
-                    style={{ backgroundColor: t.color }}
-                    className="h-1.5 w-1.5 rounded-full"
-                  />
-                  <Text className="text-foreground text-[10px] font-medium">
-                    {t.name}
-                  </Text>
-                  <X size={10} color={c.mute} />
-                </Pressable>
-              ))
+              selectedTags.map((t) => {
+                const tagColors = getTagColors(t.color, scheme);
+                return (
+                  <Pressable
+                    key={t.id}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      toggleTag(t.id);
+                    }}
+                    hitSlop={4}
+                    style={{
+                      backgroundColor: c.surface,
+                      borderColor: tagColors.dot,
+                      borderWidth: 1,
+                    }}
+                    className="min-h-7 flex-row items-center gap-1 rounded-full px-2 py-0.5"
+                  >
+                    <View
+                      style={{ backgroundColor: tagColors.dot }}
+                      className="h-1.5 w-1.5 rounded-full"
+                    />
+                    <Text
+                      className="text-foreground text-[10px] font-medium"
+                    >
+                      {t.name}
+                    </Text>
+                    <X size={10} color={c.mute} />
+                  </Pressable>
+                );
+              })
             )}
           </View>
           <ChevronRight size={16} color={c.mute} />
@@ -122,6 +128,7 @@ export function TagField({
           >
             {frequentes.map((t) => {
               const selected = selectedTagIds.includes(t.id);
+              const tagColors = getTagColors(t.color, scheme);
               return (
                 <Pressable
                   key={t.id}
@@ -129,12 +136,12 @@ export function TagField({
                   style={{
                     backgroundColor: c.bg,
                     borderWidth: 1,
-                    borderColor: selected ? t.color : c.hair,
+                    borderColor: selected ? tagColors.dot : c.hair,
                   }}
                   className="flex-row items-center gap-1 rounded-full px-2.5 py-1"
                 >
                   <View
-                    style={{ backgroundColor: t.color }}
+                    style={{ backgroundColor: tagColors.dot }}
                     className="h-1.5 w-1.5 rounded-full"
                   />
                   <Text className="text-foreground text-xs font-medium">

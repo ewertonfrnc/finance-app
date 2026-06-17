@@ -22,7 +22,8 @@ import { Button } from "heroui-native";
 export default function LoginScreen() {
   const router = useRouter();
   const scheme = useColorScheme();
-  const muteColor = colorsForScheme(scheme).mute;
+  const colors = colorsForScheme(scheme);
+  const muteColor = colors.mute;
   const { mutate: login, isPending, error } = useLogin();
 
   const [email, setEmail] = useState("");
@@ -59,7 +60,7 @@ export default function LoginScreen() {
   const spinStyle = useSpinAnimation(isPending);
 
   return (
-    <Screen>
+    <Screen className="bg-background">
       <KeyboardAvoidingView className="flex-1" behavior="padding">
         <ScrollView
           className="flex-1 px-6"
@@ -69,7 +70,7 @@ export default function LoginScreen() {
         >
           {/* Header */}
           <View className="mb-10">
-            <Text className="text-muted text-label mb-2 font-semibold tracking-widest uppercase">
+            <Text className="text-accent text-label mb-2 font-semibold tracking-widest uppercase">
               Bem-vindo de volta
             </Text>
             <Text className="text-foreground text-heading font-bold">
@@ -152,15 +153,15 @@ export default function LoginScreen() {
             onPress={handleSubmit}
             isIconOnly={isPending}
             isDisabled={isPending}
-            className="bg-foreground h-14 rounded-4xl"
+            className="bg-ds-canvas-bg h-14 rounded-4xl"
           >
             <Button.Label>
               {isPending ? (
                 <Animated.View style={spinStyle}>
-                  <LoaderCircle color="#000" size={20} />
+                  <LoaderCircle color={colors.text} size={20} />
                 </Animated.View>
               ) : (
-                <Text className="text-background font-semibold">Entrar</Text>
+                <Text className="text-foreground font-semibold">Entrar</Text>
               )}
             </Button.Label>
           </Button>
@@ -180,7 +181,7 @@ export default function LoginScreen() {
           >
             <Button.Label className="text-muted text-sm">
               Não tem conta?{" "}
-              <Text className="text-foreground font-medium underline">
+              <Text className="text-link font-medium underline">
                 Criar conta
               </Text>
             </Button.Label>

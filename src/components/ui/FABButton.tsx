@@ -1,7 +1,11 @@
 import { Plus } from "lucide-react-native";
 import { StyleSheet, TouchableOpacity, useColorScheme } from "react-native";
 
-import { colorsForScheme, DS_RADIUS, DS_SHADOWS } from "@/src/lib/designTokens";
+import {
+  colorsForScheme,
+  DS_RADIUS,
+  fabShadowForScheme,
+} from "@/src/lib/designTokens";
 
 interface FABButtonProps {
   onPress: () => void;
@@ -16,13 +20,13 @@ export function FABButton({ onPress, bottom = 80 }: FABButtonProps) {
     <TouchableOpacity
       style={[
         styles.fab,
-        DS_SHADOWS.fab,
+        fabShadowForScheme(scheme),
         { bottom, backgroundColor: colors.green, borderRadius: DS_RADIUS.pill },
       ]}
       activeOpacity={0.85}
       onPress={onPress}
     >
-      <Plus color="#fff" size={24} strokeWidth={2.5} />
+      <Plus color={colors.accentForeground} size={24} strokeWidth={2.5} />
     </TouchableOpacity>
   );
 }

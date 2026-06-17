@@ -121,7 +121,7 @@ export default function CategoryStepScreen() {
             hitSlop={12}
             activeOpacity={0.7}
           >
-            <ChevronLeft size={22} color={c.green} strokeWidth={2} />
+            <ChevronLeft size={22} color={c.text} strokeWidth={2} />
           </TouchableOpacity>
 
           <View className="flex-row items-center gap-1.5">
@@ -130,11 +130,7 @@ export default function CategoryStepScreen() {
                 key={i}
                 style={{
                   backgroundColor:
-                    i === currentIndex
-                      ? c.green
-                      : i < currentIndex
-                        ? c.hairStrong
-                        : c.hair,
+                    i <= currentIndex ? c.green : c.hair,
                   height: 6,
                   width: i === currentIndex ? 16 : 6,
                   borderRadius: 99,
@@ -156,7 +152,7 @@ export default function CategoryStepScreen() {
 
         {/* Conteúdo */}
         <View className="flex-1 pt-6">
-          <Text className="text-muted text-step mb-3 font-semibold tracking-widest uppercase">
+          <Text className="text-accent text-step mb-3 font-semibold tracking-widest uppercase">
             {current.number} · {current.label}
           </Text>
 
@@ -172,6 +168,7 @@ export default function CategoryStepScreen() {
             value={value}
             onValueChange={setValue}
             type="economia"
+            accentColor={c.green}
           />
 
           <Text className="text-muted mt-6 text-sm leading-relaxed">
@@ -183,9 +180,9 @@ export default function CategoryStepScreen() {
         <View className="pb-2">
           <Button
             onPress={() => advance(value)}
-            className="bg-foreground h-14 rounded-4xl"
+            className="bg-ds-canvas-bg h-14 rounded-4xl"
           >
-            <Button.Label className="text-background text-base font-semibold">
+            <Button.Label className="text-foreground text-base font-semibold">
               Próximo
             </Button.Label>
           </Button>

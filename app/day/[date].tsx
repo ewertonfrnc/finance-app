@@ -44,26 +44,26 @@ function DailyProjectionCard({
 
   return (
     <View
-      style={{ backgroundColor: c.greenTint }}
-      className="mx-4 mt-3 mb-2 gap-2 rounded-xl px-4 py-3"
+      style={{ backgroundColor: c.surface, borderColor: c.hair }}
+      className="mx-4 mt-3 mb-2 gap-2 rounded-xl border px-4 py-3"
     >
       <View className="flex-row items-center gap-2">
         <Text
-          style={{ color: c.greenDeep }}
+          style={{ color: c.green }}
           className="flex-1 text-sm font-semibold"
         >
           Diário previsto
         </Text>
         <View
           style={{
-            backgroundColor: c.bg,
+            backgroundColor: c.greenTint,
             borderWidth: 1,
-            borderColor: c.greenSoft,
+            borderColor: c.hairStrong,
           }}
           className="rounded px-1.5 py-0.5"
         >
           <Text
-            style={{ color: c.greenSoft }}
+            style={{ color: c.green }}
             className="text-xs font-semibold tracking-wide"
           >
             PREVISÃO
@@ -106,7 +106,7 @@ function DailyProjectionCard({
             Vem da sua previsão mensal de diários.{" "}
             <Pressable onPress={onAdjustPress} hitSlop={8}>
               <Text
-                style={{ color: c.greenDeep }}
+                style={{ color: c.green }}
                 className="text-xs font-semibold underline"
               >
                 Toque para ajustar.
@@ -222,7 +222,7 @@ export default function DayScreen() {
   }
 
   return (
-    <Screen>
+    <Screen className="bg-background">
       <DayNavigator
         date={date}
         onBack={goBack}
@@ -232,7 +232,7 @@ export default function DayScreen() {
       />
 
       {/* Saldo fim do dia — DS: header trajectory bg = surface */}
-      <View className="bg-surface-secondary flex-row items-start justify-between px-4 py-4">
+      <View className="bg-surface-secondary border-separator flex-row items-start justify-between border-t px-4 py-4">
         {/* Ontem */}
         <View className="items-start">
           <Text
@@ -260,10 +260,10 @@ export default function DayScreen() {
               variant="regular"
               numberOfLines={1}
               adjustsFontSizeToFit
-              className={todayBalance >= 0 ? "text-ds-green" : undefined}
+              className={todayBalance >= 0 ? "text-accent" : undefined}
             />
           ) : (
-            <Text className="text-ds-green font-mono-semibold text-balance-highlight">
+            <Text className="text-accent font-mono-semibold text-balance-highlight">
               —
             </Text>
           )}
@@ -286,8 +286,7 @@ export default function DayScreen() {
         </View>
       </View>
 
-      {/* <View className="" /> */}
-      <View className="border-surface border-dotted" />
+      <View className="border-separator mx-4 border-b border-dashed" />
 
       {/* Resumo de fluxo — DS: entradas=greenMid, saídas=danger, líquido=sign-based */}
       <View className="bg-surface-secondary flex-row items-start justify-between px-4 py-4">
@@ -299,7 +298,7 @@ export default function DayScreen() {
             value={income}
             variant="small"
             sign="positive"
-            className="text-ds-green-mid"
+            className="text-accent"
           />
         </View>
         <View className="flex-1 items-center">
@@ -316,10 +315,10 @@ export default function DayScreen() {
         </View>
       </View>
 
-      <View className="bg-surface-secondary mx-4 h-px" />
+      <View className="bg-separator mx-4 h-px" />
 
       {/* Filtro */}
-      <View className="flex-row items-center gap-3 px-4 py-3">
+      <View className="border-separator flex-row items-center gap-3 border-b px-4 py-3">
         {/* Prioriza o scroll local dos chips para não disparar a troca de dia por engano. */}
         <GestureDetector gesture={filterScrollGesture}>
           <ScrollView
@@ -341,8 +340,6 @@ export default function DayScreen() {
           </ScrollView>
         </GestureDetector>
       </View>
-
-      <Separator />
 
       <GestureDetector gesture={swipeGesture}>
         <Animated.View

@@ -1,12 +1,13 @@
 import { Calendar } from "lucide-react-native";
 import { useRef } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, useColorScheme } from "react-native";
 
 import {
   DatePickerSheet,
   type DatePickerSheetRef,
 } from "@/src/components/ui/DatePickerSheet";
 import { formatFullDate } from "@/src/lib/date";
+import { colorsForScheme } from "@/src/lib/designTokens";
 
 interface DateFieldProps {
   value: string; // "YYYY-MM-DD"
@@ -15,6 +16,8 @@ interface DateFieldProps {
 
 export function DateField({ value, onChange }: DateFieldProps) {
   const sheetRef = useRef<DatePickerSheetRef>(null);
+  const scheme = useColorScheme();
+  const colors = colorsForScheme(scheme);
 
   return (
     <View>
@@ -25,7 +28,7 @@ export function DateField({ value, onChange }: DateFieldProps) {
         <Text className="font-mono-medium text-foreground text-input">
           {formatFullDate(value)}
         </Text>
-        <Calendar size={18} className="text-success" />
+        <Calendar size={18} color={colors.green} />
       </Pressable>
 
       <DatePickerSheet

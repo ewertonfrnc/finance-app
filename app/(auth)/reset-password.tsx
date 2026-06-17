@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { CheckCircle, Eye, EyeOff } from "lucide-react-native";
+import { CheckCircle, ChevronLeft, Eye, EyeOff } from "lucide-react-native";
 import { useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -12,7 +12,8 @@ import {
   useColorScheme,
 } from "react-native";
 
-import { colorsForScheme } from "@/src/lib/designTokens";
+import { Screen } from "@/src/components/ui/Screen";
+import { colorsForScheme, DS_COLORS } from "@/src/lib/designTokens";
 import { resetPasswordSchema } from "@/src/features/auth/schemas";
 import { useResetPassword } from "@/src/features/auth/hooks/useResetPassword";
 import { Button } from "heroui-native";
@@ -30,17 +31,14 @@ function getStrength(password: string): PasswordStrength {
   return "fraca";
 }
 
-const STRENGTH_COLORS: Record<PasswordStrength, string[]> = {
-  fraca: ["#e65a4a", "#2e4037", "#2e4037"],
-  média: ["#c89f22", "#c89f22", "#2e4037"],
-  forte: ["#14874e", "#14874e", "#14874e"],
-};
-
 const STRENGTH_LABELS: Record<PasswordStrength, string> = {
   fraca: "Fraca",
   média: "Média",
   forte: "Forte",
 };
+
+const SUCCESS_COLORS = DS_COLORS.dark;
+const SUCCESS_BUTTON = DS_COLORS.light.bg;
 
 export default function ResetPasswordScreen() {
   const { token } = useLocalSearchParams<{ token: string }>();
@@ -63,12 +61,21 @@ export default function ResetPasswordScreen() {
   const isValid = parseResult.success;
 
   const confirmError =
-    submitted && !isValid && password.length > 0 && confirmPassword.length > 0
+    (submitted || confirmPassword.length > 0) &&
+    password.length > 0 &&
+    confirmPassword.length > 0 &&
+    password !== confirmPassword
       ? "As senhas não batem."
       : null;
 
   const strength = password.length > 0 ? getStrength(password) : null;
-  const strengthColors = strength ? STRENGTH_COLORS[strength] : null;
+  const strengthColors = strength
+    ? {
+        fraca: [colors.red, colors.hairStrong, colors.hairStrong],
+        média: [colors.amber, colors.amber, colors.hairStrong],
+        forte: [colors.green, colors.green, colors.green],
+      }[strength]
+    : null;
 
   function handleSubmit() {
     setSubmitted(true);
@@ -81,24 +88,29 @@ export default function ResetPasswordScreen() {
 
   if (success) {
     return (
-      <View className="flex-1" style={{ backgroundColor: "#062015" }}>
+      <Screen style={{ backgroundColor: SUCCESS_COLORS.greenDeep }}>
         <View className="flex-1 items-center justify-center px-6">
           <View
             className="mb-8 h-16 w-16 items-center justify-center rounded-full"
-            style={{ backgroundColor: "rgba(255,255,255,0.10)" }}
+            style={{ backgroundColor: SUCCESS_COLORS.greenTint }}
           >
-            <CheckCircle size={30} color="#5ab87a" strokeWidth={1.8} />
+            <CheckCircle size={30} color={SUCCESS_COLORS.green} strokeWidth={1.8} />
           </View>
 
           <Text
             className="mb-4 font-bold"
-            style={{ color: "#e8ede9", fontSize: 36, lineHeight: 42, textAlign: "center" }}
+            style={{
+              color: SUCCESS_COLORS.text,
+              fontSize: 36,
+              lineHeight: 42,
+              textAlign: "center",
+            }}
           >
             {"Senha\nredefinida."}
           </Text>
           <Text
             style={{
-              color: "rgba(255,255,255,0.55)",
+              color: SUCCESS_COLORS.mute,
               fontSize: 15,
               textAlign: "center",
               lineHeight: 22,
@@ -111,19 +123,22 @@ export default function ResetPasswordScreen() {
         <View className="px-6 pb-8">
           <Button
             onPress={() => router.replace("/(auth)/login")}
-            className="bg-background h-14 rounded-4xl"
+            style={{ backgroundColor: SUCCESS_BUTTON }}
+            className="h-14 rounded-4xl"
           >
             <Button.Label>
-              <Text className="text-foreground font-semibold">Entrar agora</Text>
+              <Text style={{ color: SUCCESS_COLORS.greenDeep }} className="font-semibold">
+                Entrar agora
+              </Text>
             </Button.Label>
           </Button>
         </View>
-      </View>
+      </Screen>
     );
   }
 
   return (
-    <View className="bg-background flex-1">
+    <Screen className="bg-background">
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -141,11 +156,14 @@ export default function ResetPasswordScreen() {
             hitSlop={12}
             activeOpacity={0.7}
           >
-            <Text className="text-foreground text-xl">{"‹"}</Text>
+            <ChevronLeft size={22} color={colors.text} strokeWidth={2} />
           </TouchableOpacity>
 
           {/* Heading */}
-          <Text className="text-foreground mb-2 font-bold" style={{ fontSize: 32, lineHeight: 38 }}>
+          <Text
+            className="text-foreground mb-2 font-bold"
+            style={{ fontSize: 32, lineHeight: 38 }}
+          >
             {"Cria uma\nsenha nova."}
           </Text>
           <Text className="text-muted mb-10" style={{ fontSize: 15 }}>
@@ -197,7 +215,13 @@ export default function ResetPasswordScreen() {
                       />
                     ))}
                   </View>
-                  <Text style={{ color: strengthColors[0], fontSize: 12, fontWeight: "600" }}>
+                  <Text
+                    style={{
+                      color: strengthColors[0],
+                      fontSize: 12,
+                      fontWeight: "600",
+                    }}
+                  >
                     {STRENGTH_LABELS[strength]}
                   </Text>
                 </View>
@@ -263,17 +287,19 @@ export default function ResetPasswordScreen() {
         <View className="px-6 pb-4">
           <Button
             onPress={handleSubmit}
-            isDisabled={isPending}
-            className={`h-14 rounded-4xl ${isValid ? "bg-foreground" : "bg-surface-secondary"}`}
+            isDisabled={!isValid || isPending}
+            className={`h-14 rounded-4xl ${isValid ? "bg-ds-canvas-bg" : "bg-surface-tertiary"}`}
           >
             <Button.Label>
-              <Text className={`font-semibold ${isValid ? "text-background" : "text-muted"}`}>
+              <Text
+                className={`font-semibold ${isValid ? "text-foreground" : "text-muted"}`}
+              >
                 Confirmar nova senha
               </Text>
             </Button.Label>
           </Button>
         </View>
       </KeyboardAvoidingView>
-    </View>
+    </Screen>
   );
 }

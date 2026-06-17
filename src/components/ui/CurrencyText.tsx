@@ -17,7 +17,7 @@ const VARIANT_CLASSES: Record<Variant, string> = {
 };
 
 const SIGN_CLASSES: Record<Sign, string> = {
-  positive: "text-success",
+  positive: "text-accent",
   negative: "text-danger",
   neutral: "text-foreground",
 };

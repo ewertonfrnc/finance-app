@@ -16,11 +16,12 @@ import { formatBRL } from "@/src/lib/currency";
 import { DS_COLORS } from "@/src/lib/designTokens";
 import { useOnboardingStore } from "@/src/stores/useOnboardingStore";
 
-// This screen always uses the dark greenDeep palette regardless of device theme.
-const G = DS_COLORS.light;
+// This screen always uses the deep green palette regardless of device theme.
+const G = DS_COLORS.dark;
+const BUTTON = DS_COLORS.light.bg;
 const BG = G.greenDeep;
-const INK = "#ffffff";
-const INK_MUTED = DS_COLORS.dark.mute;
+const INK = G.text;
+const INK_MUTED = G.mute;
 
 export default function SaldoScreen() {
   const router = useRouter();
@@ -72,7 +73,7 @@ export default function SaldoScreen() {
     <Screen style={{ backgroundColor: BG }} className="px-6">
       <View className="flex-1 pt-10">
         <Text
-          style={{ color: INK_MUTED }}
+          style={{ color: G.green }}
           className="mb-2 text-xs font-medium tracking-widest uppercase"
         >
           Oi, {firstName}
@@ -101,7 +102,7 @@ export default function SaldoScreen() {
             {formatBRL(initialBalance)}
           </Animated.Text>
           <View
-            style={{ backgroundColor: "rgba(255,255,255,0.30)" }}
+            style={{ backgroundColor: G.green }}
             className="mt-2 h-0.5"
           />
           <TextInput
@@ -144,7 +145,7 @@ export default function SaldoScreen() {
           onPress={handleConcluir}
           isIconOnly={isPending}
           isDisabled={isPending}
-          style={{ backgroundColor: INK }}
+          style={{ backgroundColor: BUTTON }}
           className="h-14 rounded-4xl"
         >
           <Button.Label>

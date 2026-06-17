@@ -10,8 +10,8 @@ export function Chip({ label, selected = false, onPress }: ChipProps) {
   return (
     <Pressable
       onPress={onPress}
-      className={`rounded-full px-3 py-1.5 ${
-        selected ? "bg-accent" : "bg-surface-secondary"
+      className={`rounded-full border px-3 py-1.5 ${
+        selected ? "border-accent bg-accent" : "border-separator bg-surface-secondary"
       }`}
     >
       <Text

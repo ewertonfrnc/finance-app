@@ -1,13 +1,12 @@
-import { subDays } from "date-fns";
 import { useRouter } from "expo-router";
 import {
   ArrowLeft,
   Calendar,
+  ChevronRight,
   Repeat,
   Tag,
-  X,
 } from "lucide-react-native";
-import { useMemo, useState } from "react";
+import { useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Pressable,
@@ -21,7 +20,10 @@ import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CurrencyInput } from "@/src/components/ui/CurrencyInput";
-import { DateField } from "@/src/components/ui/DateField";
+import {
+  DatePickerSheet,
+  type DatePickerSheetRef,
+} from "@/src/components/ui/DatePickerSheet";
 import { TypeSelector } from "@/src/components/ui/TypeSelector";
 import { RecurrenceEndField } from "@/src/features/transactions/components/RecurrenceEndField";
 import { RecurrenceSelector } from "@/src/features/transactions/components/RecurrenceSelector";
@@ -41,7 +43,7 @@ interface TransactionFormProps {
   onDelete?: () => void;
   isLoading?: boolean;
   isDeleting?: boolean;
-  tagField?: React.ReactNode;
+  onTagPress?: () => void;
   tagSummary?: string;
   header?: React.ReactNode;
   children?: React.ReactNode;
@@ -50,25 +52,13 @@ interface TransactionFormProps {
 const TITLE = { new: "Novo lançamento", edit: "Editar lançamento" } as const;
 const SUBMIT_LABEL = { new: "Lançar", edit: "Salvar alterações" } as const;
 
-type DetailId = "tag" | "date" | "recurrence";
+type DetailId = "recurrence";
 
 interface DetailRowProps {
   label: string;
   value: string;
   icon: React.ComponentType<{ size?: number; color?: string }>;
   iconColor: string;
-}
-
-interface DatePreset {
-  label: string;
-  value: string;
-}
-
-interface DatePresetButtonProps {
-  label: string;
-  active: boolean;
-  accentColor: string;
-  onPress: () => void;
 }
 
 function DetailRow({
@@ -106,44 +96,8 @@ function DetailIndicator({ color }: { color: string }) {
   );
 }
 
-function DatePresetButton({
-  label,
-  active,
-  accentColor,
-  onPress,
-}: DatePresetButtonProps) {
-  return (
-    <Pressable
-      onPress={onPress}
-      className="border-surface-tertiary rounded-full border px-3 py-1.5"
-      style={
-        active
-          ? {
-              backgroundColor: `${accentColor}22`,
-              borderColor: accentColor,
-            }
-          : undefined
-      }
-    >
-      <Text
-        className="text-muted text-xs font-medium"
-        style={active ? { color: accentColor } : undefined}
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
-
-function formatDateSummary(date: string, presets: DatePreset[]): string {
-  return (
-    presets.find((preset) => preset.value === date)?.label ??
-    formatFullDate(date)
-  );
-}
-
 function isDetailId(value: string): value is DetailId {
-  return value === "tag" || value === "date" || value === "recurrence";
+  return value === "recurrence";
 }
 
 function RecurrenceEndSummary({ endDate }: { endDate?: string }) {
@@ -166,7 +120,7 @@ export function TransactionForm({
   onDelete,
   isLoading = false,
   isDeleting = false,
-  tagField,
+  onTagPress,
   tagSummary = "Sem tag",
   header,
   children,
@@ -175,6 +129,8 @@ export function TransactionForm({
   const { bottom } = useSafeAreaInsets();
   const scheme = useColorScheme();
   const c = colorsForScheme(scheme);
+
+  const datePickerSheetRef = useRef<DatePickerSheetRef>(null);
 
   const [type, setType] = useState<TransactionType>(
     initialValues?.type ?? "diario",
@@ -197,15 +153,6 @@ export function TransactionForm({
   const [expandedDetail, setExpandedDetail] = useState<DetailId | null>(null);
 
   const canSubmit = amountCents > 0 && description.trim().length > 0;
-  const typeAccentColor = CATEGORY_COLORS[type].dot;
-  const datePresets = useMemo<DatePreset[]>(() => {
-    const now = new Date();
-    return [
-      { label: "Hoje", value: formatIsoDate(now) },
-      { label: "Ontem", value: formatIsoDate(subDays(now, 1)) },
-      { label: "Anteontem", value: formatIsoDate(subDays(now, 2)) },
-    ];
-  }, []);
   const recurrenceSummary =
     formatRecurrenceLabel(recurrence) || "Não repete";
   const showRecurrenceDetail = mode === "new" || recurrence !== "none";
@@ -231,16 +178,15 @@ export function TransactionForm({
   return (
     <KeyboardAvoidingView className="bg-surface flex-1" behavior="padding">
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-4">
+      <View className="flex-row items-center px-4 py-4">
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <ArrowLeft size={22} className="text-foreground" />
+          <ArrowLeft size={22} color={c.mute} />
         </Pressable>
-        <Text className="text-foreground text-sheet-title font-bold">
-          {TITLE[mode]}
-        </Text>
-        <Pressable onPress={() => router.back()} hitSlop={8}>
-          <X size={22} className="text-foreground" />
-        </Pressable>
+        <View className="absolute inset-x-0 items-center" pointerEvents="none">
+          <Text className="text-foreground text-sheet-title font-bold">
+            {TITLE[mode]}
+          </Text>
+        </View>
       </View>
 
       <Animated.ScrollView
@@ -320,54 +266,37 @@ export function TransactionForm({
           </View>
           <View className="bg-surface-tertiary h-px opacity-45" />
 
-          {tagField ? (
-            <Accordion.Item value="tag">
-              <Accordion.Trigger className="min-h-11 px-0 py-2">
+          {onTagPress ? (
+            <>
+              <Pressable
+                onPress={onTagPress}
+                className="min-h-11 flex-row items-center py-2"
+              >
                 <DetailRow
                   label="TAG"
                   value={tagSummary}
                   icon={Tag}
                   iconColor={c.mute}
                 />
-                <DetailIndicator color={c.mute} />
-              </Accordion.Trigger>
-              <Accordion.Content className="px-0 pb-0">
-                <View className="py-2.5 pl-7">
-                  {tagField}
-                </View>
-              </Accordion.Content>
+                <ChevronRight size={16} color={c.mute} />
+              </Pressable>
               <DetailSeparator />
-            </Accordion.Item>
+            </>
           ) : null}
 
-          <Accordion.Item value="date">
-            <Accordion.Trigger className="min-h-11 px-0 py-2">
-              <DetailRow
-                label="DATA"
-                value={formatDateSummary(date, datePresets)}
-                icon={Calendar}
-                iconColor={c.mute}
-              />
-              <DetailIndicator color={c.mute} />
-            </Accordion.Trigger>
-            <Accordion.Content className="px-0 pb-0">
-              <View className="gap-2.5 py-2.5 pl-7">
-                <DateField value={date} onChange={setDate} />
-                <View className="flex-row flex-wrap gap-2">
-                  {datePresets.map((preset) => (
-                    <DatePresetButton
-                      key={preset.value}
-                      label={preset.label}
-                      active={date === preset.value}
-                      accentColor={typeAccentColor}
-                      onPress={() => setDate(preset.value)}
-                    />
-                  ))}
-                </View>
-              </View>
-            </Accordion.Content>
-            {showRecurrenceDetail ? <DetailSeparator /> : null}
-          </Accordion.Item>
+          <Pressable
+            onPress={() => datePickerSheetRef.current?.open()}
+            className="min-h-11 flex-row items-center py-2"
+          >
+            <DetailRow
+              label="DATA"
+              value={date === formatIsoDate(new Date()) ? "Hoje" : formatFullDate(date)}
+              icon={Calendar}
+              iconColor={c.mute}
+            />
+            <ChevronRight size={16} color={c.mute} />
+          </Pressable>
+          {showRecurrenceDetail ? <DetailSeparator /> : null}
 
           {showRecurrenceDetail && (
             <Accordion.Item value="recurrence">
@@ -438,6 +367,15 @@ export function TransactionForm({
           </Pressable>
         )}
       </View>
+
+      <DatePickerSheet
+        ref={datePickerSheetRef}
+        value={date}
+        title="Selecionar data"
+        description="Escolha a data em que este lançamento entra no saldo."
+        summaryLabel="Data do lançamento"
+        onConfirm={setDate}
+      />
     </KeyboardAvoidingView>
   );
 }

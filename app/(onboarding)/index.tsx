@@ -23,7 +23,7 @@ export default function WelcomeScreen() {
     <Screen className="bg-background flex-1 px-6">
       <View className="flex-1 justify-center">
         <View className="mb-8 flex-row items-center gap-2">
-          <View className="bg-success h-2.5 w-2.5 rounded-full" />
+          <View className="bg-accent h-2.5 w-2.5 rounded-full" />
           <Text className="text-foreground text-step font-semibold tracking-widest uppercase">
             diário
           </Text>
@@ -33,7 +33,7 @@ export default function WelcomeScreen() {
           O quanto{"\n"}você pode{"\n"}gastar hoje?
         </Text>
 
-        <Text className="text-muted text-[15px] leading-relaxed">
+        <Text className="text-muted text-transaction leading-relaxed">
           Sem categorias intermináveis. Sem planilha.{"\n"}Um número simples por
           dia, e o saldo do{"\n"}mês cuidando de você.
         </Text>
@@ -42,9 +42,9 @@ export default function WelcomeScreen() {
       <View className="gap-3">
         <Button
           onPress={handleCalcular}
-          className="bg-foreground h-14 rounded-4xl"
+          className="bg-ds-canvas-bg h-14 rounded-4xl"
         >
-          <Button.Label className="text-background text-base font-semibold">
+          <Button.Label className="text-foreground text-base font-semibold">
             Calcular meu diário
           </Button.Label>
         </Button>
@@ -52,7 +52,7 @@ export default function WelcomeScreen() {
         <Button
           variant="secondary"
           onPress={handleJaSei}
-          className="h-14 rounded-4xl"
+          className="border-separator h-14 rounded-4xl border bg-transparent"
         >
           <Button.Label className="text-foreground text-base font-semibold">
             Já sei meu diário

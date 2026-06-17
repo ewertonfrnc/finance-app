@@ -58,7 +58,7 @@ export default function CadastroScreen() {
   }
 
   return (
-    <Screen>
+    <Screen className="bg-background">
       <KeyboardAvoidingView className="flex-1" behavior="padding">
         <ScrollView
           className="flex-1 px-6"
@@ -68,7 +68,7 @@ export default function CadastroScreen() {
         >
           {/* Header */}
           <View className="mb-10">
-            <Text className="text-muted text-label mb-2 font-semibold tracking-widest uppercase">
+            <Text className="text-accent text-label mb-2 font-semibold tracking-widest uppercase">
               Crie sua conta
             </Text>
             <Text className="text-foreground text-heading mb-3 font-bold">
@@ -170,9 +170,9 @@ export default function CadastroScreen() {
           <Button
             onPress={handleSubmit}
             isDisabled={!isValid && submitted}
-            className="bg-foreground h-14 rounded-4xl"
+            className="bg-ds-canvas-bg h-14 rounded-4xl"
           >
-            <Button.Label className="text-background text-base font-semibold">
+            <Button.Label className="text-foreground text-base font-semibold">
               Cadastrar
             </Button.Label>
           </Button>

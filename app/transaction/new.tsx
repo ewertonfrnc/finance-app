@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 
 import { TransactionForm } from "@/src/components/transactions/TransactionForm";
 import { Screen } from "@/src/components/ui/Screen";
-import { TagField } from "@/src/features/tags/components/TagField";
 import { formatTagSelectionSummary } from "@/src/features/tags/constants";
 import { useInvalidateTagData } from "@/src/features/tags/hooks/useInvalidateTagData";
 import { useTagPickerSync } from "@/src/features/tags/hooks/useTagPickerSync";
@@ -45,6 +44,11 @@ export default function NewTransactionScreen() {
 
   const tagSummary = formatTagSelectionSummary(selectedTagIds, tags);
 
+  function handleTagPress() {
+    useTagPickerStore.getState().set(selectedTagIds);
+    router.push("/tags/pick");
+  }
+
   function handleSubmit(values: FormValues) {
     create(
       {
@@ -73,13 +77,7 @@ export default function NewTransactionScreen() {
         onSubmit={handleSubmit}
         isLoading={isPending}
         tagSummary={tagSummary}
-        tagField={
-          <TagField
-            selectedTagIds={selectedTagIds}
-            onChangeTagIds={setSelectedTagIds}
-            showHeader={false}
-          />
-        }
+        onTagPress={handleTagPress}
       />
     </Screen>
   );

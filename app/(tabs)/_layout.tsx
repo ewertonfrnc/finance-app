@@ -8,7 +8,11 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { colorsForScheme, DS_RADIUS, DS_SHADOWS } from "@/src/lib/designTokens";
+import {
+  colorsForScheme,
+  DS_RADIUS,
+  fabShadowForScheme,
+} from "@/src/lib/designTokens";
 
 export default function TabsLayout() {
   const { bottom } = useSafeAreaInsets();
@@ -17,7 +21,7 @@ export default function TabsLayout() {
   const colors = colorsForScheme(scheme);
 
   return (
-    <View className="flex-1">
+    <View className="bg-background flex-1">
       <Tabs
         screenOptions={{
           headerShown: false,
@@ -58,14 +62,18 @@ export default function TabsLayout() {
                 <View
                   style={[
                     styles.fabCircle,
-                    DS_SHADOWS.fab,
+                    fabShadowForScheme(scheme),
                     {
                       backgroundColor: colors.green,
                       borderRadius: DS_RADIUS.pill,
                     },
                   ]}
                 >
-                  <Plus color="#fff" size={24} strokeWidth={2.5} />
+                  <Plus
+                    color={colors.accentForeground}
+                    size={24}
+                    strokeWidth={2.5}
+                  />
                 </View>
               </TouchableOpacity>
             ),

@@ -41,10 +41,10 @@ export default function TagPickScreen() {
   }
 
   return (
-    <Screen>
+    <Screen className="bg-background">
       <View className="flex-row items-center justify-between px-4 py-4">
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <ArrowLeft size={22} className="text-foreground" />
+          <ArrowLeft size={22} color={c.text} />
         </Pressable>
         <Text className="text-foreground text-base font-semibold">
           Escolher tag
@@ -53,11 +53,11 @@ export default function TagPickScreen() {
           onPress={() => router.push("/tags/form?mode=create")}
           hitSlop={8}
         >
-          <Plus size={22} color={c.mute} />
+          <Plus size={22} color={c.green} />
         </Pressable>
       </View>
 
-      <View className="bg-surface-secondary mx-4 mb-2 flex-row items-center gap-2 rounded-xl px-3 py-2.5">
+      <View className="bg-surface-secondary border-separator mx-4 mb-2 flex-row items-center gap-2 rounded-xl border px-3 py-2.5">
         <Search size={14} color={c.mute} />
         <TextInput
           value={search}
@@ -85,7 +85,7 @@ export default function TagPickScreen() {
         {pendingTagIds.length === 0 && <Check size={16} color={c.green} />}
       </Pressable>
 
-      <View className="bg-surface-secondary mx-4 mb-1 h-px" />
+      <View className="bg-separator mx-4 mb-1 h-px" />
 
       <FlatList
         data={filteredTags}
@@ -108,7 +108,7 @@ export default function TagPickScreen() {
           );
         }}
         ItemSeparatorComponent={() => (
-          <View className="bg-surface-secondary mx-4 h-px" />
+          <View className="bg-separator mx-4 h-px" />
         )}
         ListEmptyComponent={
           <Text className="text-muted px-4 py-4 text-sm">

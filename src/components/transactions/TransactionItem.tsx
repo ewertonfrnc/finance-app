@@ -1,5 +1,5 @@
 import { Repeat } from "lucide-react-native";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, useColorScheme } from "react-native";
 
 import { TagBadge } from "@/src/features/tags/components/TagBadge";
 import type {
@@ -7,6 +7,7 @@ import type {
   TransactionType,
 } from "@/src/features/transactions/types";
 import { formatDayHeader } from "@/src/lib/date";
+import { colorsForScheme } from "@/src/lib/designTokens";
 import { CurrencyText } from "../ui/CurrencyText";
 import { TypeBadge } from "../ui/TypeBadge";
 
@@ -29,6 +30,8 @@ export function TransactionItem({
   showDate = false,
 }: TransactionItemProps) {
   const { type, amount, description } = transaction;
+  const scheme = useColorScheme();
+  const colors = colorsForScheme(scheme);
 
   const isRecurring = transaction.recurrence !== "none";
   const hasSubline = showDate || isRecurring || transaction.tags.length > 0;
@@ -50,7 +53,9 @@ export function TransactionItem({
 
         {hasSubline && (
           <View className="mt-1 flex-row flex-wrap items-center gap-1">
-            {isRecurring && <Repeat size={12} className="text-muted" />}
+            {isRecurring && (
+              <Repeat size={12} color={colors.mute} strokeWidth={2} />
+            )}
             {showDate && (
               <Text className="text-muted text-body-small">
                 {formatDayHeader(transaction.date)}

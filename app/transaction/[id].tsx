@@ -5,7 +5,6 @@ import { ActivityIndicator, View } from "react-native";
 
 import { TransactionForm } from "@/src/components/transactions/TransactionForm";
 import { Screen } from "@/src/components/ui/Screen";
-import { TagField } from "@/src/features/tags/components/TagField";
 import { formatTagSelectionSummary } from "@/src/features/tags/constants";
 import { useInvalidateTagData } from "@/src/features/tags/hooks/useInvalidateTagData";
 import { useTagPickerSync } from "@/src/features/tags/hooks/useTagPickerSync";
@@ -148,6 +147,11 @@ export default function EditTransactionScreen() {
     ...(transaction?.tags ?? []),
   ]);
 
+  function handleTagPress() {
+    useTagPickerStore.getState().set(selectedTagIds);
+    router.push("/tags/pick");
+  }
+
   if (isLoading || !transaction) {
     return (
       <Screen>
@@ -175,6 +179,7 @@ export default function EditTransactionScreen() {
         isLoading={isUpdating}
         isDeleting={isDeleting}
         tagSummary={tagSummary}
+        onTagPress={handleTagPress}
         header={
           isRecurring ? (
             <SeriesBadge
@@ -182,13 +187,6 @@ export default function EditTransactionScreen() {
               endDate={transaction.recurrenceEndDate}
             />
           ) : null
-        }
-        tagField={
-          <TagField
-            selectedTagIds={selectedTagIds}
-            onChangeTagIds={setSelectedTagIds}
-            showHeader={false}
-          />
         }
       >
         {transaction.sourceSeriesId ? <SeriesOriginNotice /> : null}

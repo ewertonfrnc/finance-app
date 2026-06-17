@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Pressable, TextInput } from "react-native";
+import { Pressable, TextInput, useColorScheme } from "react-native";
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -9,35 +9,40 @@ import Animated, {
 
 import type { TransactionType } from "@/src/features/transactions/types";
 import { formatBRL } from "@/src/lib/currency";
-import { CATEGORY_COLORS } from "@/src/lib/designTokens";
+import { categoryColorsForScheme } from "@/src/lib/designTokens";
 
 interface CurrencyInputProps {
   value: number; // centavos
   onValueChange: (cents: number) => void;
   type?: TransactionType;
+  accentColor?: string;
 }
 
 export function CurrencyInput({
   value,
   onValueChange,
   type = "diario",
+  accentColor,
 }: CurrencyInputProps) {
   const inputRef = useRef<TextInput>(null);
+  const scheme = useColorScheme();
+  const categoryColors = categoryColorsForScheme(scheme);
+  const currentColor = accentColor ?? categoryColors[type].dot;
 
-  const fromColor = useSharedValue(CATEGORY_COLORS[type].dot);
-  const toColor = useSharedValue(CATEGORY_COLORS[type].dot);
+  const fromColor = useSharedValue(currentColor);
+  const toColor = useSharedValue(currentColor);
   const progress = useSharedValue(1);
   const prevType = useRef<TransactionType>(type);
   const opacity = useSharedValue(value === 0 ? 0.35 : 1);
 
   useEffect(() => {
-    if (prevType.current === type) return;
-    fromColor.value = CATEGORY_COLORS[prevType.current].dot;
-    toColor.value = CATEGORY_COLORS[type].dot;
+    if (prevType.current === type && toColor.value === currentColor) return;
+    fromColor.value = toColor.value;
+    toColor.value = currentColor;
     progress.value = 0;
     progress.value = withTiming(1, { duration: 300 });
     prevType.current = type;
-  }, [type, fromColor, toColor, progress]);
+  }, [type, currentColor, fromColor, toColor, progress]);
 
   const isEmpty = value === 0;
   useEffect(() => {

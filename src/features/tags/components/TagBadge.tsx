@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Text, View, useColorScheme } from "react-native";
 
 import { getTagColors } from "../constants";
 
@@ -10,16 +10,16 @@ interface TagBadgeProps {
 
 export function TagBadge({ name, color, size = "md" }: TagBadgeProps) {
   const isSmall = size === "sm";
-  const colors = getTagColors(color);
+  const scheme = useColorScheme();
+  const colors = getTagColors(color, scheme);
 
   return (
     <View
       style={{
-        backgroundColor: colors.bg + "33",
-        borderColor: colors.bg + "44",
+        borderColor: colors.dot,
         borderWidth: 1,
       }}
-      className={`flex-row items-center gap-1 rounded-full ${
+      className={`bg-surface-secondary flex-row items-center gap-1 rounded-full ${
         isSmall ? "px-2 py-0.5" : "px-2.5 py-1"
       }`}
     >
@@ -30,8 +30,7 @@ export function TagBadge({ name, color, size = "md" }: TagBadgeProps) {
         }
       />
       <Text
-        style={{ color: colors.ink }}
-        className={`font-medium ${isSmall ? "text-[10px]" : "text-xs"}`}
+        className={`text-foreground font-medium ${isSmall ? "text-[10px]" : "text-xs"}`}
       >
         {name}
       </Text>

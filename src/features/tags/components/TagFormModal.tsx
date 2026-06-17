@@ -1,18 +1,17 @@
 import {
-  BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetScrollView,
   BottomSheetTextInput,
-  type BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
 import { Check, Trash2, X } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Alert, Pressable, Text, View, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { renderSheetBackdrop } from "@/src/components/ui/SheetBackdrop";
 import { colorsForScheme } from "@/src/lib/designTokens";
 
-import { TAG_COLOR_PALETTE } from "../constants";
+import { getTagPaletteForScheme } from "../constants";
 import { useTagForm } from "../hooks/useTagForm";
 import type { Tag } from "../types";
 import { TagBadge } from "./TagBadge";
@@ -40,6 +39,7 @@ export function TagFormModal({
 
   const scheme = useColorScheme();
   const c = colorsForScheme(scheme);
+  const tagPalette = getTagPaletteForScheme(scheme);
 
   const {
     name,
@@ -56,17 +56,6 @@ export function TagFormModal({
   useEffect(() => {
     sheetRef.current?.present();
   }, [mode, tag]);
-
-  const renderBackdrop = useCallback(
-    (props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-      />
-    ),
-    [],
-  );
 
   function handleDelete() {
     if (!tag) return;
@@ -97,9 +86,11 @@ export function TagFormModal({
       ref={sheetRef}
       snapPoints={snapPoints}
       enablePanDownToClose
-      backdropComponent={renderBackdrop}
+      backdropComponent={renderSheetBackdrop}
       keyboardBehavior="extend"
       bottomInset={bottom}
+      backgroundStyle={{ backgroundColor: c.surface }}
+      handleIndicatorStyle={{ backgroundColor: c.dragHandle }}
       onDismiss={onClose}
     >
       <BottomSheetScrollView contentContainerClassName="px-6 pt-2 pb-6">
@@ -129,6 +120,7 @@ export function TagFormModal({
             borderBottomColor: hasError ? c.red : c.hairStrong,
           }}
           placeholder="Como vamos chamar essa tag?"
+          placeholderTextColor={c.faint}
           value={name}
           onChangeText={setName}
           autoCorrect={false}
@@ -136,7 +128,7 @@ export function TagFormModal({
         />
         <View className="mt-1 mb-5 flex-row items-center justify-between">
           {hasError ? (
-            <Text className="text-xs text-red-500">
+            <Text className="text-danger text-xs">
               Dê um nome pra continuar
             </Text>
           ) : (
@@ -152,28 +144,33 @@ export function TagFormModal({
           <Text className="text-muted text-xs">Toque pra escolher</Text>
         </View>
         <View className="mb-6 flex-row flex-wrap gap-2">
-          {TAG_COLOR_PALETTE.map((item) => (
+          {tagPalette.map((item) => (
             <Pressable
               key={item.hex}
               style={{
-                backgroundColor: item.hex,
+                backgroundColor: c.surface,
                 width: "48%",
                 borderWidth: 2,
-                borderColor:
-                  color === item.hex ? c.overlayStandard : "transparent",
+                borderColor: color === item.hex ? c.text : item.dot,
               }}
               className="flex-row items-center justify-between rounded-xl px-3 py-3"
               onPress={() => setColor(item.hex)}
             >
-              <Text className="text-sm font-medium" style={{ color: item.ink }}>
-                {item.label}
-              </Text>
-              {color === item.hex && <Check size={14} color={item.ink} />}
+              <View className="flex-row items-center gap-2">
+                <View
+                  style={{ backgroundColor: item.dot }}
+                  className="h-2 w-2 rounded-full"
+                />
+                <Text className="text-foreground text-sm font-medium">
+                  {item.label}
+                </Text>
+              </View>
+              {color === item.hex && <Check size={14} color={c.text} />}
             </Pressable>
           ))}
         </View>
 
-        <View className="bg-surface-secondary border-foreground/30 mb-6 flex-row items-center gap-3 rounded-xl border border-dotted px-4 py-3">
+        <View className="bg-surface-secondary border-separator mb-6 flex-row items-center gap-3 rounded-xl border border-dotted px-4 py-3">
           <Text className="text-muted text-label font-semibold tracking-wider uppercase">
             Prévia
           </Text>
@@ -185,11 +182,11 @@ export function TagFormModal({
         </View>
 
         <Pressable
-          className="bg-foreground mb-3 items-center rounded-xl py-3.5"
+          className="bg-ds-canvas-bg mb-3 items-center rounded-xl py-3.5"
           onPress={handleSubmit}
           disabled={isPending}
         >
-          <Text className="text-background text-sm font-semibold">
+          <Text className="text-foreground text-sm font-semibold">
             {isPending ? "Salvando..." : mode === "create" ? "Criar" : "Salvar"}
           </Text>
         </Pressable>

@@ -1,9 +1,10 @@
 import { Repeat } from "lucide-react-native";
-import { Text, View } from "react-native";
+import { Text, View, useColorScheme } from "react-native";
 
 import { formatRecurrenceLabel } from "@/src/features/transactions/constants";
 import type { RecurrenceType } from "@/src/features/transactions/types";
 import { formatFullDate } from "@/src/lib/date";
+import { colorsForScheme } from "@/src/lib/designTokens";
 
 interface SeriesBadgeProps {
   recurrence: RecurrenceType;
@@ -16,12 +17,14 @@ interface SeriesBadgeProps {
  * salvar/excluir e cair no ScopeSheet.
  */
 export function SeriesBadge({ recurrence, endDate }: SeriesBadgeProps) {
+  const scheme = useColorScheme();
+  const colors = colorsForScheme(scheme);
   const label = formatRecurrenceLabel(recurrence);
 
   return (
     <View className="border-ds-hair-strong bg-ds-green-tint flex-row items-start gap-2 rounded-xl border px-3 py-2.5">
       <View className="bg-background rounded-full p-1">
-        <Repeat size={15} className="text-ds-green mt-0.5" />
+        <Repeat size={15} color={colors.green} />
       </View>
       <View className="flex-1">
         <Text className="text-ds-green text-xs font-semibold">

@@ -27,9 +27,9 @@ export default function ResumoScreen() {
   );
 
   return (
-    <Screen className="px-6">
+    <Screen className="bg-background px-6">
       <View className="flex-1 pt-10">
-        <Text className="text-muted text-step mb-2 font-semibold tracking-widest uppercase">
+        <Text className="text-accent text-step mb-2 font-semibold tracking-widest uppercase">
           Pronto
         </Text>
 
@@ -38,7 +38,7 @@ export default function ResumoScreen() {
         </Text>
 
         {/* Totais */}
-        <View className="border-separator rounded-xl border p-4">
+        <View className="border-separator bg-surface-secondary rounded-card-lg border p-4">
           <View className="mb-8 gap-5">
             <View className="flex-row items-center justify-between">
               <Text className="text-muted text-label font-semibold tracking-widest uppercase">
@@ -62,7 +62,7 @@ export default function ResumoScreen() {
                   ÷ {daysPerMonth} dias
                 </Text>
               </View>
-              <Text className="text-foreground font-mono-semibold text-balance-highlight">
+              <Text className="text-accent font-mono-semibold text-balance-highlight">
                 {formatBRL(dailyBudget)}
               </Text>
             </View>
@@ -100,9 +100,9 @@ export default function ResumoScreen() {
       <View className="pb-2">
         <Button
           onPress={() => router.push("/(onboarding)/cadastro")}
-          className="bg-foreground h-14 rounded-4xl"
+          className="bg-ds-canvas-bg h-14 rounded-4xl"
         >
-          <Button.Label className="text-background text-base font-semibold">
+          <Button.Label className="text-foreground text-base font-semibold">
             Continuar
           </Button.Label>
         </Button>

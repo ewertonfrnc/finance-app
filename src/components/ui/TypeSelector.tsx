@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, useColorScheme } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -8,7 +8,7 @@ import Animated, {
 
 import type { TransactionType } from "@/src/features/transactions/types";
 import { SPRING } from "@/src/lib/animations";
-import { CATEGORY_COLORS } from "@/src/lib/designTokens";
+import { categoryColorsForScheme } from "@/src/lib/designTokens";
 
 interface TypeSelectorProps {
   value: TransactionType;
@@ -23,6 +23,8 @@ const TYPES: { value: TransactionType; label: string }[] = [
 ];
 
 export function TypeSelector({ value, onChange }: TypeSelectorProps) {
+  const scheme = useColorScheme();
+  const categoryColors = categoryColorsForScheme(scheme);
   const chipLayouts = useRef<{ x: number; width: number }[]>([]);
   const initialized = useRef(false);
 
@@ -32,7 +34,7 @@ export function TypeSelector({ value, onChange }: TypeSelectorProps) {
   const pillStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: pillX.value }],
     width: pillW.value,
-    backgroundColor: CATEGORY_COLORS[value].bg,
+    backgroundColor: categoryColors[value].bg,
   }));
 
   function handlePress(index: number, type: TransactionType) {
@@ -54,7 +56,7 @@ export function TypeSelector({ value, onChange }: TypeSelectorProps) {
 
       {TYPES.map((type, i) => {
         const active = value === type.value;
-        const colors = CATEGORY_COLORS[type.value];
+        const colors = categoryColors[type.value];
 
         return (
           <Pressable

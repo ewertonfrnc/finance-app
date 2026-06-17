@@ -1,4 +1,5 @@
 import Svg, { Polygon } from "react-native-svg";
+import { useColorScheme } from "react-native";
 
 import { getTagColors } from "../constants";
 
@@ -7,7 +8,8 @@ interface TagFlagProps {
 }
 
 export function TagFlag({ color }: TagFlagProps) {
-  const colors = getTagColors(color);
+  const scheme = useColorScheme();
+  const colors = getTagColors(color, scheme);
 
   return (
     <Svg width={12} height={16} viewBox="0 0 12 16">
