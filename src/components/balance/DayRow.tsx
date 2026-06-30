@@ -23,7 +23,7 @@ import type {
 } from "@/src/features/transactions/types";
 import { getBalanceTierColors } from "@/src/lib/balanceTier";
 import { formatWeekday, isWeekend } from "@/src/lib/date";
-import { colorsForScheme } from "@/src/lib/designTokens";
+import { schemeKey } from "@/src/lib/designTokens";
 import { usePrivacyStore } from "@/src/stores/usePrivacyStore";
 import { CurrencyText } from "../ui/CurrencyText";
 
@@ -37,33 +37,107 @@ interface DayRowProps {
   onLongPress?: (date: string) => void;
 }
 
-const CATEGORIES: { type: TransactionType; label: string }[] = [
-  { type: "entrada", label: "Entrada" },
-  { type: "saida", label: "Saída" },
-  { type: "diario", label: "Diário" },
-  { type: "economia", label: "Economia" },
+const CATEGORIES: {
+  type: TransactionType;
+  label: string;
+  mark: string;
+}[] = [
+  { type: "entrada", label: "Entrada", mark: "↙" },
+  { type: "saida", label: "Saída", mark: "↗" },
+  { type: "diario", label: "Diário", mark: "D" },
+  { type: "economia", label: "Economia", mark: "E" },
 ];
 
 const TODAY = format(new Date(), "yyyy-MM-dd");
 const PRIVACY_MASK = "••••";
+const CATEGORY_INACTIVE_COLORS = {
+  light: { bg: "#ebeff1", ink: "#8d99a1" },
+  dark: { bg: "#2a3438", ink: "#8f9ba2" },
+} as const;
+const ROW_SURFACE_COLORS = {
+  light: {
+    todayRow: "rgba(16, 60, 40, 0.03)",
+    todayDate: "rgba(16, 60, 40, 0.10)",
+    weekendDate: "rgba(14, 19, 16, 0.04)",
+  },
+  dark: {
+    todayRow: "rgba(115, 205, 159, 0.08)",
+    todayDate: "rgba(115, 205, 159, 0.10)",
+    weekendDate: "rgba(255, 255, 255, 0.04)",
+  },
+} as const;
+const CATEGORY_MARK_CLASSES: Record<
+  TransactionType,
+  { bg: string; text: string }
+> = {
+  entrada: { bg: "bg-cat-entrada-bg", text: "text-cat-entrada-ink" },
+  saida: { bg: "bg-cat-saida-bg", text: "text-cat-saida-ink" },
+  diario: { bg: "bg-cat-diario-bg", text: "text-cat-diario-ink" },
+  economia: { bg: "bg-cat-economia-bg", text: "text-cat-economia-ink" },
+};
 
 interface TransactionLinesProps {
-  lines: { type: TransactionType; label: string }[];
+  lines: { type: TransactionType; label: string; mark: string }[];
   amounts: Record<TransactionType, number>;
+  scheme: "light" | "dark";
   hideEntrada?: boolean;
   entradaFadeStyle?: AnimatedStyle<ViewStyle>;
+}
+
+function CategoryMark({
+  category,
+  inactiveColors,
+}: {
+  category?: { type: TransactionType; mark: string };
+  inactiveColors: { bg: string; ink: string };
+}) {
+  if (!category) {
+    return (
+      <View
+        style={{ backgroundColor: inactiveColors.bg }}
+        className="h-4 w-4 items-center justify-center rounded-full"
+      >
+        <Text
+          style={{ color: inactiveColors.ink }}
+          className="font-mono-semibold text-[10px] leading-none"
+        >
+          ·
+        </Text>
+      </View>
+    );
+  }
+
+  const classes = CATEGORY_MARK_CLASSES[category.type];
+
+  return (
+    <View
+      className={`h-4 w-4 items-center justify-center rounded-full ${classes.bg}`}
+    >
+      <Text
+        className={`font-mono-semibold text-[10px] leading-none ${classes.text}`}
+      >
+        {category.mark}
+      </Text>
+    </View>
+  );
 }
 
 function TransactionLines({
   lines,
   amounts,
+  scheme,
   hideEntrada = false,
   entradaFadeStyle,
 }: TransactionLinesProps) {
+  const inactiveColors = CATEGORY_INACTIVE_COLORS[scheme];
+
   if (lines.length === 0) {
     return (
-      <View className="flex-row items-center justify-between opacity-35">
-        <Text className="text-muted text-body-small italic">Sem lançamento</Text>
+      <View className="flex-row items-center justify-between gap-3 opacity-45">
+        <View className="flex-row items-center gap-2">
+          <CategoryMark inactiveColors={inactiveColors} />
+          <Text className="text-muted text-body-small">Sem lançamento</Text>
+        </View>
         <CurrencyText value={0} variant="small" sign="neutral" />
       </View>
     );
@@ -71,32 +145,42 @@ function TransactionLines({
 
   return (
     <>
-      {lines.map((cat) => (
-        <View key={cat.type} className="flex-row items-center">
-          <Text className="text-muted text-body-small flex-1">{cat.label}</Text>
-          {cat.type === "entrada" ? (
-            <Animated.View style={entradaFadeStyle}>
-              {hideEntrada ? (
-                <Text className="font-mono-medium text-foreground text-base">
-                  {PRIVACY_MASK}
-                </Text>
-              ) : (
-                <CurrencyText
-                  value={amounts[cat.type]}
-                  variant="small"
-                  sign="neutral"
-                />
-              )}
-            </Animated.View>
-          ) : (
-            <CurrencyText
-              value={amounts[cat.type]}
-              variant="small"
-              sign="neutral"
+      {lines.map((cat) => {
+        const active = amounts[cat.type] > 0;
+
+        return (
+          <View key={cat.type} className="flex-row items-center gap-2">
+            <CategoryMark
+              category={active ? { type: cat.type, mark: cat.mark } : undefined}
+              inactiveColors={inactiveColors}
             />
-          )}
-        </View>
-      ))}
+            <Text className="text-muted text-body-small flex-1">
+              {cat.label}
+            </Text>
+            {cat.type === "entrada" ? (
+              <Animated.View style={entradaFadeStyle}>
+                {hideEntrada ? (
+                  <Text className="font-mono-medium text-foreground text-base">
+                    {PRIVACY_MASK}
+                  </Text>
+                ) : (
+                  <CurrencyText
+                    value={amounts[cat.type]}
+                    variant="small"
+                    sign="neutral"
+                  />
+                )}
+              </Animated.View>
+            ) : (
+              <CurrencyText
+                value={amounts[cat.type]}
+                variant="small"
+                sign="neutral"
+              />
+            )}
+          </View>
+        );
+      })}
     </>
   );
 }
@@ -166,17 +250,22 @@ export const DayRow = memo(function DayRow({
   );
 
   const scheme = useColorScheme();
+  const schemeName = schemeKey(scheme);
   const colors = getBalanceTierColors(dayBalance.endBalance, scheme);
-  const dsColors = colorsForScheme(scheme);
-  const dayNumColor = isToday
-    ? dsColors.green
-    : isFuture
-      ? dsColors.future
-      : dsColors.text;
-  const weekdayColor = isFuture ? dsColors.futureMute : dsColors.mute;
+  const surface = ROW_SURFACE_COLORS[schemeName];
 
-  const weekendDayBg = weekend ? dsColors.weekendBg : undefined;
-  const rowBg = isToday ? dsColors.greenTint : undefined;
+  const dateCellBg = isToday
+    ? surface.todayDate
+    : weekend
+      ? surface.weekendDate
+      : undefined;
+  const rowBg = isToday ? surface.todayRow : undefined;
+  const dayNumClassName = `font-mono-semibold text-base leading-none ${
+    isFuture ? "text-ds-future" : "text-ds-text"
+  }`;
+  const weekdayClassName = `font-mono-semibold text-weekday mt-0.5 tracking-wide uppercase ${
+    isFuture ? "text-ds-future-mute" : "text-ds-mute"
+  }`;
 
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
@@ -202,38 +291,26 @@ export const DayRow = memo(function DayRow({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       style={[animatedStyle, rowBg ? { backgroundColor: rowBg } : undefined]}
-      className="flex-row items-stretch gap-3 rounded-lg pl-4"
+      className="border-ds-hair relative flex-row items-stretch overflow-hidden border-b"
     >
       <View
-        style={weekendDayBg ? { backgroundColor: weekendDayBg } : undefined}
-        className="my-2 w-8 items-center justify-center rounded-md py-0.5"
+        style={dateCellBg ? { backgroundColor: dateCellBg } : undefined}
+        className="border-ds-hair relative w-14 items-center justify-center border-r py-2"
       >
-        <Text
-          style={{ color: dayNumColor }}
-          className="font-mono-medium text-sm"
-        >
-          {dayNum}
-        </Text>
         {isToday && (
-          <View
-            style={{ backgroundColor: dsColors.green }}
-            className="absolute top-1 -right-1 h-1.5 w-1.5 rounded-full"
-          />
+          <View className="bg-ds-green absolute top-0 bottom-0 left-0 w-1 rounded-r-full" />
         )}
-        <Text
-          style={{ color: weekdayColor }}
-          className="text-weekday font-medium tracking-wide uppercase"
-        >
-          {weekday}
-        </Text>
+        <Text className={dayNumClassName}>{dayNum}</Text>
+        <Text className={weekdayClassName}>{weekday}</Text>
       </View>
 
       <View
-        className={`flex-1 justify-center gap-1 py-2 ${isProjectionOnly ? "opacity-50" : ""}`}
+        className={`flex-1 justify-center gap-1 px-3 py-2 ${isProjectionOnly ? "opacity-50" : ""}`}
       >
         <TransactionLines
           lines={visibleLines}
           amounts={amounts}
+          scheme={schemeName}
           hideEntrada={displayHidden}
           entradaFadeStyle={fadeStyle}
         />
@@ -242,11 +319,8 @@ export const DayRow = memo(function DayRow({
       <View
         style={{
           backgroundColor: colors.bg,
-          width: 144,
-          borderBottomWidth: 2,
-          borderBottomColor: dsColors.hair,
         }}
-        className={`items-end justify-center px-2.5`}
+        className="border-ds-hair w-36 items-end justify-center border-l px-2.5"
       >
         <Animated.View style={fadeStyle}>
           {displayHidden ? (

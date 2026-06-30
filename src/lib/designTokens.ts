@@ -136,10 +136,10 @@ export const DS_RADIUS = {
 
 export const CATEGORY_COLORS: Record<TransactionType | "cartao", ColorTriple> =
   {
-    entrada: { dot: "#14874e", bg: "#dff5e7", ink: "#103c28" },
-    saida: { dot: "#bc4527", bg: "#ffe9e5", ink: "#7a342b" },
-    diario: { dot: "#af7c00", bg: "#f5eee0", ink: "#5b4404" },
-    economia: { dot: "#1b8abd", bg: "#dbf3ff", ink: "#0b4e6c" },
+    entrada: { dot: "#129868", bg: "#dff5eb", ink: "#0b593f" },
+    saida: { dot: "#bf5317", bg: "#ffe9dc", ink: "#79320d" },
+    diario: { dot: "#a623cd", bg: "#f6ddff", ink: "#6c1984" },
+    economia: { dot: "#7cab2d", bg: "#edf7db", ink: "#4d7014" },
     cartao: { dot: "#7457d1", bg: "#e4f7ec", ink: "#103c28" },
   };
 
@@ -149,10 +149,10 @@ export const CATEGORY_COLORS_BY_SCHEME: Record<
 > = {
   light: CATEGORY_COLORS,
   dark: {
-    entrada: { dot: "#73cd9f", bg: "#1f3d2e", ink: "#d5f8e5" },
-    saida: { dot: "#ed756e", bg: "#432722", ink: "#ffd2cd" },
-    diario: { dot: "#baa44d", bg: "#3b3419", ink: "#f1df9b" },
-    economia: { dot: "#6fbde8", bg: "#203a4a", ink: "#c8ecff" },
+    entrada: { dot: "#1e8f68", bg: "#1d3d32", ink: "#ebfff6" },
+    saida: { dot: "#b15c2d", bg: "#432a20", ink: "#fff2ea" },
+    diario: { dot: "#9f4bc0", bg: "#3d2548", ink: "#f8eaff" },
+    economia: { dot: "#779f47", bg: "#303d25", ink: "#f4ffe8" },
     cartao: { dot: "#b6a4ee", bg: "#3d3158", ink: "#e2d8ff" },
   },
 };

@@ -34,7 +34,10 @@ import type {
   TransactionType,
 } from "@/src/features/transactions/types";
 import { formatFullDate, formatIsoDate } from "@/src/lib/date";
-import { CATEGORY_COLORS, colorsForScheme } from "@/src/lib/designTokens";
+import {
+  categoryColorsForScheme,
+  colorsForScheme,
+} from "@/src/lib/designTokens";
 
 interface TransactionFormProps {
   mode: "new" | "edit";
@@ -129,6 +132,7 @@ export function TransactionForm({
   const { bottom } = useSafeAreaInsets();
   const scheme = useColorScheme();
   const c = colorsForScheme(scheme);
+  const categoryColors = categoryColorsForScheme(scheme);
 
   const datePickerSheetRef = useRef<DatePickerSheetRef>(null);
 
@@ -210,7 +214,7 @@ export function TransactionForm({
         <View className="gap-2">
           <View className="flex-row items-center gap-1.5">
             <View
-              style={{ backgroundColor: CATEGORY_COLORS[type].dot }}
+              style={{ backgroundColor: categoryColors[type].dot }}
               className="h-2 w-2 rounded-full"
             />
             <Text className="text-muted text-label font-semibold tracking-widest">
