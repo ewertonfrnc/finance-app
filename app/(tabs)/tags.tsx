@@ -1,7 +1,7 @@
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useToast } from "heroui-native";
 import { ArrowUpDown, Plus, Search } from "lucide-react-native";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FlatList,
   Pressable,
@@ -10,10 +10,17 @@ import {
   View,
   useColorScheme,
 } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from "react-native-reanimated";
 import { MonthNavigator } from "@/src/components/navigation/MonthNavigator";
 import { CurrencyText } from "@/src/components/ui/CurrencyText";
 import { Screen } from "@/src/components/ui/Screen";
 import { TagFlag } from "@/src/features/tags/components/TagFlag";
+import { getTagColors } from "@/src/features/tags/constants";
 import { TagFormModal } from "@/src/features/tags/components/TagFormModal";
 import { useTags } from "@/src/features/tags/hooks/useTags";
 import type { TagWithTotal } from "@/src/features/tags/types";
@@ -22,25 +29,79 @@ import { useDateStore } from "@/src/stores/useDateStore";
 
 interface TagRowProps {
   tag: TagWithTotal;
+  maxMonthlyTotal: number;
+  trackColor: string;
+  scheme: ReturnType<typeof useColorScheme>;
+  animationDelayMs: number;
+  animationKey: number;
   onPress: () => void;
 }
 
-function TagRow({ tag, onPress }: TagRowProps) {
+function TagRow({
+  tag,
+  maxMonthlyTotal,
+  trackColor,
+  scheme,
+  animationDelayMs,
+  animationKey,
+  onPress,
+}: TagRowProps) {
+  const tagColors = getTagColors(tag.color, scheme);
+  const hasTotal = tag.monthlyTotal > 0 && maxMonthlyTotal > 0;
+  const progress = hasTotal
+    ? Math.max(8, Math.round((tag.monthlyTotal / maxMonthlyTotal) * 100))
+    : 0;
+  const fillProgress = useSharedValue(0);
+
+  useEffect(() => {
+    fillProgress.value = 0;
+
+    if (hasTotal) {
+      fillProgress.value = withDelay(
+        animationDelayMs,
+        withTiming(progress, { duration: 520 }),
+      );
+    }
+  }, [animationDelayMs, animationKey, fillProgress, hasTotal, progress]);
+
+  const animatedBarStyle = useAnimatedStyle(() => ({
+    width: `${fillProgress.value}%`,
+  }));
+
   return (
     <Pressable
       onPress={onPress}
-      className="flex-row items-center gap-3 px-4 py-3"
+      className="flex-row items-center gap-3 px-4 py-3.5"
     >
-      <TagFlag color={tag.color} />
-      <View className="flex-1">
+      <View style={{ opacity: hasTotal ? 1 : 0.45 }}>
+        <TagFlag color={tag.color} />
+      </View>
+      <View className="flex-1 gap-2">
         <Text
-          className="text-foreground text-transaction font-semibold"
+          className={`${hasTotal ? "text-foreground" : "text-muted"} text-transaction font-semibold`}
           numberOfLines={1}
         >
           {tag.name}
         </Text>
+        <View
+          style={{ backgroundColor: trackColor }}
+          className="h-1 overflow-hidden rounded-full"
+        >
+          <Animated.View
+            style={[
+              { backgroundColor: tagColors.dot, opacity: hasTotal ? 1 : 0 },
+              animatedBarStyle,
+            ]}
+            className="h-full rounded-full"
+          />
+        </View>
       </View>
-      <CurrencyText value={tag.monthlyTotal} sign="neutral" variant="small" />
+      <CurrencyText
+        value={tag.monthlyTotal}
+        sign="neutral"
+        variant="small"
+        className={hasTotal ? "" : "text-muted"}
+      />
     </Pressable>
   );
 }
@@ -86,6 +147,7 @@ export default function TagsScreen() {
   const { data: tags = [], isLoading } = useTags(selectedYear, selectedMonth);
   const [search, setSearch] = useState("");
   const [formMode, setFormMode] = useState<"create" | "edit" | null>(null);
+  const [barAnimationKey, setBarAnimationKey] = useState(0);
   const router = useRouter();
   const { toast } = useToast();
   const scheme = useColorScheme();
@@ -93,13 +155,43 @@ export default function TagsScreen() {
   const iconColor = colors.mute;
   const accentColor = colors.green;
 
-  const filtered = useMemo(() => {
+  const visibleTags = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return tags;
-    return tags.filter((t) => t.name.toLowerCase().includes(q));
-  }, [tags, search]);
+    const matches = q
+      ? tags.filter((t) => t.name.toLowerCase().includes(q))
+      : tags;
 
-  const showEmpty = filtered.length === 0 && !isLoading;
+    return [...matches].sort((a, b) => {
+      const aIsUnused = a.monthlyTotal <= 0;
+      const bIsUnused = b.monthlyTotal <= 0;
+
+      if (aIsUnused === bIsUnused) return 0;
+      return aIsUnused ? 1 : -1;
+    });
+  }, [tags, search]);
+  const summary = useMemo(() => {
+    const total = tags.reduce((sum, tag) => sum + tag.monthlyTotal, 0);
+    const activeTags = tags.filter((tag) => tag.monthlyTotal > 0).length;
+    const maxMonthlyTotal = tags.reduce(
+      (max, tag) => Math.max(max, tag.monthlyTotal),
+      0,
+    );
+    const topTag = tags.reduce<TagWithTotal | null>((current, tag) => {
+      if (tag.monthlyTotal <= 0) return current;
+      if (current === null || tag.monthlyTotal > current.monthlyTotal) return tag;
+      return current;
+    }, null);
+
+    return { activeTags, maxMonthlyTotal, topTag, total };
+  }, [tags]);
+
+  const showEmpty = visibleTags.length === 0 && !isLoading;
+
+  useFocusEffect(
+    useCallback(() => {
+      setBarAnimationKey((current) => current + 1);
+    }, []),
+  );
 
   function handleSortPress() {
     toast.show({
@@ -118,7 +210,7 @@ export default function TagsScreen() {
     <Screen className="bg-background">
       <MonthNavigator onCalendarPress={() => router.navigate("/")} />
 
-      <View className="gap-2 px-4 pb-2">
+      <View className="gap-3 px-4 pb-2">
         <View className="flex-row items-center justify-between pt-1">
           <View className="flex-row items-baseline gap-2">
             <Text className="text-foreground text-label font-semibold tracking-[2px]">
@@ -145,6 +237,50 @@ export default function TagsScreen() {
           </View>
         </View>
 
+        <View
+          style={{ backgroundColor: colors.surface, borderColor: colors.hair }}
+          className="rounded-2xl border px-4 py-3"
+        >
+          <Text className="text-muted text-label font-semibold tracking-widest">
+            CATEGORIZADO NO MÊS
+          </Text>
+          <View className="mt-1 flex-row items-end justify-between gap-4">
+            <View className="flex-1">
+              <CurrencyText
+                value={summary.total}
+                sign="neutral"
+                variant="large"
+                className="text-foreground"
+              />
+              <Text className="text-muted mt-1 text-xs">
+                {summary.activeTags === 1
+                  ? "1 tag com movimento"
+                  : `${summary.activeTags} tags com movimento`}
+              </Text>
+            </View>
+
+            <View className="items-end">
+              <Text className="text-muted text-label font-semibold tracking-widest">
+                TOP TAG
+              </Text>
+              <Text
+                className="text-foreground mt-1 max-w-32 text-right text-sm font-semibold"
+                numberOfLines={1}
+              >
+                {summary.topTag?.name ?? "Sem uso"}
+              </Text>
+              {summary.topTag ? (
+                <CurrencyText
+                  value={summary.topTag.monthlyTotal}
+                  sign="neutral"
+                  variant="small"
+                  className="mt-0.5"
+                />
+              ) : null}
+            </View>
+          </View>
+        </View>
+
         <View className="bg-surface-secondary border-separator flex-row items-center gap-2 rounded-xl border px-3">
           <Search size={16} color={iconColor} />
           <TextInput
@@ -167,17 +303,38 @@ export default function TagsScreen() {
         />
       ) : (
         <FlatList
-          data={filtered}
+          data={visibleTags}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TagRow
-              tag={item}
-              onPress={() => router.push(`/tags/${item.id}`)}
-            />
-          )}
+          renderItem={({ item, index }) => {
+            const startsUnusedGroup =
+              item.monthlyTotal <= 0 &&
+              (index === 0 || visibleTags[index - 1]?.monthlyTotal > 0);
+
+            return (
+              <>
+                {startsUnusedGroup ? (
+                  <View className="px-4 pb-1 pt-4">
+                    <Text className="text-muted text-label font-semibold tracking-widest">
+                      SEM USO NESTE MÊS
+                    </Text>
+                  </View>
+                ) : null}
+                <TagRow
+                  tag={item}
+                  maxMonthlyTotal={summary.maxMonthlyTotal}
+                  trackColor={colors.hair}
+                  scheme={scheme}
+                  animationDelayMs={Math.min(index * 24, 180)}
+                  animationKey={barAnimationKey}
+                  onPress={() => router.push(`/tags/${item.id}`)}
+                />
+              </>
+            );
+          }}
           ItemSeparatorComponent={() => (
             <View className="bg-separator mx-4 h-px" />
           )}
+          contentContainerClassName="pb-28"
         />
       )}
 
