@@ -162,22 +162,22 @@
   @variant light {
     /* Design system base aliases. Existing app tokens are mapped below. */
     --ds-bg: #ffffff;
-    --ds-surface: oklch(0.985 0.005 160);
-    --ds-canvas-bg: oklch(0.96 0.005 160);
-    --ds-text: oklch(0.18 0.01 160);
-    --ds-mute: oklch(0.5 0.005 160);
-    --ds-faint: oklch(0.72 0.005 160);
-    --ds-future: oklch(0.62 0.01 160);
-    --ds-future-mute: oklch(0.78 0.005 160);
-    --ds-hair: oklch(0.93 0.005 160);
-    --ds-hair-strong: oklch(0.86 0.005 160);
-    --ds-drag-handle: oklch(0.88 0 0);
+    --ds-surface: #f8fafa;
+    --ds-canvas-bg: #eef2f2;
+    --ds-text: #1a2e35;
+    --ds-mute: #4a6269;
+    --ds-faint: #93a3a7;
+    --ds-future: #818e90;
+    --ds-future-mute: #b4c0c1;
+    --ds-hair: #e8ebec;
+    --ds-hair-strong: #d4dcdb;
+    --ds-drag-handle: #d7d7d7;
 
-    --ds-green-deep: oklch(0.22 0.04 162);
-    --ds-green: oklch(0.32 0.06 160);
-    --ds-green-mid: oklch(0.55 0.1 158);
-    --ds-green-soft: oklch(0.78 0.07 158);
-    --ds-green-tint: oklch(0.95 0.03 158);
+    --ds-green-deep: #2f6a4a;
+    --ds-green: #328f97;
+    --ds-green-mid: #4fb8b2;
+    --ds-green-soft: #a3d9d4;
+    --ds-green-tint: #e3f4f2;
 
     --ds-red: oklch(0.55 0.16 25);
     --ds-red-strong: oklch(0.5 0.18 25);
@@ -202,9 +202,9 @@
     --cat-economia-dot: #7cab2d;
     --cat-economia-bg: #edf7db;
     --cat-economia-ink: #4d7014;
-    --cat-cartao-dot: oklch(0.55 0.18 290);
-    --cat-cartao-bg: oklch(0.96 0.025 160);
-    --cat-cartao-ink: oklch(0.32 0.06 160);
+    --cat-cartao-dot: #7457d1;
+    --cat-cartao-bg: #ece8fb;
+    --cat-cartao-ink: #3a2d73;
 
     --tag-gray-bg: oklch(0.92 0.005 160);
     --tag-gray-ink: oklch(0.36 0.005 160);
@@ -249,7 +249,7 @@
       0 4px 12px -6px rgba(0, 0, 0, 0.08);
     --shadow-sheet: 0 -20px 50px -10px rgba(20, 40, 30, 0.2);
     --shadow-summary: 0 4px 18px -10px rgba(20, 40, 30, 0.18);
-    --shadow-fab: 0 8px 20px -8px oklch(0.3 0.06 160 / 0.5);
+    --shadow-fab: 0 8px 20px -8px rgba(50, 143, 151, 0.5);
 
     --background: var(--ds-bg);
     --foreground: var(--ds-text);
@@ -306,23 +306,23 @@
   }
 
   @variant dark {
-    --ds-bg: oklch(0.215 0.013 160);
-    --ds-surface: oklch(0.245 0.012 160);
-    --ds-canvas-bg: oklch(0.185 0.012 160);
-    --ds-text: oklch(0.95 0.005 160);
-    --ds-mute: oklch(0.70 0.008 160);
-    --ds-faint: oklch(0.55 0.01 160);
-    --ds-future: oklch(0.60 0.01 160);
-    --ds-future-mute: oklch(0.45 0.01 160);
-    --ds-hair: oklch(0.30 0.01 160);
-    --ds-hair-strong: oklch(0.40 0.012 160);
-    --ds-drag-handle: oklch(0.40 0.012 160);
+    --ds-bg: #0b1114;
+    --ds-surface: #131d21;
+    --ds-canvas-bg: #080e11;
+    --ds-text: #e0ede9;
+    --ds-mute: #a0bfba;
+    --ds-faint: #6f8884;
+    --ds-future: #74908b;
+    --ds-future-mute: #4a5d5a;
+    --ds-hair: #1c2a2c;
+    --ds-hair-strong: #2e4244;
+    --ds-drag-handle: #2e4244;
 
-    --ds-green-deep: oklch(0.32 0.05 162);
-    --ds-green: oklch(0.78 0.11 160);
-    --ds-green-mid: oklch(0.70 0.11 158);
-    --ds-green-soft: oklch(0.52 0.08 158);
-    --ds-green-tint: oklch(0.30 0.035 158);
+    --ds-green-deep: #21453f;
+    --ds-green: #8de5db;
+    --ds-green-mid: #6ec89a;
+    --ds-green-soft: #4f9b94;
+    --ds-green-tint: #163230;
 
     --ds-red: oklch(0.70 0.15 25);
     --ds-red-strong: oklch(0.70 0.15 25);
@@ -347,9 +347,9 @@
     --cat-economia-dot: #779f47;
     --cat-economia-bg: #303d25;
     --cat-economia-ink: #f4ffe8;
-    --cat-cartao-dot: oklch(0.68 0.09 295);
-    --cat-cartao-bg: oklch(0.34 0.07 295);
-    --cat-cartao-ink: oklch(0.84 0.10 295);
+    --cat-cartao-dot: #b6a4ee;
+    --cat-cartao-bg: #3d3158;
+    --cat-cartao-ink: #e2d8ff;
 
     --tag-gray-bg: oklch(0.32 0.006 160);
     --tag-gray-ink: oklch(0.82 0.006 160);
@@ -376,16 +376,16 @@
     --tag-brown-ink: oklch(0.82 0.06 60);
     --tag-brown-dot: oklch(0.62 0.06 60);
 
-    --saldo-dark-green-bg: #1a4a38;
-    --saldo-dark-green-ink: #96eec6;
-    --saldo-light-green-bg: #1e4032;
-    --saldo-light-green-ink: #96e2be;
-    --saldo-yellow-bg: #463c1e;
-    --saldo-yellow-ink: #eed48e;
-    --saldo-light-red-bg: #46262d;
-    --saldo-light-red-ink: #f0a2ae;
-    --saldo-dark-red-bg: #4e2029;
-    --saldo-dark-red-ink: #f8b0ba;
+    --saldo-dark-green-bg: #214f3c;
+    --saldo-dark-green-ink: #baf5d7;
+    --saldo-light-green-bg: #1a3f31;
+    --saldo-light-green-ink: #a6efca;
+    --saldo-yellow-bg: #493f25;
+    --saldo-yellow-ink: #f4d98e;
+    --saldo-light-red-bg: #4a2b31;
+    --saldo-light-red-ink: #f8b8c3;
+    --saldo-dark-red-bg: #5a2530;
+    --saldo-dark-red-ink: #ffd2da;
 
     --overlay-standard: oklch(0% 0 0 / 35%);
     --overlay-delete: rgba(15, 25, 20, 0.35);
