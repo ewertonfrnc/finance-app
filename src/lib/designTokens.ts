@@ -134,18 +134,16 @@ export const DS_RADIUS = {
   subLabel: 4,
 } as const;
 
-export const CATEGORY_COLORS: Record<TransactionType | "cartao", ColorTriple> =
-  {
-    entrada: { dot: "#129868", bg: "#dff5eb", ink: "#0b593f" },
-    saida: { dot: "#bf5317", bg: "#ffe9dc", ink: "#79320d" },
-    diario: { dot: "#a623cd", bg: "#f6ddff", ink: "#6c1984" },
-    economia: { dot: "#7cab2d", bg: "#edf7db", ink: "#4d7014" },
-    cartao: { dot: "#7457d1", bg: "#ece8fb", ink: "#3a2d73" },
-  };
+export const CATEGORY_COLORS: Record<TransactionType, ColorTriple> = {
+  entrada: { dot: "#129868", bg: "#dff5eb", ink: "#0b593f" },
+  saida: { dot: "#bf5317", bg: "#ffe9dc", ink: "#79320d" },
+  diario: { dot: "#a623cd", bg: "#f6ddff", ink: "#6c1984" },
+  economia: { dot: "#7cab2d", bg: "#edf7db", ink: "#4d7014" },
+};
 
 export const CATEGORY_COLORS_BY_SCHEME: Record<
   Scheme,
-  Record<TransactionType | "cartao", ColorTriple>
+  Record<TransactionType, ColorTriple>
 > = {
   light: CATEGORY_COLORS,
   dark: {
@@ -153,7 +151,6 @@ export const CATEGORY_COLORS_BY_SCHEME: Record<
     saida: { dot: "#b15c2d", bg: "#432a20", ink: "#fff2ea" },
     diario: { dot: "#9f4bc0", bg: "#3d2548", ink: "#f8eaff" },
     economia: { dot: "#779f47", bg: "#303d25", ink: "#f4ffe8" },
-    cartao: { dot: "#b6a4ee", bg: "#3d3158", ink: "#e2d8ff" },
   },
 };
 

@@ -23,7 +23,8 @@ import type {
 } from "@/src/features/transactions/types";
 import { getBalanceTierColors } from "@/src/lib/balanceTier";
 import { formatWeekday, isWeekend } from "@/src/lib/date";
-import { schemeKey } from "@/src/lib/designTokens";
+import { categoryColorsForScheme, schemeKey } from "@/src/lib/designTokens";
+import { TRANSACTION_TYPE_VISUAL } from "@/src/lib/transactionTypeVisuals";
 import { usePrivacyStore } from "@/src/stores/usePrivacyStore";
 import { CurrencyText } from "../ui/CurrencyText";
 
@@ -40,12 +41,11 @@ interface DayRowProps {
 const CATEGORIES: {
   type: TransactionType;
   label: string;
-  mark: string;
 }[] = [
-  { type: "entrada", label: "Entrada", mark: "↙" },
-  { type: "saida", label: "Saída", mark: "↗" },
-  { type: "diario", label: "Diário", mark: "D" },
-  { type: "economia", label: "Economia", mark: "E" },
+  { type: "entrada", label: TRANSACTION_TYPE_VISUAL.entrada.label },
+  { type: "saida", label: TRANSACTION_TYPE_VISUAL.saida.label },
+  { type: "diario", label: TRANSACTION_TYPE_VISUAL.diario.label },
+  { type: "economia", label: TRANSACTION_TYPE_VISUAL.economia.label },
 ];
 
 const TODAY = format(new Date(), "yyyy-MM-dd");
@@ -68,16 +68,16 @@ const ROW_SURFACE_COLORS = {
 } as const;
 const CATEGORY_MARK_CLASSES: Record<
   TransactionType,
-  { bg: string; text: string }
+  { bg: string }
 > = {
-  entrada: { bg: "bg-cat-entrada-bg", text: "text-cat-entrada-ink" },
-  saida: { bg: "bg-cat-saida-bg", text: "text-cat-saida-ink" },
-  diario: { bg: "bg-cat-diario-bg", text: "text-cat-diario-ink" },
-  economia: { bg: "bg-cat-economia-bg", text: "text-cat-economia-ink" },
+  entrada: { bg: "bg-cat-entrada-bg" },
+  saida: { bg: "bg-cat-saida-bg" },
+  diario: { bg: "bg-cat-diario-bg" },
+  economia: { bg: "bg-cat-economia-bg" },
 };
 
 interface TransactionLinesProps {
-  lines: { type: TransactionType; label: string; mark: string }[];
+  lines: { type: TransactionType; label: string }[];
   amounts: Record<TransactionType, number>;
   scheme: "light" | "dark";
   hideEntrada?: boolean;
@@ -87,9 +87,11 @@ interface TransactionLinesProps {
 function CategoryMark({
   category,
   inactiveColors,
+  scheme,
 }: {
-  category?: { type: TransactionType; mark: string };
+  category?: { type: TransactionType };
   inactiveColors: { bg: string; ink: string };
+  scheme: "light" | "dark";
 }) {
   if (!category) {
     return (
@@ -108,16 +110,14 @@ function CategoryMark({
   }
 
   const classes = CATEGORY_MARK_CLASSES[category.type];
+  const colors = categoryColorsForScheme(scheme)[category.type];
+  const { Icon } = TRANSACTION_TYPE_VISUAL[category.type];
 
   return (
     <View
-      className={`h-4 w-4 items-center justify-center rounded-full ${classes.bg}`}
+      className={`h-4 w-4 items-center justify-center rounded ${classes.bg}`}
     >
-      <Text
-        className={`font-mono-semibold text-[10px] leading-none ${classes.text}`}
-      >
-        {category.mark}
-      </Text>
+      <Icon size={10} color={colors.dot} strokeWidth={2.6} />
     </View>
   );
 }
@@ -135,7 +135,7 @@ function TransactionLines({
     return (
       <View className="flex-row items-center justify-between gap-3 opacity-45">
         <View className="flex-row items-center gap-2">
-          <CategoryMark inactiveColors={inactiveColors} />
+          <CategoryMark inactiveColors={inactiveColors} scheme={scheme} />
           <Text className="text-muted text-body-small">Sem lançamento</Text>
         </View>
         <CurrencyText value={0} variant="small" sign="neutral" />
@@ -151,8 +151,9 @@ function TransactionLines({
         return (
           <View key={cat.type} className="flex-row items-center gap-2">
             <CategoryMark
-              category={active ? { type: cat.type, mark: cat.mark } : undefined}
+              category={active ? { type: cat.type } : undefined}
               inactiveColors={inactiveColors}
+              scheme={scheme}
             />
             <Text className="text-muted text-body-small flex-1">
               {cat.label}

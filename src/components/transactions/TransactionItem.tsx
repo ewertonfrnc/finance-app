@@ -2,21 +2,12 @@ import { Repeat } from "lucide-react-native";
 import { Pressable, Text, View, useColorScheme } from "react-native";
 
 import { TagBadge } from "@/src/features/tags/components/TagBadge";
-import type {
-  Transaction,
-  TransactionType,
-} from "@/src/features/transactions/types";
+import type { Transaction } from "@/src/features/transactions/types";
 import { formatDayHeader } from "@/src/lib/date";
 import { colorsForScheme } from "@/src/lib/designTokens";
+import { TRANSACTION_TYPE_LABEL } from "@/src/lib/transactionTypeVisuals";
 import { CurrencyText } from "../ui/CurrencyText";
 import { TypeBadge } from "../ui/TypeBadge";
-
-const TYPE_LABEL: Record<TransactionType, string> = {
-  entrada: "Entrada",
-  saida: "Saída",
-  diario: "Diário",
-  economia: "Economia",
-};
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -76,7 +67,7 @@ export function TransactionItem({
       <View className="items-end">
         <CurrencyText value={amount} sign="neutral" variant="small" />
         <Text className="text-muted text-body-small mt-0.5">
-          {TYPE_LABEL[type]}
+          {TRANSACTION_TYPE_LABEL[type]}
         </Text>
       </View>
     </Pressable>

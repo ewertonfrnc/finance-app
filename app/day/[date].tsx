@@ -1,6 +1,7 @@
 import { format, parseISO } from "date-fns";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Separator, useToast } from "heroui-native";
+import { ListFilter, Plus, ReceiptText } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
   FlatList,
@@ -25,6 +26,7 @@ import type { TransactionType } from "@/src/features/transactions/types";
 import { formatBRL } from "@/src/lib/currency";
 import { formatDayHeader, nextDay, prevDay } from "@/src/lib/date";
 import { colorsForScheme } from "@/src/lib/designTokens";
+import { TRANSACTION_TYPE_LABEL } from "@/src/lib/transactionTypeVisuals";
 import { transactionDetailHref } from "@/src/lib/transactionHref";
 
 const TODAY = format(new Date(), "yyyy-MM-dd");
@@ -126,6 +128,115 @@ const FILTER_OPTIONS: { label: string; value: TransactionType | null }[] = [
   { label: "Diários", value: "diario" },
   { label: "Economia", value: "economia" },
 ];
+
+function TransactionListHeader({
+  date,
+  filteredCount,
+  totalCount,
+  selectedType,
+  isFuture,
+  projectedDaily,
+  onAdjustProjectionPress,
+}: {
+  date: string;
+  filteredCount: number;
+  totalCount: number;
+  selectedType: TransactionType | null;
+  isFuture: boolean;
+  projectedDaily: number;
+  onAdjustProjectionPress: () => void;
+}) {
+  const countLabel =
+    selectedType === null ? `${totalCount}` : `${filteredCount}/${totalCount}`;
+
+  return (
+    <View>
+      {isFuture && projectedDaily > 0 ? (
+        <DailyProjectionCard
+          date={date}
+          amount={projectedDaily}
+          onAdjustPress={onAdjustProjectionPress}
+        />
+      ) : null}
+
+      <View className="flex-row items-baseline justify-between px-4 pt-4 pb-2">
+        <Text className="text-muted text-label font-semibold tracking-[2px]">
+          LANÇAMENTOS
+        </Text>
+        <Text className="text-muted text-body-small font-mono">
+          {countLabel}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+function DayEmptyState({
+  hasFilter,
+  selectedType,
+  onAddPress,
+  onClearFilter,
+}: {
+  hasFilter: boolean;
+  selectedType: TransactionType | null;
+  onAddPress: () => void;
+  onClearFilter: () => void;
+}) {
+  const scheme = useColorScheme();
+  const c = colorsForScheme(scheme);
+  const title = hasFilter
+    ? "Nada neste filtro"
+    : "Nenhum lançamento neste dia";
+  const description = hasFilter
+    ? `${TRANSACTION_TYPE_LABEL[selectedType ?? "entrada"]} não apareceu nesse dia. Veja todos os lançamentos ou escolha outro tipo.`
+    : "Quando você registrar uma entrada, saída, diário ou economia nessa data, ela aparece aqui.";
+  const Icon = hasFilter ? ListFilter : ReceiptText;
+
+  return (
+    <View className="flex-1 items-center justify-center px-8 py-14">
+      <View
+        style={{ backgroundColor: c.surface, borderColor: c.hair }}
+        className="mb-5 h-14 w-14 items-center justify-center rounded-2xl border"
+      >
+        <Icon size={24} color={c.green} strokeWidth={2.2} />
+      </View>
+
+      <Text className="text-foreground text-center text-lg font-bold">
+        {title}
+      </Text>
+      <Text className="text-muted mt-2 max-w-80 text-center text-sm leading-5">
+        {description}
+      </Text>
+
+      <View className="mt-6 flex-row items-center gap-3">
+        {hasFilter ? (
+          <Pressable
+            onPress={onClearFilter}
+            className="bg-surface-secondary border-separator rounded-xl border px-4 py-3"
+          >
+            <Text className="text-foreground text-sm font-semibold">
+              Ver todos
+            </Text>
+          </Pressable>
+        ) : null}
+
+        <Pressable
+          onPress={onAddPress}
+          style={{ backgroundColor: c.greenTint, borderColor: c.hairStrong }}
+          className="flex-row items-center gap-2 rounded-xl border px-4 py-3"
+        >
+          <Plus size={16} color={c.green} strokeWidth={2.4} />
+          <Text
+            style={{ color: c.green }}
+            className="text-sm font-semibold"
+          >
+            Novo lançamento
+          </Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
 
 export default function DayScreen() {
   const { date } = useLocalSearchParams<{ date: string }>();
@@ -352,21 +463,31 @@ export default function DayScreen() {
             data={filtered}
             keyExtractor={(tx) => tx.occurrenceKey}
             ListHeaderComponent={
-              isFuture && projectedDaily > 0 ? (
-                <DailyProjectionCard
-                  date={date}
-                  amount={projectedDaily}
-                  onAdjustPress={() => {
-                    toast.show({
-                      placement: "top",
-                      duration: 3500,
-                      label: "Em breve",
-                      description:
-                        "A tela de ajuste do diário será adicionada em breve.",
-                    });
-                  }}
-                />
-              ) : null
+              <TransactionListHeader
+                date={date}
+                filteredCount={filtered.length}
+                totalCount={transactions.length}
+                selectedType={selectedType}
+                isFuture={isFuture}
+                projectedDaily={projectedDaily}
+                onAdjustProjectionPress={() => {
+                  toast.show({
+                    placement: "top",
+                    duration: 3500,
+                    label: "Em breve",
+                    description:
+                      "A tela de ajuste do diário será adicionada em breve.",
+                  });
+                }}
+              />
+            }
+            ListEmptyComponent={
+              <DayEmptyState
+                hasFilter={selectedType !== null && transactions.length > 0}
+                selectedType={selectedType}
+                onAddPress={openNewTransaction}
+                onClearFilter={() => setSelectedType(null)}
+              />
             }
             renderItem={({ item }) => (
               <TransactionItem
@@ -378,7 +499,7 @@ export default function DayScreen() {
               />
             )}
             ItemSeparatorComponent={() => <Separator />}
-            contentContainerClassName="pb-8"
+            contentContainerClassName="flex-grow pb-8"
           />
         </Animated.View>
       </GestureDetector>
