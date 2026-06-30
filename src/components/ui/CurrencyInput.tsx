@@ -11,11 +11,14 @@ import type { TransactionType } from "@/src/features/transactions/types";
 import { formatBRL } from "@/src/lib/currency";
 import { categoryColorsForScheme } from "@/src/lib/designTokens";
 
+const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
+
 interface CurrencyInputProps {
   value: number; // centavos
   onValueChange: (cents: number) => void;
   type?: TransactionType;
   accentColor?: string;
+  autoFocus?: boolean;
 }
 
 export function CurrencyInput({
@@ -23,6 +26,7 @@ export function CurrencyInput({
   onValueChange,
   type = "diario",
   accentColor,
+  autoFocus = false,
 }: CurrencyInputProps) {
   const inputRef = useRef<TextInput>(null);
   const scheme = useColorScheme();
@@ -34,6 +38,13 @@ export function CurrencyInput({
   const progress = useSharedValue(1);
   const prevType = useRef<TransactionType>(type);
   const opacity = useSharedValue(value === 0 ? 0.35 : 1);
+
+  useEffect(() => {
+    if (!autoFocus) return;
+
+    const timeout = setTimeout(() => inputRef.current?.focus(), 250);
+    return () => clearTimeout(timeout);
+  }, [autoFocus]);
 
   useEffect(() => {
     if (prevType.current === type && toColor.value === currentColor) return;
@@ -70,24 +81,25 @@ export function CurrencyInput({
     const digits = text.replace(/\D/g, "");
     onValueChange(digits ? parseInt(digits, 10) : 0);
   };
+  const formattedValue = formatBRL(value);
 
   return (
     <Pressable onPress={() => inputRef.current?.focus()}>
-      <Animated.Text
-        style={animatedTextStyle}
-        className="font-mono-semibold text-balance-highlight"
-      >
-        {formatBRL(value)}
-      </Animated.Text>
-      <Animated.View style={animatedBgStyle} className="mt-2 h-0.5" />
-      <TextInput
+      <AnimatedTextInput
         ref={inputRef}
-        value={String(value)}
+        value={formattedValue}
         onChangeText={handleChangeText}
         keyboardType="number-pad"
-        caretHidden
-        style={{ height: 0, width: 0, opacity: 0 }}
+        selectionColor={currentColor}
+        cursorColor={currentColor}
+        selection={{
+          start: formattedValue.length,
+          end: formattedValue.length,
+        }}
+        style={animatedTextStyle}
+        className="p-0 font-mono-semibold text-balance-highlight"
       />
+      <Animated.View style={animatedBgStyle} className="mt-2 h-0.5" />
     </Pressable>
   );
 }

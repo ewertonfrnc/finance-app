@@ -14,6 +14,13 @@ import { isIsoDate } from "@/src/lib/date";
 import { useDateStore } from "@/src/stores/useDateStore";
 import { useTagPickerStore } from "@/src/stores/useTagPickerStore";
 
+function sameTagIds(left: string[], right: string[]) {
+  if (left.length !== right.length) return false;
+  const sortedLeft = [...left].sort();
+  const sortedRight = [...right].sort();
+  return sortedLeft.every((id, index) => id === sortedRight[index]);
+}
+
 export default function NewTransactionScreen() {
   const { date, tagId } = useLocalSearchParams<{
     date?: string;
@@ -43,6 +50,7 @@ export default function NewTransactionScreen() {
   useTagPickerSync(initialized, setSelectedTagIds);
 
   const tagSummary = formatTagSelectionSummary(selectedTagIds, tags);
+  const hasTagChanges = !sameTagIds(selectedTagIds, initialTagIds);
 
   function handleTagPress() {
     useTagPickerStore.getState().set(selectedTagIds);
@@ -77,6 +85,7 @@ export default function NewTransactionScreen() {
         onSubmit={handleSubmit}
         isLoading={isPending}
         tagSummary={tagSummary}
+        hasExternalChanges={hasTagChanges}
         onTagPress={handleTagPress}
       />
     </Screen>
