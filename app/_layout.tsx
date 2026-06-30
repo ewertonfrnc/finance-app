@@ -12,9 +12,14 @@ import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Uniwind } from "uniwind";
 
 import { colorsForScheme } from "@/src/lib/designTokens";
 import { useAuthHydration, useAuthStore } from "@/src/stores/useAuthStore";
+import {
+  useThemePreferenceHydration,
+  useThemePreferenceStore,
+} from "@/src/stores/useThemePreferenceStore";
 import "../global.css";
 
 if (__DEV__) {
@@ -32,6 +37,16 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+function ThemePreferenceSync() {
+  const preference = useThemePreferenceStore((s) => s.preference);
+
+  useEffect(() => {
+    Uniwind.setTheme(preference);
+  }, [preference]);
+
+  return null;
+}
 
 function AuthGuard({
   hasHydrated,
@@ -100,6 +115,7 @@ export default function RootLayout() {
   const scheme = useColorScheme();
   const colors = colorsForScheme(scheme);
   const hasHydrated = useAuthHydration();
+  const hasThemeHydrated = useThemePreferenceHydration();
   const [authResolved, setAuthResolved] = useState(false);
   const [loaded, error] = useFonts({
     "Inter-Regular": require("../assets/fonts/inter/Inter_18pt-Regular.ttf"),
@@ -111,7 +127,7 @@ export default function RootLayout() {
     "JetBrainsMono-Medium": require("../assets/fonts/jetbrains/JetBrainsMono-Medium.ttf"),
     "JetBrainsMono-SemiBold": require("../assets/fonts/jetbrains/JetBrainsMono-SemiBold.ttf"),
   });
-  const assetsReady = hasHydrated && (loaded || error);
+  const assetsReady = hasHydrated && hasThemeHydrated && (loaded || error);
 
   useEffect(() => {
     if (assetsReady && authResolved) {
@@ -142,6 +158,7 @@ export default function RootLayout() {
                 <Stack.Screen name="transaction/new" />
                 <Stack.Screen name="transaction/[id]" />
               </Stack>
+              <ThemePreferenceSync />
               <QuerySessionSync />
               <AuthGuard
                 hasHydrated={hasHydrated}

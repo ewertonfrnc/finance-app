@@ -1,4 +1,3 @@
-import { useNavigation, usePreventRemove } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { AccordionLayoutTransition } from "heroui-native";
 import {
@@ -8,10 +7,8 @@ import {
   Repeat,
   Tag,
 } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Alert,
-  BackHandler,
   KeyboardAvoidingView,
   Pressable,
   Text,
@@ -64,7 +61,6 @@ interface TransactionFormProps {
   isDeleting?: boolean;
   onTagPress?: () => void;
   tagSummary?: string;
-  hasExternalChanges?: boolean;
   header?: React.ReactNode;
   children?: React.ReactNode;
 }
@@ -160,19 +156,6 @@ function recurrenceSummaryText(
 function parseBalanceMonth(date: string) {
   const [year, month] = date.split("-").map(Number);
   return { year, month };
-}
-
-function normalizeInitialValues(
-  initialValues?: Partial<FormValues>,
-): FormValues {
-  return {
-    type: initialValues?.type ?? "diario",
-    amountCents: initialValues?.amountCents ?? 0,
-    description: initialValues?.description ?? "",
-    date: initialValues?.date ?? formatIsoDate(new Date()),
-    recurrence: initialValues?.recurrence ?? "none",
-    recurrenceEndDate: initialValues?.recurrenceEndDate,
-  };
 }
 
 function TransactionContextHeader({
@@ -576,12 +559,10 @@ export function TransactionForm({
   isDeleting = false,
   onTagPress,
   tagSummary = "Sem tag",
-  hasExternalChanges = false,
   header,
   children,
 }: TransactionFormProps) {
   const router = useRouter();
-  const navigation = useNavigation();
   const { bottom } = useSafeAreaInsets();
   const scheme = useColorScheme();
   const c = colorsForScheme(scheme);
@@ -607,7 +588,6 @@ export function TransactionForm({
     string | undefined
   >(initialValues?.recurrenceEndDate);
   const [expandedDetail, setExpandedDetail] = useState<DetailId | null>(null);
-  const [allowLeave, setAllowLeave] = useState(false);
   const { year: balanceYear, month: balanceMonth } = parseBalanceMonth(date);
   const { data: balanceDays = [], isFetching: isBalanceFetching } =
     useBalanceQuery(balanceYear, balanceMonth);
@@ -615,65 +595,8 @@ export function TransactionForm({
     () => balanceDays.find((day) => day.date === date),
     [balanceDays, date],
   );
-  const initialSnapshot = normalizeInitialValues(initialValues);
-
   const canSubmit = amountCents > 0 && description.trim().length > 0;
-  const hasFormChanges =
-    type !== initialSnapshot.type ||
-    amountCents !== initialSnapshot.amountCents ||
-    description !== initialSnapshot.description ||
-    date !== initialSnapshot.date ||
-    recurrence !== initialSnapshot.recurrence ||
-    recurrenceEndDate !== initialSnapshot.recurrenceEndDate;
-  const hasUnsavedChanges = hasFormChanges || hasExternalChanges;
   const showRecurrenceDetail = mode === "new" || recurrence !== "none";
-
-  const showDiscardAlert = useCallback((onDiscard: () => void) => {
-    Alert.alert(
-      "Descartar alterações?",
-      "As mudanças deste lançamento ainda não foram salvas.",
-      [
-        { text: "Continuar editando", style: "cancel" },
-        {
-          text: "Descartar",
-          style: "destructive",
-          onPress: () => {
-            setAllowLeave(true);
-            setTimeout(onDiscard, 0);
-          },
-        },
-      ],
-    );
-  }, []);
-
-  const confirmLeave = useCallback(() => {
-    if (!hasUnsavedChanges) {
-      router.back();
-      return;
-    }
-
-    showDiscardAlert(() => router.back());
-  }, [hasUnsavedChanges, router, showDiscardAlert]);
-
-  usePreventRemove(
-    hasUnsavedChanges && !allowLeave && !isLoading && !isDeleting,
-    ({ data }) => {
-      showDiscardAlert(() => navigation.dispatch(data.action));
-    },
-  );
-
-  useEffect(() => {
-    const subscription = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => {
-        if (!hasUnsavedChanges) return false;
-        confirmLeave();
-        return true;
-      },
-    );
-
-    return () => subscription.remove();
-  }, [confirmLeave, hasUnsavedChanges]);
 
   function handleRecurrenceChange(next: RecurrenceType) {
     setRecurrence(next);
@@ -697,7 +620,7 @@ export function TransactionForm({
     <KeyboardAvoidingView className="bg-surface flex-1" behavior="padding">
       {/* Header */}
       <View className="flex-row items-center px-4 py-4">
-        <Pressable onPress={confirmLeave} hitSlop={8}>
+        <Pressable onPress={() => router.back()} hitSlop={8}>
           <ArrowLeft size={22} color={c.mute} />
         </Pressable>
         <View className="absolute inset-x-0 items-center" pointerEvents="none">

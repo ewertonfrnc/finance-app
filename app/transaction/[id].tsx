@@ -27,13 +27,6 @@ import { queryKeys } from "@/src/lib/queryKeys";
 import { useAuthStore } from "@/src/stores/useAuthStore";
 import { useTagPickerStore } from "@/src/stores/useTagPickerStore";
 
-function sameTagIds(left: string[], right: string[]) {
-  if (left.length !== right.length) return false;
-  const sortedLeft = [...left].sort();
-  const sortedRight = [...right].sort();
-  return sortedLeft.every((id, index) => id === sortedRight[index]);
-}
-
 export default function EditTransactionScreen() {
   const { id, date: occurrenceDate } = useLocalSearchParams<{
     id: string;
@@ -153,8 +146,6 @@ export default function EditTransactionScreen() {
     ...tags,
     ...(transaction?.tags ?? []),
   ]);
-  const initialTagIds = transaction?.tags.map((tag) => tag.id) ?? [];
-  const hasTagChanges = !sameTagIds(selectedTagIds, initialTagIds);
 
   function handleTagPress() {
     useTagPickerStore.getState().set(selectedTagIds);
@@ -188,7 +179,6 @@ export default function EditTransactionScreen() {
         isLoading={isUpdating}
         isDeleting={isDeleting}
         tagSummary={tagSummary}
-        hasExternalChanges={hasTagChanges}
         onTagPress={handleTagPress}
         header={
           isRecurring ? (

@@ -11,8 +11,6 @@ import type { TransactionType } from "@/src/features/transactions/types";
 import { formatBRL } from "@/src/lib/currency";
 import { categoryColorsForScheme } from "@/src/lib/designTokens";
 
-const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
-
 interface CurrencyInputProps {
   value: number; // centavos
   onValueChange: (cents: number) => void;
@@ -82,23 +80,34 @@ export function CurrencyInput({
     onValueChange(digits ? parseInt(digits, 10) : 0);
   };
   const formattedValue = formatBRL(value);
+  const rawValue = value === 0 ? "" : String(value);
 
   return (
     <Pressable onPress={() => inputRef.current?.focus()}>
-      <AnimatedTextInput
+      <TextInput
         ref={inputRef}
-        value={formattedValue}
+        value={rawValue}
         onChangeText={handleChangeText}
         keyboardType="number-pad"
         selectionColor={currentColor}
         cursorColor={currentColor}
+        caretHidden
         selection={{
-          start: formattedValue.length,
-          end: formattedValue.length,
+          start: rawValue.length,
+          end: rawValue.length,
         }}
+        style={{ height: 1, opacity: 0, position: "absolute", width: 1 }}
+        accessibilityLabel="Valor"
+      />
+      <Animated.Text
         style={animatedTextStyle}
         className="p-0 font-mono-semibold text-balance-highlight"
-      />
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        pointerEvents="none"
+      >
+        {formattedValue}
+      </Animated.Text>
       <Animated.View style={animatedBgStyle} className="mt-2 h-0.5" />
     </Pressable>
   );
