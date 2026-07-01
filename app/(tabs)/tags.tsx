@@ -142,7 +142,7 @@ function EmptyState({ hasSearch, onCreatePress }: EmptyStateProps) {
 }
 
 export default function TagsScreen() {
-  const { selectedYear, selectedMonth } = useDateStore();
+  const { selectedYear, selectedMonth, goToCurrentMonth } = useDateStore();
   const { data: tags = [], isLoading } = useTags(selectedYear, selectedMonth);
   const [search, setSearch] = useState("");
   const [formMode, setFormMode] = useState<"create" | "edit" | null>(null);
@@ -207,7 +207,7 @@ export default function TagsScreen() {
 
   return (
     <Screen className="bg-background">
-      <MonthNavigator onCalendarPress={() => router.navigate("/")} />
+      <MonthNavigator onCalendarPress={goToCurrentMonth} />
 
       <View className="gap-3 px-4 pb-2">
         <View className="flex-row items-center justify-between pt-1">
