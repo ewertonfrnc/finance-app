@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import { useCallback, useEffect, useRef } from "react";
 import { FlatList, Text, View, useWindowDimensions } from "react-native";
 import Animated, {
@@ -13,6 +12,7 @@ import type {
   DayBalance,
   TransactionType,
 } from "@/src/features/transactions/types";
+import { formatIsoDate } from "@/src/lib/date";
 import { Separator } from "heroui-native";
 import { DayRow } from "./DayRow";
 
@@ -25,7 +25,9 @@ interface DayListProps {
   isPlaceholder?: boolean;
 }
 
-const TODAY = format(new Date(), "yyyy-MM-dd");
+const TODAY = formatIsoDate(new Date());
+
+const ItemSeparator = () => <Separator variant="thin" />;
 
 function LoadingBar() {
   const { width } = useWindowDimensions();
@@ -93,13 +95,22 @@ export function DayList({
     ({ item }: { item: DayBalance }) => (
       <DayRow
         dayBalance={item}
-        date={item.date}
         filter={filter}
         onPress={onDayPress}
         onLongPress={onDayLongPress}
       />
     ),
     [onDayPress, onDayLongPress, filter],
+  );
+
+  const handleScrollToIndexFailed = useCallback(
+    (info: { averageItemLength: number; index: number }) => {
+      listRef.current?.scrollToOffset({
+        offset: info.averageItemLength * info.index,
+        animated: false,
+      });
+    },
+    [],
   );
 
   return (
@@ -121,14 +132,9 @@ export function DayList({
         data={days}
         keyExtractor={(item) => item.date}
         renderItem={renderItem}
-        ItemSeparatorComponent={() => <Separator variant="thin" />}
+        ItemSeparatorComponent={ItemSeparator}
         showsVerticalScrollIndicator={false}
-        onScrollToIndexFailed={(info) => {
-          listRef.current?.scrollToOffset({
-            offset: info.averageItemLength * info.index,
-            animated: false,
-          });
-        }}
+        onScrollToIndexFailed={handleScrollToIndexFailed}
       />
     </View>
   );

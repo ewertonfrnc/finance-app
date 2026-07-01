@@ -1,6 +1,7 @@
 import { Text, View } from "react-native";
 
 import type { MonthSummary } from "@/src/features/transactions/types";
+import { PRIVACY_MASK } from "@/src/lib/privacy";
 import { usePrivacyStore } from "@/src/stores/usePrivacyStore";
 import { CurrencyText } from "../ui/CurrencyText";
 
@@ -20,7 +21,7 @@ export function BalanceSummaryHeader({ summary }: BalanceSummaryHeaderProps) {
           </Text>
           {hideValues ? (
             <Text className="text-accent font-mono-semibold text-balance-highlight">
-              ••••
+              {PRIVACY_MASK}
             </Text>
           ) : (
             <CurrencyText
@@ -36,7 +37,9 @@ export function BalanceSummaryHeader({ summary }: BalanceSummaryHeaderProps) {
             Pico / Vale
           </Text>
           {hideValues ? (
-            <Text className="text-muted font-mono-medium text-sm">••••</Text>
+            <Text className="text-muted font-mono-medium text-sm">
+              {PRIVACY_MASK}
+            </Text>
           ) : (
             <>
               <CurrencyText value={summary.peak} variant="small" sign="neutral" />

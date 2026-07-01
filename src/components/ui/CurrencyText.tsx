@@ -1,4 +1,5 @@
 import { formatBRL } from "@/src/lib/currency";
+import { PRIVACY_MASK } from "@/src/lib/privacy";
 import { Text, type TextProps } from "react-native";
 
 type Variant = "large" | "regular" | "small";
@@ -8,6 +9,8 @@ interface CurrencyTextProps extends Omit<TextProps, "children"> {
   value: number; // centavos
   variant?: Variant;
   sign?: Sign;
+  /** Render the privacy placeholder instead of the value, keeping the same styling. */
+  masked?: boolean;
 }
 
 const VARIANT_CLASSES: Record<Variant, string> = {
@@ -26,6 +29,7 @@ export function CurrencyText({
   value,
   variant = "regular",
   sign,
+  masked = false,
   className = "",
   ...props
 }: CurrencyTextProps) {
@@ -35,7 +39,7 @@ export function CurrencyText({
       className={`${VARIANT_CLASSES[variant]} ${SIGN_CLASSES[resolvedSign]} ${className}`}
       {...props}
     >
-      {formatBRL(value)}
+      {masked ? PRIVACY_MASK : formatBRL(value)}
     </Text>
   );
 }

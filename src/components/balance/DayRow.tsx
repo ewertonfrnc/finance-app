@@ -1,4 +1,3 @@
-import { format, parseISO } from "date-fns";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import {
   type ViewStyle,
@@ -22,7 +21,7 @@ import type {
   TransactionType,
 } from "@/src/features/transactions/types";
 import { getBalanceTierColors } from "@/src/lib/balanceTier";
-import { formatWeekday, isWeekend } from "@/src/lib/date";
+import { formatIsoDate, formatWeekday, isWeekend } from "@/src/lib/date";
 import { categoryColorsForScheme, schemeKey } from "@/src/lib/designTokens";
 import { TRANSACTION_TYPE_VISUAL } from "@/src/lib/transactionTypeVisuals";
 import { usePrivacyStore } from "@/src/stores/usePrivacyStore";
@@ -32,7 +31,6 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface DayRowProps {
   dayBalance: DayBalance;
-  date: string;
   filter: TransactionType | null;
   onPress: (date: string) => void;
   onLongPress?: (date: string) => void;
@@ -48,8 +46,7 @@ const CATEGORIES: {
   { type: "economia", label: TRANSACTION_TYPE_VISUAL.economia.label },
 ];
 
-const TODAY = format(new Date(), "yyyy-MM-dd");
-const PRIVACY_MASK = "••••";
+const TODAY = formatIsoDate(new Date());
 const CATEGORY_INACTIVE_COLORS = {
   light: { bg: "#ebeff1", ink: "#8d99a1" },
   dark: { bg: "#2a3438", ink: "#8f9ba2" },
@@ -66,14 +63,11 @@ const ROW_SURFACE_COLORS = {
     weekendDate: "rgba(255, 255, 255, 0.04)",
   },
 } as const;
-const CATEGORY_MARK_CLASSES: Record<
-  TransactionType,
-  { bg: string }
-> = {
-  entrada: { bg: "bg-cat-entrada-bg" },
-  saida: { bg: "bg-cat-saida-bg" },
-  diario: { bg: "bg-cat-diario-bg" },
-  economia: { bg: "bg-cat-economia-bg" },
+const CATEGORY_MARK_CLASSES: Record<TransactionType, string> = {
+  entrada: "bg-cat-entrada-bg",
+  saida: "bg-cat-saida-bg",
+  diario: "bg-cat-diario-bg",
+  economia: "bg-cat-economia-bg",
 };
 
 interface TransactionLinesProps {
@@ -109,13 +103,12 @@ function CategoryMark({
     );
   }
 
-  const classes = CATEGORY_MARK_CLASSES[category.type];
   const colors = categoryColorsForScheme(scheme)[category.type];
   const { Icon } = TRANSACTION_TYPE_VISUAL[category.type];
 
   return (
     <View
-      className={`h-4 w-4 items-center justify-center rounded ${classes.bg}`}
+      className={`h-4 w-4 items-center justify-center rounded ${CATEGORY_MARK_CLASSES[category.type]}`}
     >
       <Icon size={10} color={colors.dot} strokeWidth={2.6} />
     </View>
@@ -160,17 +153,12 @@ function TransactionLines({
             </Text>
             {cat.type === "entrada" ? (
               <Animated.View style={entradaFadeStyle}>
-                {hideEntrada ? (
-                  <Text className="font-mono-medium text-foreground text-sm">
-                    {PRIVACY_MASK}
-                  </Text>
-                ) : (
-                  <CurrencyText
-                    value={amounts[cat.type]}
-                    variant="small"
-                    sign="neutral"
-                  />
-                )}
+                <CurrencyText
+                  value={amounts[cat.type]}
+                  variant="small"
+                  sign="neutral"
+                  masked={hideEntrada}
+                />
               </Animated.View>
             ) : (
               <CurrencyText
@@ -188,12 +176,12 @@ function TransactionLines({
 
 export const DayRow = memo(function DayRow({
   dayBalance,
-  date,
   filter,
   onPress,
   onLongPress,
 }: DayRowProps) {
-  const { hideValues } = usePrivacyStore();
+  const hideValues = usePrivacyStore((s) => s.hideValues);
+  const date = dayBalance.date;
 
   const fadeOpacity = useSharedValue(1);
   const [displayHidden, setDisplayHidden] = useState(hideValues);
@@ -236,7 +224,7 @@ export const DayRow = memo(function DayRow({
     dayBalance.income === 0 &&
     dayBalance.expense === 0 &&
     dayBalance.savings === 0;
-  const dayNum = format(parseISO(dayBalance.date), "dd");
+  const dayNum = dayBalance.date.slice(8, 10);
   const weekday = formatWeekday(dayBalance.date);
 
   const amounts: Record<TransactionType, number> = {
@@ -324,21 +312,13 @@ export const DayRow = memo(function DayRow({
         className="border-ds-hair w-36 items-end justify-center border-l px-2.5"
       >
         <Animated.View style={fadeStyle}>
-          {displayHidden ? (
-            <Text
-              style={{ color: colors.ink }}
-              className="font-mono-medium text-sm"
-            >
-              {PRIVACY_MASK}
-            </Text>
-          ) : (
-            <CurrencyText
-              value={dayBalance.endBalance}
-              variant="small"
-              sign="neutral"
-              style={{ color: colors.ink }}
-            />
-          )}
+          <CurrencyText
+            value={dayBalance.endBalance}
+            variant="small"
+            sign="neutral"
+            masked={displayHidden}
+            style={{ color: colors.ink }}
+          />
         </Animated.View>
       </View>
     </AnimatedPressable>
