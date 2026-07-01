@@ -8,15 +8,21 @@ import { useFonts } from "expo-font";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { HeroUINativeProvider } from "heroui-native";
-import { useEffect, useRef, useState } from "react";
-import { StyleSheet, View, useColorScheme } from "react-native";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  type ColorSchemeName,
+  StyleSheet,
+  View,
+  useColorScheme,
+} from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Uniwind } from "uniwind";
 
-import { colorsForScheme } from "@/src/lib/designTokens";
+import { type Scheme, colorsForScheme } from "@/src/lib/designTokens";
 import { useAuthHydration, useAuthStore } from "@/src/stores/useAuthStore";
 import {
+  type ThemePreference,
   useThemePreferenceHydration,
   useThemePreferenceStore,
 } from "@/src/stores/useThemePreferenceStore";
@@ -38,10 +44,21 @@ const queryClient = new QueryClient({
   },
 });
 
+function resolvedSchemeForPreference(
+  preference: ThemePreference,
+  systemScheme: ColorSchemeName,
+): Scheme {
+  if (preference === "light" || preference === "dark") {
+    return preference;
+  }
+
+  return systemScheme === "dark" ? "dark" : "light";
+}
+
 function ThemePreferenceSync() {
   const preference = useThemePreferenceStore((s) => s.preference);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     Uniwind.setTheme(preference);
   }, [preference]);
 
@@ -112,8 +129,11 @@ function QuerySessionSync() {
 }
 
 export default function RootLayout() {
-  const scheme = useColorScheme();
-  const colors = colorsForScheme(scheme);
+  const systemScheme = useColorScheme();
+  const themePreference = useThemePreferenceStore((s) => s.preference);
+  const colors = colorsForScheme(
+    resolvedSchemeForPreference(themePreference, systemScheme),
+  );
   const hasHydrated = useAuthHydration();
   const hasThemeHydrated = useThemePreferenceHydration();
   const [authResolved, setAuthResolved] = useState(false);
@@ -128,6 +148,12 @@ export default function RootLayout() {
     "JetBrainsMono-SemiBold": require("../assets/fonts/jetbrains/JetBrainsMono-SemiBold.ttf"),
   });
   const assetsReady = hasHydrated && hasThemeHydrated && (loaded || error);
+
+  useEffect(() => {
+    if (error) {
+      throw error;
+    }
+  }, [error]);
 
   useEffect(() => {
     if (assetsReady && authResolved) {
