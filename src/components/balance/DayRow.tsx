@@ -161,7 +161,7 @@ function TransactionLines({
             {cat.type === "entrada" ? (
               <Animated.View style={entradaFadeStyle}>
                 {hideEntrada ? (
-                  <Text className="font-mono-medium text-foreground text-base">
+                  <Text className="font-mono-medium text-foreground text-sm">
                     {PRIVACY_MASK}
                   </Text>
                 ) : (
@@ -327,7 +327,7 @@ export const DayRow = memo(function DayRow({
           {displayHidden ? (
             <Text
               style={{ color: colors.ink }}
-              className="font-mono-medium text-base"
+              className="font-mono-medium text-sm"
             >
               {PRIVACY_MASK}
             </Text>

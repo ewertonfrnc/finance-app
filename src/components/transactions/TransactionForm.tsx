@@ -7,7 +7,7 @@ import {
   Repeat,
   Tag,
 } from "lucide-react-native";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -24,25 +24,21 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CurrencyInput } from "@/src/components/ui/CurrencyInput";
-import { CurrencyText } from "@/src/components/ui/CurrencyText";
 import {
   DatePickerSheet,
   type DatePickerSheetRef,
 } from "@/src/components/ui/DatePickerSheet";
 import { TypeSelector } from "@/src/components/ui/TypeSelector";
-import { useBalanceQuery } from "@/src/features/saldos/hooks/useBalanceQuery";
 import { RecurrenceEndField } from "@/src/features/transactions/components/RecurrenceEndField";
 import { RecurrenceSelector } from "@/src/features/transactions/components/RecurrenceSelector";
 import { formatRecurrenceLabel } from "@/src/features/transactions/constants";
 import type {
-  DayBalance,
   FormValues,
   RecurrenceType,
   TransactionType,
 } from "@/src/features/transactions/types";
 import { formatBRL } from "@/src/lib/currency";
 import {
-  formatDayHeader,
   formatFullDate,
   formatIsoDate,
   formatWeekdayLong,
@@ -151,113 +147,6 @@ function recurrenceSummaryText(
   }
 
   return `Repete ${label} sem data final.`;
-}
-
-function parseBalanceMonth(date: string) {
-  const [year, month] = date.split("-").map(Number);
-  return { year, month };
-}
-
-function TransactionContextHeader({
-  date,
-  dayBalance,
-  isFetching,
-  mode,
-}: {
-  date: string;
-  dayBalance?: DayBalance;
-  isFetching: boolean;
-  mode: "new" | "edit";
-}) {
-  const scheme = useColorScheme();
-  const c = colorsForScheme(scheme);
-  const isToday = date === TODAY;
-  const isFuture = date > TODAY;
-  const statusLabel = isToday ? "HOJE" : isFuture ? "FUTURO" : "REGISTRADO";
-  const balanceLabel = isFuture ? "SALDO PREVISTO" : "SALDO DO DIA";
-  const hasBalance = dayBalance !== undefined;
-
-  return (
-    <View
-      style={{ backgroundColor: c.surface, borderColor: c.hair }}
-      className="rounded-card gap-4 border px-4 py-4"
-    >
-      <View className="flex-row items-start justify-between gap-3">
-        <View className="flex-1">
-          <Text className="text-muted text-label font-semibold tracking-widest">
-            {mode === "edit" ? "EDITANDO EM" : "LANÇAMENTO EM"}
-          </Text>
-          <Text className="text-foreground text-heading mt-1 font-bold">
-            {formatDayHeader(date)}
-          </Text>
-          <Text className="text-muted text-body-small mt-0.5 font-semibold tracking-wide">
-            {formatWeekdayLong(date)}
-          </Text>
-        </View>
-
-        <View
-          style={{
-            backgroundColor: isFuture ? c.greenTint : c.canvasBg,
-            borderColor: c.hairStrong,
-          }}
-          className="rounded-chip border px-2.5 py-1"
-        >
-          <Text
-            style={{ color: isFuture ? c.green : c.mute }}
-            className="text-label font-semibold tracking-widest"
-          >
-            {statusLabel}
-          </Text>
-        </View>
-      </View>
-
-      <View className="bg-separator h-px" />
-
-      <View className="flex-row items-start justify-between gap-3">
-        <View className="flex-1">
-          <Text className="text-muted text-label mb-1 font-semibold tracking-widest">
-            {balanceLabel}
-          </Text>
-          {dayBalance ? (
-            <CurrencyText
-              value={dayBalance.endBalance}
-              variant="regular"
-              numberOfLines={1}
-              adjustsFontSizeToFit
-            />
-          ) : (
-            <Text className="text-muted font-mono-medium text-base">
-              {isFetching ? "..." : "—"}
-            </Text>
-          )}
-        </View>
-
-        <View className="items-end">
-          <Text className="text-muted text-label mb-1 font-semibold tracking-widest">
-            ENTRADAS
-          </Text>
-          <CurrencyText
-            value={dayBalance?.income ?? 0}
-            variant="small"
-            sign="positive"
-            className={!hasBalance ? "opacity-45" : ""}
-          />
-        </View>
-
-        <View className="items-end">
-          <Text className="text-muted text-label mb-1 font-semibold tracking-widest">
-            SAÍDAS
-          </Text>
-          <CurrencyText
-            value={dayBalance?.totalSpending ?? 0}
-            variant="small"
-            sign="negative"
-            className={!hasBalance ? "opacity-45" : ""}
-          />
-        </View>
-      </View>
-    </View>
-  );
 }
 
 function TagSelectionField({
@@ -591,13 +480,6 @@ export function TransactionForm({
     string | undefined
   >(initialValues?.recurrenceEndDate);
   const [expandedDetail, setExpandedDetail] = useState<DetailId | null>(null);
-  const { year: balanceYear, month: balanceMonth } = parseBalanceMonth(date);
-  const { data: balanceDays = [], isFetching: isBalanceFetching } =
-    useBalanceQuery(balanceYear, balanceMonth);
-  const dayBalance = useMemo(
-    () => balanceDays.find((day) => day.date === date),
-    [balanceDays, date],
-  );
   const canSubmit = amountCents > 0 && description.trim().length > 0;
   const showRecurrenceDetail = mode === "new" || recurrence !== "none";
 
@@ -643,13 +525,6 @@ export function TransactionForm({
         showsVerticalScrollIndicator={false}
         contentContainerClassName="gap-6 pb-28"
       >
-        {/* <TransactionContextHeader
-          mode={mode}
-          date={date}
-          dayBalance={dayBalance}
-          isFetching={isBalanceFetching}
-        /> */}
-
         {header}
 
         {/* Valor */}
