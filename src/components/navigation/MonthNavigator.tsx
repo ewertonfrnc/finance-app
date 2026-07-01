@@ -8,7 +8,9 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react-native";
-import { Pressable, Text, View, useColorScheme } from "react-native";
+import { Text, View, useColorScheme } from "react-native";
+
+import { IconButton } from "../ui/IconButton";
 
 interface MonthNavigatorProps {
   onPrev?: () => void;
@@ -37,78 +39,47 @@ export function MonthNavigator({
   const handlePrev = onPrev ?? goToPrevMonth;
   const handleNext = onNext ?? goToNextMonth;
 
-  if (onCalendarPress) {
-    return (
-      <View className="flex-row items-center justify-between px-4 py-3">
-        <Pressable
-          onPress={onCalendarPress}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Calendar size={18} color={accentColor} />
-        </Pressable>
-
-        <View className="flex-row items-center gap-1">
-          <Pressable
-            onPress={handlePrev}
-            disabled={disabled}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <ChevronLeft size={20} color={navColor} />
-          </Pressable>
-          <Text className="text-foreground text-month px-2 font-semibold">
-            {formatMonthHeader(selectedYear, selectedMonth)}
-          </Text>
-          <Pressable
-            onPress={handleNext}
-            disabled={disabled}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <ChevronRight size={20} color={navColor} />
-          </Pressable>
-        </View>
-
-        {onToggleHide ? (
-          <Pressable
-            onPress={onToggleHide}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            {isHidden ? (
-              <EyeOff size={18} color={accentColor} />
-            ) : (
-              <Eye size={18} color={accentColor} />
-            )}
-          </Pressable>
-        ) : (
-          <View style={{ width: 18 }} />
-        )}
-      </View>
-    );
-  }
-
   return (
     <View className="flex-row items-center justify-between px-4 py-3">
-      <Pressable
-        onPress={handlePrev}
-        disabled={disabled}
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-      >
-        <ChevronLeft size={20} color={navColor} />
-      </Pressable>
+      {onCalendarPress ? (
+        <IconButton
+          Icon={Calendar}
+          color={accentColor}
+          size={18}
+          onPress={onCalendarPress}
+        />
+      ) : (
+        <View style={{ width: 18 }} />
+      )}
 
-      <View className="flex-row items-center gap-2">
-        <Calendar size={16} color={accentColor} />
-        <Text className="text-foreground text-month font-semibold">
+      <View className="flex-row items-center gap-1">
+        <IconButton
+          Icon={ChevronLeft}
+          color={navColor}
+          onPress={handlePrev}
+          disabled={disabled}
+        />
+        <Text className="text-foreground text-month px-2 font-semibold">
           {formatMonthHeader(selectedYear, selectedMonth)}
         </Text>
+        <IconButton
+          Icon={ChevronRight}
+          color={navColor}
+          onPress={handleNext}
+          disabled={disabled}
+        />
       </View>
 
-      <Pressable
-        onPress={handleNext}
-        disabled={disabled}
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-      >
-        <ChevronRight size={20} color={navColor} />
-      </Pressable>
+      {onToggleHide ? (
+        <IconButton
+          Icon={isHidden ? EyeOff : Eye}
+          color={accentColor}
+          size={18}
+          onPress={onToggleHide}
+        />
+      ) : (
+        <View style={{ width: 18 }} />
+      )}
     </View>
   );
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useWindowDimensions } from "react-native";
 import { Gesture, type GestureType } from "react-native-gesture-handler";
 import {
@@ -69,76 +69,76 @@ export function useHorizontalSwipe({
     [isTransitioning, enterFrom],
   );
 
-  const swipeGesture = Gesture.Pan()
-    .enabled(!isTransitioning)
-    .activeOffsetX([-16, 16])
-    .failOffsetY([-12, 12])
-    .onUpdate((event) => {
-      if (isNavigating.value) return;
-      translateX.value = Math.max(
-        -maxDrag,
-        Math.min(maxDrag, event.translationX),
-      );
-    })
-    .onEnd((event) => {
-      if (isNavigating.value) return;
+  const swipeGesture = useMemo(() => {
+    const gesture = Gesture.Pan()
+      .enabled(!isTransitioning)
+      .activeOffsetX([-16, 16])
+      .failOffsetY([-12, 12])
+      .onUpdate((event) => {
+        if (isNavigating.value) return;
+        translateX.value = Math.max(
+          -maxDrag,
+          Math.min(maxDrag, event.translationX),
+        );
+      })
+      .onEnd((event) => {
+        if (isNavigating.value) return;
 
-      const shouldGoNext =
-        event.translationX <= -swipeDistance ||
-        event.velocityX <= -SWIPE_VELOCITY;
-      const shouldGoPrev =
-        event.translationX >= swipeDistance ||
-        event.velocityX >= SWIPE_VELOCITY;
+        // +1 avança (next, sai pela esquerda), -1 volta (prev, sai pela direita), 0 sem troca.
+        const direction =
+          event.translationX <= -swipeDistance ||
+          event.velocityX <= -SWIPE_VELOCITY
+            ? 1
+            : event.translationX >= swipeDistance ||
+                event.velocityX >= SWIPE_VELOCITY
+              ? -1
+              : 0;
 
-      if (shouldGoNext) {
+        if (direction === 0) {
+          translateX.value = withSpring(0, SPRING);
+          return;
+        }
+
+        const onSwipe = direction === 1 ? onSwipeNext : onSwipePrev;
         isNavigating.value = true;
         scheduleOnRN(setIsTransitioning, true);
         translateX.value = withTiming(
-          -screenWidth,
+          -direction * screenWidth,
           EXIT_ANIMATION,
           (finished) => {
             if (finished) {
-              enterFrom.value = 1;
-              scheduleOnRN(onSwipeNext);
+              enterFrom.value = direction;
+              scheduleOnRN(onSwipe);
             } else {
               isNavigating.value = false;
               scheduleOnRN(setIsTransitioning, false);
             }
           },
         );
-        return;
-      }
+      })
+      .onFinalize(() => {
+        if (!isNavigating.value && translateX.value !== 0) {
+          translateX.value = withSpring(0, SPRING);
+        }
+      });
 
-      if (shouldGoPrev) {
-        isNavigating.value = true;
-        scheduleOnRN(setIsTransitioning, true);
-        translateX.value = withTiming(
-          screenWidth,
-          EXIT_ANIMATION,
-          (finished) => {
-            if (finished) {
-              enterFrom.value = -1;
-              scheduleOnRN(onSwipePrev);
-            } else {
-              isNavigating.value = false;
-              scheduleOnRN(setIsTransitioning, false);
-            }
-          },
-        );
-        return;
-      }
+    if (externalGestureToFail) {
+      gesture.requireExternalGestureToFail(externalGestureToFail);
+    }
 
-      translateX.value = withSpring(0, SPRING);
-    })
-    .onFinalize(() => {
-      if (!isNavigating.value && translateX.value !== 0) {
-        translateX.value = withSpring(0, SPRING);
-      }
-    });
-
-  if (externalGestureToFail) {
-    swipeGesture.requireExternalGestureToFail(externalGestureToFail);
-  }
+    return gesture;
+  }, [
+    isTransitioning,
+    maxDrag,
+    swipeDistance,
+    screenWidth,
+    onSwipeNext,
+    onSwipePrev,
+    externalGestureToFail,
+    enterFrom,
+    isNavigating,
+    translateX,
+  ]);
 
   const animatedContentStyle = useAnimatedStyle(() => {
     const distance = Math.abs(translateX.value);
