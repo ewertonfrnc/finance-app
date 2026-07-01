@@ -14,6 +14,7 @@ import {
 } from "react-native";
 
 import { Screen } from "@/src/components/ui/Screen";
+import { normalizeEmail } from "@/src/features/auth/lib/normalizeEmail";
 import { registerSchema } from "@/src/features/auth/schemas";
 import { colorsForScheme } from "@/src/lib/designTokens";
 import { useOnboardingStore } from "@/src/stores/useOnboardingStore";
@@ -32,8 +33,13 @@ export default function CadastroScreen() {
 
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
+  const normalizedEmail = normalizeEmail(email);
 
-  const parseResult = registerSchema.safeParse({ name, email, password });
+  const parseResult = registerSchema.safeParse({
+    name,
+    email: normalizedEmail,
+    password,
+  });
   const isValid = parseResult.success;
 
   const invalidFields =
@@ -54,7 +60,7 @@ export default function CadastroScreen() {
   function handleSubmit() {
     setSubmitted(true);
     if (!isValid) return;
-    setCredentials(name.trim(), email.trim().toLowerCase(), password);
+    setCredentials(name.trim(), normalizedEmail, password);
     router.push("/(onboarding)/saldo");
   }
 
@@ -118,6 +124,9 @@ export default function CadastroScreen() {
                 placeholder="seu@email.com"
                 placeholderTextColor={c.faint}
                 autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="email"
+                textContentType="username"
                 keyboardType="email-address"
                 returnKeyType="next"
                 onSubmitEditing={() => passwordRef.current?.focus()}
@@ -145,6 +154,10 @@ export default function CadastroScreen() {
                   onChangeText={setPassword}
                   placeholder="Mínimo 8 caracteres"
                   placeholderTextColor={c.faint}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="new-password"
+                  textContentType="newPassword"
                   secureTextEntry={!showPassword}
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit}

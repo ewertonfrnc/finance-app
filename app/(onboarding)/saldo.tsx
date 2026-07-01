@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { Redirect, useRouter } from "expo-router";
 import { Button } from "heroui-native";
 import { LoaderCircle } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
@@ -51,7 +51,9 @@ export default function SaldoScreen() {
     });
   }, [initialBalance, opacity]);
 
-  const firstName = name.split(" ")[0];
+  const hasCredentials = Boolean(name && email && password);
+  const firstName = name.trim().split(/\s+/)[0];
+  const rawBalanceValue = initialBalance === 0 ? "" : String(initialBalance);
 
   function handleChangeText(text: string) {
     const digits = text.replace(/\D/g, "");
@@ -59,6 +61,8 @@ export default function SaldoScreen() {
   }
 
   function handleConcluir() {
+    if (!hasCredentials || isPending) return;
+
     const registerPayload = {
       name,
       email,
@@ -74,6 +78,10 @@ export default function SaldoScreen() {
         router.replace("/(tabs)");
       },
     });
+  }
+
+  if (!hasCredentials) {
+    return <Redirect href="/(onboarding)/cadastro" />;
   }
 
   return (
@@ -92,7 +100,7 @@ export default function SaldoScreen() {
 
           <Text
             style={{ color: INK }}
-            className="mb-10 text-2xl font-semibold leading-snug"
+            className="mb-10 text-2xl leading-snug font-semibold"
           >
             E aí, quanto tem na conta nesse exato momento?
           </Text>
@@ -112,16 +120,17 @@ export default function SaldoScreen() {
             >
               {formatBRL(initialBalance)}
             </Animated.Text>
-            <View
-              style={{ backgroundColor: G.green }}
-              className="mt-2 h-0.5"
-            />
+            <View style={{ backgroundColor: G.green }} className="mt-2 h-0.5" />
             <TextInput
               ref={inputRef}
-              value={String(initialBalance)}
+              value={rawBalanceValue}
               onChangeText={handleChangeText}
               keyboardType="number-pad"
               caretHidden
+              selection={{
+                start: rawBalanceValue.length,
+                end: rawBalanceValue.length,
+              }}
               style={{ height: 0, width: 0, opacity: 0 }}
             />
           </Pressable>

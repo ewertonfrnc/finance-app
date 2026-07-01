@@ -1,7 +1,7 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { Button, useToast } from "heroui-native";
 import { ChevronLeft } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -83,7 +83,12 @@ export default function CategoryStepScreen() {
 
   const [value, setValue] = useState(current ? categories[current.slug] : 0);
 
-  if (!current) return null;
+  useEffect(() => {
+    if (!current) return;
+    setValue(categories[current.slug]);
+  }, [current, categories]);
+
+  if (!current) return <Redirect href="/(onboarding)" />;
 
   const isLast = currentIndex === STEPS.length - 1;
 
@@ -133,8 +138,7 @@ export default function CategoryStepScreen() {
               <View
                 key={i}
                 style={{
-                  backgroundColor:
-                    i <= currentIndex ? c.green : c.hair,
+                  backgroundColor: i <= currentIndex ? c.green : c.hair,
                   height: 6,
                   width: i === currentIndex ? 16 : 6,
                   borderRadius: 99,
