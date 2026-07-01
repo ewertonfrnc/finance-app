@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import { Chip } from "heroui-native";
 import { ChevronRight, X } from "lucide-react-native";
 import { useMemo } from "react";
 import {
@@ -82,7 +83,7 @@ export function TagField({
               selectedTags.map((t) => {
                 const tagColors = getTagColors(t.color, scheme);
                 return (
-                  <Pressable
+                  <Chip
                     key={t.id}
                     onPress={(e) => {
                       e.stopPropagation();
@@ -94,19 +95,19 @@ export function TagField({
                       borderColor: tagColors.dot,
                       borderWidth: 1,
                     }}
-                    className="min-h-7 flex-row items-center gap-1 rounded-full px-2 py-0.5"
+                    variant="tertiary"
+                    size="sm"
+                    className="min-h-7"
                   >
                     <View
                       style={{ backgroundColor: tagColors.dot }}
                       className="h-1.5 w-1.5 rounded-full"
                     />
-                    <Text
-                      className="text-foreground text-[10px] font-medium"
-                    >
+                    <Chip.Label className="text-foreground text-[10px] font-medium">
                       {t.name}
-                    </Text>
+                    </Chip.Label>
                     <X size={10} color={c.mute} />
-                  </Pressable>
+                  </Chip>
                 );
               })
             )}
@@ -130,7 +131,7 @@ export function TagField({
               const selected = selectedTagIds.includes(t.id);
               const tagColors = getTagColors(t.color, scheme);
               return (
-                <Pressable
+                <Chip
                   key={t.id}
                   onPress={() => toggleTag(t.id)}
                   style={{
@@ -138,16 +139,18 @@ export function TagField({
                     borderWidth: 1,
                     borderColor: selected ? tagColors.dot : c.hair,
                   }}
-                  className="flex-row items-center gap-1 rounded-full px-2.5 py-1"
+                  variant={selected ? "soft" : "secondary"}
+                  color={selected ? "accent" : "default"}
+                  size="sm"
                 >
                   <View
                     style={{ backgroundColor: tagColors.dot }}
                     className="h-1.5 w-1.5 rounded-full"
                   />
-                  <Text className="text-foreground text-xs font-medium">
+                  <Chip.Label className="text-foreground text-xs font-medium">
                     {t.name}
-                  </Text>
-                </Pressable>
+                  </Chip.Label>
+                </Chip>
               );
             })}
             <Pressable onPress={openPicker} hitSlop={8}>

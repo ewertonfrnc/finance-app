@@ -1,11 +1,11 @@
 import { useRouter } from "expo-router";
-import { ArrowLeft, Check, Plus, Search, X } from "lucide-react-native";
+import { SearchField } from "heroui-native";
+import { ArrowLeft, Check, Plus } from "lucide-react-native";
 import { useState } from "react";
 import {
   FlatList,
   Pressable,
   Text,
-  TextInput,
   View,
   useColorScheme,
 } from "react-native";
@@ -57,22 +57,17 @@ export default function TagPickScreen() {
         </Pressable>
       </View>
 
-      <View className="bg-surface-secondary border-separator mx-4 mb-2 flex-row items-center gap-2 rounded-xl border px-3 py-2.5">
-        <Search size={14} color={c.mute} />
-        <TextInput
-          value={search}
-          onChangeText={setSearch}
-          placeholder="Buscar tag..."
-          placeholderTextColor={c.mute}
-          className="text-foreground flex-1 text-sm"
-          autoCorrect={false}
-        />
-        {search.length > 0 && (
-          <Pressable onPress={() => setSearch("")} hitSlop={4}>
-            <X size={14} color={c.mute} />
-          </Pressable>
-        )}
-      </View>
+      <SearchField value={search} onChange={setSearch} className="mx-4 mb-2">
+        <SearchField.Group>
+          <SearchField.SearchIcon iconProps={{ size: 14, color: c.mute }} />
+          <SearchField.Input
+            accessibilityLabel="Buscar tag"
+            placeholder="Buscar tag..."
+            autoCorrect={false}
+          />
+          <SearchField.ClearButton iconProps={{ size: 14, color: c.mute }} />
+        </SearchField.Group>
+      </SearchField>
 
       <Pressable
         onPress={() => set([])}

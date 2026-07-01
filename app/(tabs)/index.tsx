@@ -1,7 +1,7 @@
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
+import { Tabs } from "heroui-native";
 import { useCallback, useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -14,10 +14,15 @@ import { MonthNavigator } from "@/src/components/navigation/MonthNavigator";
 import { Screen } from "@/src/components/ui/Screen";
 import { useDailyBalances } from "@/src/features/saldos/hooks/useDailyBalances";
 import { usePrefetchAdjacentBalances } from "@/src/features/saldos/hooks/usePrefetchAdjacentBalances";
-import { useTabIndicator } from "@/src/features/saldos/hooks/useTabIndicator";
 import { DAY_FILTER_OPTIONS } from "@/src/features/transactions/constants";
 import { useDateStore } from "@/src/stores/useDateStore";
 import { usePrivacyStore } from "@/src/stores/usePrivacyStore";
+
+const ALL_FILTER_VALUE = "todas";
+
+function getFilterTabValue(index: number) {
+  return DAY_FILTER_OPTIONS[index]?.value ?? ALL_FILTER_VALUE;
+}
 
 function useMonthFade(resetKey: string) {
   const opacity = useSharedValue(1);
@@ -52,13 +57,13 @@ export default function SaldosScreen() {
   } = useDailyBalances(selectedYear, selectedMonth);
   usePrefetchAdjacentBalances(selectedYear, selectedMonth);
   const router = useRouter();
-  const {
-    activeIndex: filterIndex,
-    indicatorStyle,
-    selectTab,
-    onTabLayout,
-  } = useTabIndicator();
-  const filter = DAY_FILTER_OPTIONS[filterIndex];
+  const [filterTabValue, setFilterTabValue] = useState(() =>
+    getFilterTabValue(0),
+  );
+  const filter =
+    DAY_FILTER_OPTIONS.find(
+      (opt) => (opt.value ?? ALL_FILTER_VALUE) === filterTabValue,
+    ) ?? DAY_FILTER_OPTIONS[0];
 
   const { hideValues, toggleHideValues } = usePrivacyStore();
 
@@ -96,26 +101,27 @@ export default function SaldosScreen() {
 
       {/* <BalanceSummaryHeader summary={monthSummary} /> */}
 
-      <View className="border-separator flex-row justify-between border-b px-4 pt-2">
-        <Animated.View
-          style={indicatorStyle}
-          className="bg-accent absolute bottom-0 left-0 h-0.5"
-        />
-        {DAY_FILTER_OPTIONS.map((opt, index) => (
-          <Pressable
-            key={opt.label}
-            onPress={() => selectTab(index)}
-            className="items-center pb-1"
-            onLayout={(e) => onTabLayout(index, e)}
-          >
-            <Text
-              className={`text-sm font-medium ${filterIndex === index ? "text-accent" : "text-muted"}`}
+      <Tabs
+        value={filterTabValue}
+        onValueChange={setFilterTabValue}
+        variant="secondary"
+        className="border-separator border-b px-4 pt-2"
+      >
+        <Tabs.List className="w-full justify-between border-b-0">
+          <Tabs.Indicator className="border-accent" />
+          {DAY_FILTER_OPTIONS.map((opt, index) => (
+            <Tabs.Trigger
+              key={opt.label}
+              value={getFilterTabValue(index)}
+              className="px-0 pt-0 pb-1"
             >
-              {opt.label}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
+              <Tabs.Label className="text-sm font-medium">
+                {opt.label}
+              </Tabs.Label>
+            </Tabs.Trigger>
+          ))}
+        </Tabs.List>
+      </Tabs>
 
       <Animated.View
         className="flex-1"

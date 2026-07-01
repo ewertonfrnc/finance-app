@@ -1,12 +1,11 @@
 import { useFocusEffect, useRouter } from "expo-router";
-import { useToast } from "heroui-native";
-import { ArrowUpDown, Plus, Search } from "lucide-react-native";
+import { SearchField, useToast } from "heroui-native";
+import { ArrowUpDown, Plus } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FlatList,
   Pressable,
   Text,
-  TextInput,
   View,
   useColorScheme,
 } from "react-native";
@@ -239,12 +238,12 @@ export default function TagsScreen() {
 
         <View
           style={{ backgroundColor: colors.surface, borderColor: colors.hair }}
-          className="rounded-2xl border px-4 py-3"
+          className="rounded-2xl border px-4 py-4"
         >
           <Text className="text-muted text-label font-semibold tracking-widest">
             CATEGORIZADO NO MÊS
           </Text>
-          <View className="mt-1 flex-row items-end justify-between gap-4">
+          <View className="mt-3 flex-row items-end justify-between gap-5">
             <View className="flex-1">
               <CurrencyText
                 value={summary.total}
@@ -252,19 +251,19 @@ export default function TagsScreen() {
                 variant="large"
                 className="text-foreground"
               />
-              <Text className="text-muted mt-1 text-xs">
+              <Text className="text-muted mt-2 text-xs">
                 {summary.activeTags === 1
                   ? "1 tag com movimento"
                   : `${summary.activeTags} tags com movimento`}
               </Text>
             </View>
 
-            <View className="items-end">
+            <View className="min-w-28 items-end pb-0.5">
               <Text className="text-muted text-label font-semibold tracking-widest">
                 TOP TAG
               </Text>
               <Text
-                className="text-foreground mt-1 max-w-32 text-right text-sm font-semibold"
+                className="text-foreground mt-2 max-w-32 text-right text-sm font-semibold"
                 numberOfLines={1}
               >
                 {summary.topTag?.name ?? "Sem uso"}
@@ -281,19 +280,17 @@ export default function TagsScreen() {
           </View>
         </View>
 
-        <View className="bg-surface-secondary border-separator flex-row items-center gap-2 rounded-xl border px-3">
-          <Search size={16} color={iconColor} />
-          <TextInput
-            className="text-foreground flex-1 py-2.5 text-sm"
-            placeholder="Filtrar tags"
-            placeholderTextColor={iconColor}
-            value={search}
-            onChangeText={setSearch}
-            autoCorrect={false}
-            autoCapitalize="none"
-            returnKeyType="search"
-          />
-        </View>
+        <SearchField value={search} onChange={setSearch}>
+          <SearchField.Group>
+            <SearchField.SearchIcon iconProps={{ color: iconColor }} />
+            <SearchField.Input
+              placeholder="Filtrar tags"
+              autoCorrect={false}
+              autoCapitalize="none"
+            />
+            <SearchField.ClearButton iconProps={{ color: iconColor }} />
+          </SearchField.Group>
+        </SearchField>
       </View>
 
       {showEmpty ? (

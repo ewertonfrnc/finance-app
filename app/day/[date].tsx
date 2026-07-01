@@ -1,6 +1,6 @@
 import { format, parseISO } from "date-fns";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Separator, useToast } from "heroui-native";
+import { Chip, Separator, useToast } from "heroui-native";
 import { ListFilter, Plus, ReceiptText } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
@@ -17,7 +17,6 @@ import Animated from "react-native-reanimated";
 import { useHorizontalSwipe } from "@/src/components/gestures/useHorizontalSwipe";
 import { DayNavigator } from "@/src/components/navigation/DayNavigator";
 import { TransactionItem } from "@/src/components/transactions/TransactionItem";
-import { Chip } from "@/src/components/ui/Chip";
 import { CurrencyText } from "@/src/components/ui/CurrencyText";
 import { Screen } from "@/src/components/ui/Screen";
 import { useBalanceQuery } from "@/src/features/saldos/hooks/useBalanceQuery";
@@ -440,13 +439,16 @@ export default function DayScreen() {
             {FILTER_OPTIONS.map((opt) => (
               <Chip
                 key={opt.label}
-                label={opt.label}
-                selected={selectedType === opt.value}
+                variant={selectedType === opt.value ? "primary" : "secondary"}
+                color={selectedType === opt.value ? "accent" : "default"}
+                size="md"
                 onPress={() => {
                   if (isTransitioning) return;
                   setSelectedType(opt.value);
                 }}
-              />
+              >
+                {opt.label}
+              </Chip>
             ))}
           </ScrollView>
         </GestureDetector>

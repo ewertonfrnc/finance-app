@@ -1,4 +1,5 @@
-import { Pressable, ScrollView, Text } from "react-native";
+import { Chip } from "heroui-native";
+import { ScrollView } from "react-native";
 
 import type { RecurrenceType } from "@/src/features/transactions/types";
 
@@ -30,23 +31,17 @@ export function RecurrenceSelector({
         const active = value === option.value;
 
         return (
-          <Pressable
+          <Chip
             key={option.value}
             onPress={() => onChange(option.value)}
-            className={`flex-row items-center rounded-full px-3 py-1.5 ${
-              active
-                ? "bg-ds-green-tint border border-ds-hair-strong"
-                : "bg-surface border border-surface-tertiary"
-            }`}
+            variant={active ? "soft" : "secondary"}
+            color={active ? "accent" : "default"}
+            size="md"
           >
-            <Text
-              className={`text-xs font-medium ${
-                active ? "text-ds-green" : "text-muted"
-              }`}
-            >
+            <Chip.Label className="text-xs font-medium">
               {option.label}
-            </Text>
-          </Pressable>
+            </Chip.Label>
+          </Chip>
         );
       })}
     </ScrollView>

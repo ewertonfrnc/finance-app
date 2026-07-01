@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { AccordionLayoutTransition } from "heroui-native";
+import { AccordionLayoutTransition, Chip, Input } from "heroui-native";
 import {
   ArrowLeft,
   Calendar,
@@ -12,7 +12,6 @@ import {
   KeyboardAvoidingView,
   Pressable,
   Text,
-  TextInput,
   View,
   useColorScheme,
 } from "react-native";
@@ -371,24 +370,27 @@ function AmountSection({
 
       <View className="flex-row flex-wrap gap-2">
         {QUICK_AMOUNTS.map((amount) => (
-          <Pressable
+          <Chip
             key={amount}
             onPress={() => onValueChange(value + amount)}
             style={{
               backgroundColor: typeColors.bg,
               borderColor: typeColors.dot,
+              borderWidth: 1,
             }}
-            className="rounded-control min-h-10 flex-1 basis-[22%] items-center justify-center border px-2"
+            variant="tertiary"
+            size="lg"
+            className="rounded-control min-h-10 flex-1 basis-[22%]"
           >
-            <Text
+            <Chip.Label
               style={{ color: typeColors.ink }}
               className="text-sm font-semibold"
               numberOfLines={1}
               adjustsFontSizeToFit
             >
               +{formatBRL(amount).replace("R$", "").trim()}
-            </Text>
-          </Pressable>
+            </Chip.Label>
+          </Chip>
         ))}
       </View>
     </View>
@@ -661,15 +663,15 @@ export function TransactionForm({
           <Text className="text-muted text-label font-semibold tracking-widest">
             DESCRIÇÃO
           </Text>
-          <TextInput
+          <Input
             value={description}
             onChangeText={setDescription}
             placeholder="Onde foi parar essa grana?"
-            placeholderTextColor="#9ca3af"
             maxLength={200}
             returnKeyType="done"
             scrollEnabled={false}
-            className="text-foreground border-surface-tertiary text-input min-h-11 border-b-2 py-2 font-medium"
+            variant="secondary"
+            className="text-input border-surface-tertiary min-h-11 rounded-none border-x-0 border-t-0 border-b-2 bg-transparent px-0 py-2 font-medium"
           />
           <Text className="text-muted self-end text-xs">
             {description.length}/200

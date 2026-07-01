@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
-import { ListGroup, Switch } from "heroui-native";
+import { Button, Dialog, ListGroup, Switch } from "heroui-native";
 import { LogOut, Moon } from "lucide-react-native";
+import { useState } from "react";
 import { Text, View } from "react-native";
 import { Uniwind, useUniwind } from "uniwind";
 
@@ -13,6 +14,7 @@ import {
 } from "@/src/stores/useThemePreferenceStore";
 
 export default function MenuScreen() {
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const setThemePreference = useThemePreferenceStore((s) => s.setPreference);
   const { theme } = useUniwind();
@@ -26,6 +28,7 @@ export default function MenuScreen() {
   }
 
   function handleLogout() {
+    setShowLogoutConfirm(false);
     clearAuth();
     router.replace("/(onboarding)");
   }
@@ -49,9 +52,14 @@ export default function MenuScreen() {
           >
             APARÊNCIA
           </Text>
-          <ListGroup variant="default" className="border-ds-hair rounded-card border">
+          <ListGroup
+            variant="default"
+            className="border-ds-hair rounded-card border"
+          >
             <ListGroup.Item
-              onPress={() => updateThemePreference(isDarkMode ? "light" : "dark")}
+              onPress={() =>
+                updateThemePreference(isDarkMode ? "light" : "dark")
+              }
               className="min-h-16 px-4 py-3"
             >
               <ListGroup.ItemPrefix className="mr-3">
@@ -109,8 +117,14 @@ export default function MenuScreen() {
           >
             CONTA
           </Text>
-          <ListGroup variant="default" className="border-ds-hair rounded-card border">
-            <ListGroup.Item onPress={handleLogout} className="min-h-16 px-4 py-3">
+          <ListGroup
+            variant="default"
+            className="border-ds-hair rounded-card border"
+          >
+            <ListGroup.Item
+              onPress={() => setShowLogoutConfirm(true)}
+              className="min-h-16 px-4 py-3"
+            >
               <ListGroup.ItemPrefix className="mr-3">
                 <View
                   style={{
@@ -139,6 +153,43 @@ export default function MenuScreen() {
               </ListGroup.ItemContent>
             </ListGroup.Item>
           </ListGroup>
+
+          <Dialog
+            isOpen={showLogoutConfirm}
+            onOpenChange={setShowLogoutConfirm}
+          >
+            <Dialog.Portal>
+              <Dialog.Overlay />
+              <Dialog.Content className="rounded-card border-ds-red-ring bg-surface mx-6 gap-4 border p-5">
+                <View className="gap-2">
+                  <Dialog.Title className="text-foreground text-lg font-bold">
+                    Encerrar sessão?
+                  </Dialog.Title>
+                  <Dialog.Description className="text-muted text-sm leading-5">
+                    Você volta para a entrada do app e precisará fazer login
+                    novamente.
+                  </Dialog.Description>
+                </View>
+
+                <View className="flex-row justify-end gap-2">
+                  <Button
+                    variant="tertiary"
+                    size="sm"
+                    onPress={() => setShowLogoutConfirm(false)}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    variant="danger-soft"
+                    size="sm"
+                    onPress={handleLogout}
+                  >
+                    Sair
+                  </Button>
+                </View>
+              </Dialog.Content>
+            </Dialog.Portal>
+          </Dialog>
         </View>
       </View>
     </Screen>
