@@ -57,6 +57,7 @@ interface TransactionFormProps {
   isDeleting?: boolean;
   onTagPress?: () => void;
   tagSummary?: string;
+  errorMessage?: string;
   header?: React.ReactNode;
   children?: React.ReactNode;
 }
@@ -451,6 +452,7 @@ export function TransactionForm({
   isDeleting = false,
   onTagPress,
   tagSummary = "Sem tag",
+  errorMessage,
   header,
   children,
 }: TransactionFormProps) {
@@ -584,6 +586,12 @@ export function TransactionForm({
         ) : null}
 
         {children}
+
+        {errorMessage ? (
+          <View className="bg-danger/10 rounded-xl px-4 py-3">
+            <Text className="text-danger text-sm">{errorMessage}</Text>
+          </View>
+        ) : null}
       </Animated.ScrollView>
 
       {/* Footer */}

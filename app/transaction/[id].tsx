@@ -22,9 +22,10 @@ import type {
   FormValues,
   RecurrenceScope,
 } from "@/src/features/transactions/types";
-import { useDateStore } from "@/src/stores/useDateStore";
+import { isIsoDate } from "@/src/lib/date";
 import { queryKeys } from "@/src/lib/queryKeys";
 import { useAuthStore } from "@/src/stores/useAuthStore";
+import { useDateStore } from "@/src/stores/useDateStore";
 import { useTagPickerStore } from "@/src/stores/useTagPickerStore";
 
 export default function EditTransactionScreen() {
@@ -39,8 +40,18 @@ export default function EditTransactionScreen() {
 
   const { data: transaction, isLoading } = useTransaction(id);
   const { data: tags = [] } = useTags(selectedYear, selectedMonth);
-  const { mutate: update, isPending: isUpdating } = useUpdateTransaction();
-  const { mutate: remove, isPending: isDeleting } = useDeleteTransaction();
+  const {
+    mutate: update,
+    isPending: isUpdating,
+    error: updateError,
+    reset: resetUpdate,
+  } = useUpdateTransaction();
+  const {
+    mutate: remove,
+    isPending: isDeleting,
+    error: deleteError,
+    reset: resetDelete,
+  } = useDeleteTransaction();
   const invalidate = useInvalidateTransactionData();
   const invalidateTags = useInvalidateTagData();
 
@@ -51,8 +62,13 @@ export default function EditTransactionScreen() {
   const [showEditSheet, setShowEditSheet] = useState(false);
   const [pendingValues, setPendingValues] = useState<FormValues | null>(null);
 
-  const isRecurring = Boolean(transaction && transaction.recurrence !== "none");
-  const effectiveOccurrenceDate = occurrenceDate ?? transaction?.date;
+  const routeOccurrenceDate =
+    typeof occurrenceDate === "string" && isIsoDate(occurrenceDate)
+      ? occurrenceDate
+      : undefined;
+  const effectiveOccurrenceDate = routeOccurrenceDate ?? transaction?.date;
+  const isRecurring = Boolean(transaction?.seriesId);
+  const mutationError = updateError ?? deleteError;
 
   useEffect(() => {
     if (transaction && !tagsInitialized.current) {
@@ -66,6 +82,7 @@ export default function EditTransactionScreen() {
   useTagPickerSync(tagsInitialized, setSelectedTagIds);
 
   function submitUpdate(values: FormValues, scope?: RecurrenceScope) {
+    resetUpdate();
     update(
       {
         id,
@@ -80,7 +97,9 @@ export default function EditTransactionScreen() {
           tags: selectedTagIds,
           // Escopo viaja no CORPO do PATCH (≠ delete, que usa query).
           // instance_date = data da ocorrência da rota, não a do template.
-          ...(scope ? { scope, instance_date: effectiveOccurrenceDate } : {}),
+          ...(scope
+            ? { scope, instance_date: effectiveOccurrenceDate ?? values.date }
+            : {}),
         },
       },
       {
@@ -122,6 +141,7 @@ export default function EditTransactionScreen() {
   }
 
   function handleDelete() {
+    resetDelete();
     if (isRecurring) {
       setShowDeleteSheet(true);
       return;
@@ -130,7 +150,10 @@ export default function EditTransactionScreen() {
   }
 
   function handleDeleteWithScope(scope: RecurrenceScope) {
+    resetDelete();
     // date = a ocorrência da rota; nunca transaction.date (template).
+    if (!effectiveOccurrenceDate) return;
+
     remove(
       { id, params: { scope, date: effectiveOccurrenceDate } },
       {
@@ -170,7 +193,7 @@ export default function EditTransactionScreen() {
           type: transaction.type,
           amountCents: transaction.amount,
           description: transaction.description,
-          date: transaction.date,
+          date: effectiveOccurrenceDate,
           recurrence: transaction.recurrence,
           recurrenceEndDate: transaction.recurrenceEndDate,
         }}
@@ -178,6 +201,7 @@ export default function EditTransactionScreen() {
         onDelete={handleDelete}
         isLoading={isUpdating}
         isDeleting={isDeleting}
+        errorMessage={mutationError?.message}
         tagSummary={tagSummary}
         onTagPress={handleTagPress}
         header={

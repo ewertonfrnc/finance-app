@@ -20,7 +20,12 @@ export default function NewTransactionScreen() {
     tagId?: string;
   }>();
   const router = useRouter();
-  const { mutate: create, isPending } = useCreateTransaction();
+  const {
+    mutate: create,
+    isPending,
+    error: createError,
+    reset: resetCreate,
+  } = useCreateTransaction();
   const invalidate = useInvalidateTransactionData();
   const invalidateTags = useInvalidateTagData();
   const { selectedYear, selectedMonth } = useDateStore();
@@ -50,6 +55,7 @@ export default function NewTransactionScreen() {
   }
 
   function handleSubmit(values: FormValues) {
+    resetCreate();
     create(
       {
         type: values.type,
@@ -76,6 +82,7 @@ export default function NewTransactionScreen() {
         initialValues={{ date: initialDate }}
         onSubmit={handleSubmit}
         isLoading={isPending}
+        errorMessage={createError?.message}
         tagSummary={tagSummary}
         onTagPress={handleTagPress}
       />
