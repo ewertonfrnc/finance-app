@@ -15,12 +15,14 @@ import {
 import { Screen } from "@/src/components/ui/Screen";
 import { colorsForScheme, DS_COLORS } from "@/src/lib/designTokens";
 import { forgotPasswordSchema } from "@/src/features/auth/schemas";
+import { normalizeEmail } from "@/src/features/auth/lib/normalizeEmail";
 import { useForgotPassword } from "@/src/features/auth/hooks/useForgotPassword";
 import { Button } from "heroui-native";
 
 type Status = "idle" | "sent";
 const SUCCESS_COLORS = DS_COLORS.dark;
 const SUCCESS_BUTTON = DS_COLORS.light.bg;
+const RESEND_DELAY_SECONDS = 47;
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -30,19 +32,22 @@ export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
-  const [countdown, setCountdown] = useState(47);
+  const [countdown, setCountdown] = useState(RESEND_DELAY_SECONDS);
 
   const inputRef = useRef<TextInput>(null);
   const {
     mutate: sendForgotPassword,
     isPending,
     error: sendError,
+    reset: resetForgotPassword,
   } = useForgotPassword();
 
-  const parseResult = forgotPasswordSchema.safeParse({ email });
+  const normalizedEmail = normalizeEmail(email);
+  const parseResult = forgotPasswordSchema.safeParse({
+    email: normalizedEmail,
+  });
   const isValid = parseResult.success;
-  const emailError =
-    submitted && !isValid ? "Informe um e-mail válido" : null;
+  const emailError = submitted && !isValid ? "Informe um e-mail válido" : null;
 
   useEffect(() => {
     if (status !== "sent" || countdown <= 0) return;
@@ -56,11 +61,11 @@ export default function ForgotPasswordScreen() {
     setSubmitted(true);
     if (!isValid || isPending) return;
     sendForgotPassword(
-      { email: email.trim().toLowerCase() },
+      { email: normalizedEmail },
       {
         onSuccess: () => {
           setStatus("sent");
-          setCountdown(47);
+          setCountdown(RESEND_DELAY_SECONDS);
         },
       },
     );
@@ -69,9 +74,9 @@ export default function ForgotPasswordScreen() {
   function handleResend() {
     if (!canResend || isPending) return;
     sendForgotPassword(
-      { email: email.trim().toLowerCase() },
+      { email: normalizedEmail },
       {
-        onSuccess: () => setCountdown(47),
+        onSuccess: () => setCountdown(RESEND_DELAY_SECONDS),
       },
     );
   }
@@ -80,6 +85,7 @@ export default function ForgotPasswordScreen() {
     setStatus("idle");
     setEmail("");
     setSubmitted(false);
+    if (sendError) resetForgotPassword();
     setTimeout(() => inputRef.current?.focus(), 100);
   }
 
@@ -129,7 +135,7 @@ export default function ForgotPasswordScreen() {
               marginBottom: 24,
             }}
           >
-            {email}
+            {normalizedEmail}
           </Text>
 
           {/* Info box */}
@@ -141,7 +147,9 @@ export default function ForgotPasswordScreen() {
             }}
           >
             <View className="flex-row items-start gap-3">
-              <Text style={{ color: SUCCESS_COLORS.mute, marginTop: 1 }}>•</Text>
+              <Text style={{ color: SUCCESS_COLORS.mute, marginTop: 1 }}>
+                •
+              </Text>
               <Text
                 style={{ color: SUCCESS_COLORS.mute, fontSize: 14, flex: 1 }}
               >
@@ -153,6 +161,14 @@ export default function ForgotPasswordScreen() {
               </Text>
             </View>
           </View>
+
+          {sendError && (
+            <View className="bg-danger/10 mt-4 rounded-xl px-4 py-3">
+              <Text className="text-danger text-sm">
+                Não foi possível conectar. Tente novamente.
+              </Text>
+            </View>
+          )}
         </ScrollView>
 
         {/* Rodapé */}
@@ -253,10 +269,14 @@ export default function ForgotPasswordScreen() {
               onChangeText={(v) => {
                 setEmail(v);
                 if (submitted) setSubmitted(false);
+                if (sendError) resetForgotPassword();
               }}
               placeholder="voce@email.com"
               placeholderTextColor={colors.mute}
               autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              textContentType="username"
               keyboardType="email-address"
               returnKeyType="send"
               onSubmitEditing={handleSend}
@@ -282,15 +302,11 @@ export default function ForgotPasswordScreen() {
         <View className="gap-3 px-6 pb-4">
           <Button
             onPress={handleSend}
-            isDisabled={!isValid || isPending}
-            className={`h-14 rounded-4xl ${isValid ? "bg-ds-canvas-bg" : "bg-surface-tertiary"}`}
+            isDisabled={isPending}
+            className="bg-ds-canvas-bg h-14 rounded-4xl"
           >
             <Button.Label>
-              <Text
-                className={`font-semibold ${isValid ? "text-foreground" : "text-muted"}`}
-              >
-                Enviar link
-              </Text>
+              <Text className="text-foreground font-semibold">Enviar link</Text>
             </Button.Label>
           </Button>
 

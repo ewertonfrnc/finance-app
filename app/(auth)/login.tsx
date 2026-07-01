@@ -15,6 +15,7 @@ import Animated from "react-native-reanimated";
 
 import { Screen } from "@/src/components/ui/Screen";
 import { useLogin } from "@/src/features/auth/hooks/useLogin";
+import { normalizeEmail } from "@/src/features/auth/lib/normalizeEmail";
 import { colorsForScheme } from "@/src/lib/designTokens";
 import { loginSchema } from "@/src/features/auth/schemas";
 import { useSpinAnimation } from "@/src/lib/animations";
@@ -25,7 +26,7 @@ export default function LoginScreen() {
   const scheme = useColorScheme();
   const colors = colorsForScheme(scheme);
   const muteColor = colors.mute;
-  const { mutate: login, isPending, error } = useLogin();
+  const { mutate: login, isPending, error, reset: resetLogin } = useLogin();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,8 +34,12 @@ export default function LoginScreen() {
   const [submitted, setSubmitted] = useState(false);
 
   const passwordRef = useRef<TextInput>(null);
+  const normalizedEmail = normalizeEmail(email);
 
-  const parseResult = loginSchema.safeParse({ email, password });
+  const parseResult = loginSchema.safeParse({
+    email: normalizedEmail,
+    password,
+  });
   const isValid = parseResult.success;
 
   const invalidFields =
@@ -53,9 +58,19 @@ export default function LoginScreen() {
     setSubmitted(true);
     if (!isValid || isPending) return;
     login(
-      { email: email.trim().toLowerCase(), password },
+      { email: normalizedEmail, password },
       { onSuccess: () => router.replace("/(tabs)") },
     );
+  }
+
+  function handleEmailChange(value: string) {
+    setEmail(value);
+    if (error) resetLogin();
+  }
+
+  function handlePasswordChange(value: string) {
+    setPassword(value);
+    if (error) resetLogin();
   }
 
   const spinStyle = useSpinAnimation(isPending);
@@ -90,10 +105,13 @@ export default function LoginScreen() {
               </Text>
               <TextInput
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={handleEmailChange}
                 placeholder="seu@email.com"
                 placeholderTextColor={muteColor}
                 autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="email"
+                textContentType="username"
                 keyboardType="email-address"
                 returnKeyType="next"
                 onSubmitEditing={() => passwordRef.current?.focus()}
@@ -118,9 +136,13 @@ export default function LoginScreen() {
                 <TextInput
                   ref={passwordRef}
                   value={password}
-                  onChangeText={setPassword}
+                  onChangeText={handlePasswordChange}
                   placeholder="Sua senha"
                   placeholderTextColor={muteColor}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="current-password"
+                  textContentType="password"
                   secureTextEntry={!showPassword}
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit}

@@ -40,13 +40,25 @@ const STRENGTH_LABELS: Record<PasswordStrength, string> = {
 const SUCCESS_COLORS = DS_COLORS.dark;
 const SUCCESS_BUTTON = DS_COLORS.light.bg;
 
+function getSingleParam(value: string | string[] | undefined) {
+  if (Array.isArray(value)) return value[0] ?? "";
+  return value ?? "";
+}
+
 export default function ResetPasswordScreen() {
-  const { token } = useLocalSearchParams<{ token: string }>();
+  const { token: tokenParam } = useLocalSearchParams<{
+    token?: string | string[];
+  }>();
   const router = useRouter();
   const scheme = useColorScheme();
   const colors = colorsForScheme(scheme);
 
-  const { mutate: doReset, isPending, error: resetError } = useResetPassword();
+  const {
+    mutate: doReset,
+    isPending,
+    error: resetError,
+    reset: resetResetPassword,
+  } = useResetPassword();
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -56,16 +68,49 @@ export default function ResetPasswordScreen() {
   const [success, setSuccess] = useState(false);
 
   const confirmRef = useRef<TextInput>(null);
+  const token = getSingleParam(tokenParam);
+  const hasToken = token.length > 0;
 
-  const parseResult = resetPasswordSchema.safeParse({ password, confirmPassword });
-  const isValid = parseResult.success;
+  const parseResult = resetPasswordSchema.safeParse({
+    password,
+    confirmPassword,
+  });
+  const isValid = hasToken && parseResult.success;
 
-  const confirmError =
-    (submitted || confirmPassword.length > 0) &&
+  const invalidFields =
+    submitted && !parseResult.success
+      ? new Set(parseResult.error.issues.map((i) => i.path[0]))
+      : new Set();
+
+  const passwordError = invalidFields.has("password")
+    ? password.length === 0
+      ? "Informe a nova senha."
+      : password.length > 72
+        ? "Máximo 72 caracteres."
+        : "Mínimo 8 caracteres."
+    : null;
+
+  const showConfirmMismatch =
     password.length > 0 &&
     confirmPassword.length > 0 &&
-    password !== confirmPassword
-      ? "As senhas não batem."
+    password !== confirmPassword;
+  const confirmError = showConfirmMismatch
+    ? "As senhas não batem."
+    : invalidFields.has("confirmPassword")
+      ? confirmPassword.length === 0
+        ? "Confirme sua senha."
+        : "As senhas não batem."
+      : null;
+  const resetErrorText = resetError?.message.toLowerCase() ?? "";
+  const resetErrorMessage = !hasToken
+    ? "O link expirou. Solicite um novo."
+    : resetError
+      ? resetErrorText.includes("unauthorized") ||
+        resetErrorText.includes("invalid") ||
+        resetErrorText.includes("expired") ||
+        resetErrorText.includes("401")
+        ? "O link expirou. Solicite um novo."
+        : "Não foi possível conectar. Tente novamente."
       : null;
 
   const strength = password.length > 0 ? getStrength(password) : null;
@@ -80,10 +125,19 @@ export default function ResetPasswordScreen() {
   function handleSubmit() {
     setSubmitted(true);
     if (!isValid || isPending) return;
-    doReset(
-      { token: token ?? "", password },
-      { onSuccess: () => setSuccess(true) },
-    );
+    doReset({ token, password }, { onSuccess: () => setSuccess(true) });
+  }
+
+  function handlePasswordChange(value: string) {
+    setPassword(value);
+    if (submitted) setSubmitted(false);
+    if (resetError) resetResetPassword();
+  }
+
+  function handleConfirmPasswordChange(value: string) {
+    setConfirmPassword(value);
+    if (submitted) setSubmitted(false);
+    if (resetError) resetResetPassword();
   }
 
   if (success) {
@@ -94,7 +148,11 @@ export default function ResetPasswordScreen() {
             className="mb-8 h-16 w-16 items-center justify-center rounded-full"
             style={{ backgroundColor: SUCCESS_COLORS.greenTint }}
           >
-            <CheckCircle size={30} color={SUCCESS_COLORS.green} strokeWidth={1.8} />
+            <CheckCircle
+              size={30}
+              color={SUCCESS_COLORS.green}
+              strokeWidth={1.8}
+            />
           </View>
 
           <Text
@@ -116,7 +174,8 @@ export default function ResetPasswordScreen() {
               lineHeight: 22,
             }}
           >
-            Tudo certo. Agora é só entrar com a sua senha nova e continuar de onde parou.
+            Tudo certo. Agora é só entrar com a sua senha nova e continuar de
+            onde parou.
           </Text>
         </View>
 
@@ -127,7 +186,10 @@ export default function ResetPasswordScreen() {
             className="h-14 rounded-4xl"
           >
             <Button.Label>
-              <Text style={{ color: SUCCESS_COLORS.greenDeep }} className="font-semibold">
+              <Text
+                style={{ color: SUCCESS_COLORS.greenDeep }}
+                className="font-semibold"
+              >
                 Entrar agora
               </Text>
             </Button.Label>
@@ -177,13 +239,18 @@ export default function ResetPasswordScreen() {
               <Text className="text-muted text-label font-semibold tracking-widest uppercase">
                 Nova senha
               </Text>
-              <View className="border-b-2 border-surface-tertiary flex-row items-center">
+              <View
+                className={`flex-row items-center border-b-2 ${
+                  passwordError ? "border-danger" : "border-surface-tertiary"
+                }`}
+              >
                 <TextInput
                   value={password}
-                  onChangeText={(v) => {
-                    setPassword(v);
-                    if (submitted) setSubmitted(false);
-                  }}
+                  onChangeText={handlePasswordChange}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="new-password"
+                  textContentType="newPassword"
                   secureTextEntry={!showPassword}
                   returnKeyType="next"
                   onSubmitEditing={() => confirmRef.current?.focus()}
@@ -202,6 +269,9 @@ export default function ResetPasswordScreen() {
                   )}
                 </TouchableOpacity>
               </View>
+              {passwordError && (
+                <Text className="text-danger text-xs">{passwordError}</Text>
+              )}
 
               {/* Strength bar */}
               {password.length > 0 && strength && strengthColors && (
@@ -241,10 +311,11 @@ export default function ResetPasswordScreen() {
                 <TextInput
                   ref={confirmRef}
                   value={confirmPassword}
-                  onChangeText={(v) => {
-                    setConfirmPassword(v);
-                    if (submitted) setSubmitted(false);
-                  }}
+                  onChangeText={handleConfirmPasswordChange}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="new-password"
+                  textContentType="newPassword"
                   secureTextEntry={!showConfirm}
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit}
@@ -269,16 +340,9 @@ export default function ResetPasswordScreen() {
             </View>
           </View>
 
-          {resetError && (
+          {resetErrorMessage && (
             <View className="bg-danger/10 mt-6 rounded-xl px-4 py-3">
-              <Text className="text-danger text-sm">
-                {resetError.message?.toLowerCase().includes("unauthorized") ||
-                resetError.message?.toLowerCase().includes("invalid") ||
-                resetError.message?.toLowerCase().includes("expired") ||
-                resetError.message?.includes("401")
-                  ? "O link expirou. Solicite um novo."
-                  : "Não foi possível conectar. Tente novamente."}
-              </Text>
+              <Text className="text-danger text-sm">{resetErrorMessage}</Text>
             </View>
           )}
         </ScrollView>
@@ -287,12 +351,12 @@ export default function ResetPasswordScreen() {
         <View className="px-6 pb-4">
           <Button
             onPress={handleSubmit}
-            isDisabled={!isValid || isPending}
-            className={`h-14 rounded-4xl ${isValid ? "bg-ds-canvas-bg" : "bg-surface-tertiary"}`}
+            isDisabled={!hasToken || isPending}
+            className={`h-14 rounded-4xl ${hasToken ? "bg-ds-canvas-bg" : "bg-surface-tertiary"}`}
           >
             <Button.Label>
               <Text
-                className={`font-semibold ${isValid ? "text-foreground" : "text-muted"}`}
+                className={`font-semibold ${hasToken ? "text-foreground" : "text-muted"}`}
               >
                 Confirmar nova senha
               </Text>
