@@ -24,6 +24,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CurrencyInput } from "@/src/components/ui/CurrencyInput";
+import { ErrorBanner } from "@/src/components/ui/ErrorBanner";
 import {
   DatePickerSheet,
   type DatePickerSheetRef,
@@ -587,11 +588,7 @@ export function TransactionForm({
 
         {children}
 
-        {errorMessage ? (
-          <View className="bg-danger/10 rounded-xl px-4 py-3">
-            <Text className="text-danger text-sm">{errorMessage}</Text>
-          </View>
-        ) : null}
+        <ErrorBanner message={errorMessage} />
       </Animated.ScrollView>
 
       {/* Footer */}
