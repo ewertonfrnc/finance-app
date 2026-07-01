@@ -2,7 +2,14 @@ import { useRouter } from "expo-router";
 import { Button } from "heroui-native";
 import { LoaderCircle } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -71,96 +78,101 @@ export default function SaldoScreen() {
 
   return (
     <Screen style={{ backgroundColor: BG }} className="px-6">
-      <View className="flex-1 pt-10">
-        <Text
-          style={{ color: G.green }}
-          className="mb-2 text-xs font-medium tracking-widest uppercase"
-        >
-          Oi, {firstName}
-        </Text>
-
-        <Text
-          style={{ color: INK }}
-          className="mb-10 text-2xl font-semibold leading-snug"
-        >
-          E aí, quanto tem na conta nesse exato momento?
-        </Text>
-
-        <Text
-          style={{ color: INK_MUTED }}
-          className="mb-4 text-xs font-medium tracking-widest uppercase"
-        >
-          Saldo Atual
-        </Text>
-
-        {/* Currency input manual para fundo escuro */}
-        <Pressable onPress={() => inputRef.current?.focus()}>
-          <Animated.Text
-            style={[animatedStyle, { color: INK }]}
-            className="font-mono-semibold text-balance-highlight"
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <View className="flex-1 pt-10">
+          <Text
+            style={{ color: G.green }}
+            className="mb-2 text-xs font-medium tracking-widest uppercase"
           >
-            {formatBRL(initialBalance)}
-          </Animated.Text>
-          <View
-            style={{ backgroundColor: G.green }}
-            className="mt-2 h-0.5"
-          />
-          <TextInput
-            ref={inputRef}
-            value={String(initialBalance)}
-            onChangeText={handleChangeText}
-            keyboardType="number-pad"
-            caretHidden
-            style={{ height: 0, width: 0, opacity: 0 }}
-          />
-        </Pressable>
+            Oi, {firstName}
+          </Text>
 
-        <Text
-          style={{ color: INK_MUTED }}
-          className="mt-8 text-sm leading-relaxed"
-        >
-          Olha pra sua conta corrente do dia a dia. Aquela onde caem salários,
-          sai aluguel, mercado, gasolina.
-          {"\n\n"}
-          Reserva, investimentos e poupança ficam de fora — esses a gente lança
-          como economias depois.
-          {"\n\n"}
-          No vermelho? Coloca 0 e a gente lança a saída em seguida.
-        </Text>
-
-        {error && (
-          <View
-            style={{ backgroundColor: G.redSoftBg }}
-            className="mt-5 rounded-xl px-4 py-3"
+          <Text
+            style={{ color: INK }}
+            className="mb-10 text-2xl font-semibold leading-snug"
           >
-            <Text style={{ color: G.redSoftText }} className="text-sm">
-              {error.message}
-            </Text>
-          </View>
-        )}
-      </View>
+            E aí, quanto tem na conta nesse exato momento?
+          </Text>
 
-      <View className="pb-4">
-        <Button
-          onPress={handleConcluir}
-          isIconOnly={isPending}
-          isDisabled={isPending}
-          style={{ backgroundColor: BUTTON }}
-          className="h-14 rounded-4xl"
-        >
-          <Button.Label>
-            {isPending ? (
-              <Animated.View style={spinStyle}>
-                <LoaderCircle color={BG} size={20} />
-              </Animated.View>
-            ) : (
-              <Text style={{ color: BG }} className="font-semibold">
-                Concluir
+          <Text
+            style={{ color: INK_MUTED }}
+            className="mb-4 text-xs font-medium tracking-widest uppercase"
+          >
+            Saldo Atual
+          </Text>
+
+          {/* Currency input manual para fundo escuro */}
+          <Pressable onPress={() => inputRef.current?.focus()}>
+            <Animated.Text
+              style={[animatedStyle, { color: INK }]}
+              className="font-mono-semibold text-balance-highlight"
+            >
+              {formatBRL(initialBalance)}
+            </Animated.Text>
+            <View
+              style={{ backgroundColor: G.green }}
+              className="mt-2 h-0.5"
+            />
+            <TextInput
+              ref={inputRef}
+              value={String(initialBalance)}
+              onChangeText={handleChangeText}
+              keyboardType="number-pad"
+              caretHidden
+              style={{ height: 0, width: 0, opacity: 0 }}
+            />
+          </Pressable>
+
+          <Text
+            style={{ color: INK_MUTED }}
+            className="mt-8 text-sm leading-relaxed"
+          >
+            Olha pra sua conta corrente do dia a dia. Aquela onde caem salários,
+            sai aluguel, mercado, gasolina.
+            {"\n\n"}
+            Reserva, investimentos e poupança ficam de fora — esses a gente
+            lança como economias depois.
+            {"\n\n"}
+            No vermelho? Coloca 0 e a gente lança a saída em seguida.
+          </Text>
+
+          {error && (
+            <View
+              style={{ backgroundColor: G.redSoftBg }}
+              className="mt-5 rounded-xl px-4 py-3"
+            >
+              <Text style={{ color: G.redSoftText }} className="text-sm">
+                {error.message}
               </Text>
-            )}
-          </Button.Label>
-        </Button>
-      </View>
+            </View>
+          )}
+        </View>
+
+        <View className="pb-4">
+          <Button
+            onPress={handleConcluir}
+            isIconOnly={isPending}
+            isDisabled={isPending}
+            style={{ backgroundColor: BUTTON }}
+            className="h-14 rounded-4xl"
+          >
+            <Button.Label>
+              {isPending ? (
+                <Animated.View style={spinStyle}>
+                  <LoaderCircle color={BG} size={20} />
+                </Animated.View>
+              ) : (
+                <Text style={{ color: BG }} className="font-semibold">
+                  Concluir
+                </Text>
+              )}
+            </Button.Label>
+          </Button>
+        </View>
+      </KeyboardAvoidingView>
     </Screen>
   );
 }

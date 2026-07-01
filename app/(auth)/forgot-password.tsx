@@ -86,120 +86,116 @@ export default function ForgotPasswordScreen() {
   if (status === "sent") {
     return (
       <Screen style={{ backgroundColor: SUCCESS_COLORS.greenDeep }}>
-        <KeyboardAvoidingView className="flex-1" behavior="padding">
-          <ScrollView
-            className="flex-1 px-6"
-            contentContainerStyle={{
-              paddingTop: 64,
-              paddingBottom: 32,
-              flexGrow: 1,
-            }}
-            showsVerticalScrollIndicator={false}
+        <ScrollView
+          className="flex-1 px-6"
+          contentContainerStyle={{
+            paddingTop: 64,
+            paddingBottom: 32,
+            flexGrow: 1,
+          }}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Ícone */}
+          <View
+            className="mb-8 h-14 w-14 items-center justify-center rounded-2xl"
+            style={{ backgroundColor: SUCCESS_COLORS.greenTint }}
           >
-            {/* Ícone */}
-            <View
-              className="mb-8 h-14 w-14 items-center justify-center rounded-2xl"
-              style={{ backgroundColor: SUCCESS_COLORS.greenTint }}
-            >
-              <Mail size={26} color={SUCCESS_COLORS.text} strokeWidth={1.6} />
+            <Mail size={26} color={SUCCESS_COLORS.text} strokeWidth={1.6} />
+          </View>
+
+          {/* Heading */}
+          <Text
+            className="mb-4 font-bold"
+            style={{ color: SUCCESS_COLORS.text, fontSize: 32, lineHeight: 38 }}
+          >
+            {"Dá uma olhada\nno seu e-mail."}
+          </Text>
+
+          {/* Descrição */}
+          <Text
+            style={{
+              color: SUCCESS_COLORS.mute,
+              fontSize: 15,
+              marginBottom: 4,
+            }}
+          >
+            Mandamos um link de redefinição pra
+          </Text>
+          <Text
+            style={{
+              color: SUCCESS_COLORS.text,
+              fontSize: 15,
+              fontWeight: "600",
+              marginBottom: 24,
+            }}
+          >
+            {email}
+          </Text>
+
+          {/* Info box */}
+          <View
+            className="rounded-2xl border px-4 py-4"
+            style={{
+              backgroundColor: SUCCESS_COLORS.greenTint,
+              borderColor: SUCCESS_COLORS.hairStrong,
+            }}
+          >
+            <View className="flex-row items-start gap-3">
+              <Text style={{ color: SUCCESS_COLORS.mute, marginTop: 1 }}>•</Text>
+              <Text
+                style={{ color: SUCCESS_COLORS.mute, fontSize: 14, flex: 1 }}
+              >
+                O link expira em{" "}
+                <Text style={{ color: SUCCESS_COLORS.text, fontWeight: "600" }}>
+                  15 minutos
+                </Text>
+                . Não achou? Verifique a caixa de spam.
+              </Text>
             </View>
+          </View>
+        </ScrollView>
 
-            {/* Heading */}
-            <Text
-              className="mb-4 font-bold"
-              style={{ color: SUCCESS_COLORS.text, fontSize: 32, lineHeight: 38 }}
-            >
-              {"Dá uma olhada\nno seu e-mail."}
-            </Text>
-
-            {/* Descrição */}
+        {/* Rodapé */}
+        <View className="gap-3 px-6 pb-8">
+          <TouchableOpacity
+            onPress={handleResend}
+            disabled={!canResend}
+            className="h-14 items-center justify-center rounded-4xl"
+            style={{
+              borderWidth: 1.5,
+              borderColor: canResend
+                ? SUCCESS_BUTTON
+                : SUCCESS_COLORS.hairStrong,
+            }}
+            activeOpacity={0.75}
+          >
             <Text
               style={{
-                color: SUCCESS_COLORS.mute,
-                fontSize: 15,
-                marginBottom: 4,
+                color: canResend ? SUCCESS_BUTTON : SUCCESS_COLORS.faint,
+                fontWeight: "600",
+                fontSize: 16,
               }}
             >
-              Mandamos um link de redefinição pra
+              {canResend ? "Reenviar link" : `Reenviar em ${countdown}s`}
             </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleChangeEmail}
+            className="h-12 items-center justify-center"
+            activeOpacity={0.7}
+          >
             <Text
               style={{
                 color: SUCCESS_COLORS.text,
-                fontSize: 15,
-                fontWeight: "600",
-                marginBottom: 24,
+                fontSize: 14,
+                textDecorationLine: "underline",
               }}
             >
-              {email}
+              Mudar o e-mail
             </Text>
-
-            {/* Info box */}
-            <View
-              className="rounded-2xl border px-4 py-4"
-              style={{
-                backgroundColor: SUCCESS_COLORS.greenTint,
-                borderColor: SUCCESS_COLORS.hairStrong,
-              }}
-            >
-              <View className="flex-row items-start gap-3">
-                <Text style={{ color: SUCCESS_COLORS.mute, marginTop: 1 }}>
-                  •
-                </Text>
-                <Text
-                  style={{ color: SUCCESS_COLORS.mute, fontSize: 14, flex: 1 }}
-                >
-                  O link expira em{" "}
-                  <Text style={{ color: SUCCESS_COLORS.text, fontWeight: "600" }}>
-                    15 minutos
-                  </Text>
-                  . Não achou? Verifique a caixa de spam.
-                </Text>
-              </View>
-            </View>
-          </ScrollView>
-
-          {/* Rodapé */}
-          <View className="gap-3 px-6 pb-8">
-            <TouchableOpacity
-              onPress={handleResend}
-              disabled={!canResend}
-              className="h-14 items-center justify-center rounded-4xl"
-              style={{
-                borderWidth: 1.5,
-                borderColor: canResend
-                  ? SUCCESS_BUTTON
-                  : SUCCESS_COLORS.hairStrong,
-              }}
-              activeOpacity={0.75}
-            >
-              <Text
-                style={{
-                  color: canResend ? SUCCESS_BUTTON : SUCCESS_COLORS.faint,
-                  fontWeight: "600",
-                  fontSize: 16,
-                }}
-              >
-                {canResend ? "Reenviar link" : `Reenviar em ${countdown}s`}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={handleChangeEmail}
-              className="h-12 items-center justify-center"
-              activeOpacity={0.7}
-            >
-              <Text
-                style={{
-                  color: SUCCESS_COLORS.text,
-                  fontSize: 14,
-                  textDecorationLine: "underline",
-                }}
-              >
-                Mudar o e-mail
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
+          </TouchableOpacity>
+        </View>
       </Screen>
     );
   }

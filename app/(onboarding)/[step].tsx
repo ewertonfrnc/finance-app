@@ -4,6 +4,7 @@ import { ChevronLeft } from "lucide-react-native";
 import { useState } from "react";
 import {
   KeyboardAvoidingView,
+  Platform,
   Text,
   TouchableOpacity,
   View,
@@ -113,7 +114,10 @@ export default function CategoryStepScreen() {
 
   return (
     <Screen className="bg-background flex-1 px-6">
-      <KeyboardAvoidingView className="flex-1" behavior="padding">
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
         {/* Header */}
         <View className="flex-row items-center justify-between py-4">
           <TouchableOpacity

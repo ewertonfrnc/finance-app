@@ -98,7 +98,10 @@ export default function TagFormScreen() {
 
       <View className="bg-separator h-px" />
 
-      <ScrollView contentContainerClassName="px-6 pt-6 pb-10">
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerClassName="px-6 pt-6 pb-10"
+      >
         <Text className="text-muted text-label mb-2 font-semibold tracking-wider uppercase">
           Nome
         </Text>

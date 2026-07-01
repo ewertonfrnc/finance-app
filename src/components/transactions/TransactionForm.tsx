@@ -10,6 +10,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
+  Platform,
   Pressable,
   Text,
   View,
@@ -619,7 +620,10 @@ export function TransactionForm({
   }
 
   return (
-    <KeyboardAvoidingView className="bg-surface flex-1" behavior="padding">
+    <KeyboardAvoidingView
+      className="bg-surface flex-1"
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       {/* Header */}
       <View className="flex-row items-center px-4 py-4">
         <Pressable onPress={() => router.back()} hitSlop={8}>
@@ -637,7 +641,7 @@ export function TransactionForm({
         className="flex-1 px-4"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        contentContainerClassName="gap-6 pb-8"
+        contentContainerClassName="gap-6 pb-28"
       >
         {/* <TransactionContextHeader
           mode={mode}

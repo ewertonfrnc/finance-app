@@ -3,6 +3,7 @@ import { Eye, EyeOff, LoaderCircle } from "lucide-react-native";
 import { useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
+  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -61,7 +62,10 @@ export default function LoginScreen() {
 
   return (
     <Screen className="bg-background">
-      <KeyboardAvoidingView className="flex-1" behavior="padding">
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
         <ScrollView
           className="flex-1 px-6"
           keyboardShouldPersistTaps="handled"
