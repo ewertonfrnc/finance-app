@@ -20,15 +20,19 @@ import {
 import { useTagForm } from "@/src/features/tags/hooks/useTagForm";
 import { useTags } from "@/src/features/tags/hooks/useTags";
 import { colorsForScheme } from "@/src/lib/designTokens";
+import { getSingleParam } from "@/src/lib/routeParams";
 import { useDateStore } from "@/src/stores/useDateStore";
 
 const MAX_TAGS = 100;
 
 export default function TagFormScreen() {
-  const { mode, id } = useLocalSearchParams<{
-    mode: "create" | "edit";
-    id?: string;
+  const { mode: modeParam, id: idParam } = useLocalSearchParams<{
+    mode?: string | string[];
+    id?: string | string[];
   }>();
+  const rawMode = getSingleParam(modeParam);
+  const mode = rawMode === "edit" ? "edit" : "create";
+  const id = getSingleParam(idParam);
   const router = useRouter();
   const scheme = useColorScheme();
   const c = colorsForScheme(scheme);
@@ -36,12 +40,17 @@ export default function TagFormScreen() {
   const tagPalette = getTagPaletteForScheme(scheme);
 
   const { selectedYear, selectedMonth } = useDateStore();
-  const { data: tags = [] } = useTags(selectedYear, selectedMonth);
+  const { data: tags = [], isLoading: isLoadingTags } = useTags(
+    selectedYear,
+    selectedMonth,
+  );
   const tag = id ? tags.find((t) => t.id === id) : undefined;
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const isEdit = mode === "edit";
+  const isEditWaitingForTag = isEdit && isLoadingTags && !tag;
+  const isEditTagMissing = isEdit && !isLoadingTags && !tag;
 
   const {
     name,
@@ -55,6 +64,7 @@ export default function TagFormScreen() {
     invalidate,
     handleSubmit,
   } = useTagForm({ mode, tag, onSuccess: () => router.back() });
+  const cannotSubmit = isPending || isEditWaitingForTag || isEditTagMissing;
 
   function handleDelete() {
     if (!tag) return;
@@ -65,7 +75,8 @@ export default function TagFormScreen() {
     if (!tag) return;
     remove(tag.id, {
       onSuccess: async () => {
-        await invalidate();
+        await invalidate(tag.id);
+        setShowDeleteConfirm(false);
         router.back();
       },
     });
@@ -78,7 +89,7 @@ export default function TagFormScreen() {
           {isEdit ? "Editar tag" : "Criar tag"}
         </Text>
         <View className="flex-row items-center gap-4">
-          {isEdit && (
+          {isEdit && tag && (
             <Pressable
               onPress={handleDelete}
               disabled={isPending}
@@ -102,6 +113,14 @@ export default function TagFormScreen() {
         keyboardShouldPersistTaps="handled"
         contentContainerClassName="px-6 pt-6 pb-10"
       >
+        {isEditWaitingForTag || isEditTagMissing ? (
+          <Text className="text-muted mb-5 text-sm">
+            {isEditWaitingForTag
+              ? "Carregando tag..."
+              : "Tag não encontrada."}
+          </Text>
+        ) : null}
+
         <Text className="text-muted text-label mb-2 font-semibold tracking-wider uppercase">
           Nome
         </Text>
@@ -177,10 +196,16 @@ export default function TagFormScreen() {
         <Pressable
           className="bg-ds-canvas-bg mb-3 items-center rounded-xl py-3.5"
           onPress={handleSubmit}
-          disabled={isPending}
+          disabled={cannotSubmit}
         >
           <Text className="text-foreground text-sm font-semibold">
-            {isPending ? "Salvando..." : isEdit ? "Salvar" : "Criar"}
+            {isPending
+              ? "Salvando..."
+              : isEditWaitingForTag
+                ? "Carregando..."
+                : isEdit
+                  ? "Salvar"
+                  : "Criar"}
           </Text>
         </Pressable>
 

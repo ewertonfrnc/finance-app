@@ -19,11 +19,15 @@ import { useTags } from "@/src/features/tags/hooks/useTags";
 import { useTagTransactions } from "@/src/features/tags/hooks/useTagTransactions";
 import { formatBRL } from "@/src/lib/currency";
 import { formatMonthHeader } from "@/src/lib/date";
+import { getSingleParam } from "@/src/lib/routeParams";
 import { transactionDetailHref } from "@/src/lib/transactionHref";
 import { useDateStore } from "@/src/stores/useDateStore";
 
 export default function TagDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id: idParam } = useLocalSearchParams<{
+    id?: string | string[];
+  }>();
+  const id = getSingleParam(idParam);
   const [showEdit, setShowEdit] = useState(false);
   const router = useRouter();
   const scheme = useColorScheme();
@@ -75,9 +79,14 @@ export default function TagDetailScreen() {
           onPress={() =>
             router.push({ pathname: "/transaction/new", params: { tagId: id } })
           }
+          disabled={!id}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Plus size={22} color={accentColor} strokeWidth={2.5} />
+          <Plus
+            size={22}
+            color={id ? accentColor : c.faint}
+            strokeWidth={2.5}
+          />
         </Pressable>
       </View>
 
