@@ -2,7 +2,7 @@ import { format, parseISO } from "date-fns";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Chip, Separator, useToast } from "heroui-native";
 import { ListFilter, Plus, ReceiptText } from "lucide-react-native";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   FlatList,
   Pressable,
@@ -23,12 +23,10 @@ import { useBalanceQuery } from "@/src/features/saldos/hooks/useBalanceQuery";
 import { useDayTransactions } from "@/src/features/transactions/hooks/useDayTransactions";
 import type { TransactionType } from "@/src/features/transactions/types";
 import { formatBRL } from "@/src/lib/currency";
-import { formatDayHeader, nextDay, prevDay } from "@/src/lib/date";
+import { formatDayHeader, isIsoDate, nextDay, prevDay } from "@/src/lib/date";
 import { colorsForScheme } from "@/src/lib/designTokens";
 import { TRANSACTION_TYPE_LABEL } from "@/src/lib/transactionTypeVisuals";
 import { transactionDetailHref } from "@/src/lib/transactionHref";
-
-const TODAY = format(new Date(), "yyyy-MM-dd");
 
 function DailyProjectionCard({
   date,
@@ -238,7 +236,9 @@ function DayEmptyState({
 }
 
 export default function DayScreen() {
-  const { date } = useLocalSearchParams<{ date: string }>();
+  const { date: dateParam } = useLocalSearchParams<{
+    date?: string | string[];
+  }>();
   const router = useRouter();
   const { toast } = useToast();
   const [selectedType, setSelectedType] = useState<TransactionType | null>(
@@ -247,6 +247,15 @@ export default function DayScreen() {
   const scheme = useColorScheme();
   const c = colorsForScheme(scheme);
   const filterScrollGesture = Gesture.Native();
+  const today = format(new Date(), "yyyy-MM-dd");
+  const date =
+    typeof dateParam === "string" && isIsoDate(dateParam) ? dateParam : today;
+
+  useEffect(() => {
+    if (dateParam !== date) {
+      router.replace(`/day/${date}`);
+    }
+  }, [dateParam, date, router]);
 
   const [year, month, day] = date.split("-").map(Number);
 
@@ -260,15 +269,27 @@ export default function DayScreen() {
   const { data: currMonthBalance = [] } = useBalanceQuery(year, month);
   const { data: nextMonthBalance = [] } = useBalanceQuery(nextYear, nextMonth);
 
-  const isFuture = date > TODAY;
-  const dayBalance = currMonthBalance.find((d) => d.date === date);
+  const balanceByDate = useMemo(() => {
+    const map = new Map<string, (typeof currMonthBalance)[number]>();
+    for (const balances of [
+      prevMonthBalance,
+      currMonthBalance,
+      nextMonthBalance,
+    ]) {
+      for (const balance of balances) {
+        map.set(balance.date, balance);
+      }
+    }
+    return map;
+  }, [prevMonthBalance, currMonthBalance, nextMonthBalance]);
+
+  const isFuture = date > today;
+  const dayBalance = balanceByDate.get(date);
   const projectedDaily = dayBalance?.dailyProjected ?? 0;
 
-  const yesterdayBalance =
-    prevMonthBalance.find((d) => d.date === prevDate)?.endBalance ?? null;
+  const yesterdayBalance = balanceByDate.get(prevDate)?.endBalance ?? null;
   const todayBalance = dayBalance?.endBalance ?? null;
-  const tomorrowBalance =
-    nextMonthBalance.find((d) => d.date === nextDate)?.endBalance ?? null;
+  const tomorrowBalance = balanceByDate.get(nextDate)?.endBalance ?? null;
 
   const filtered = useMemo(
     () =>
