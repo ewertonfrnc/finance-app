@@ -12,6 +12,7 @@ import {
   useColorScheme,
 } from "react-native";
 
+import { ErrorBanner } from "@/src/components/ui/ErrorBanner";
 import { Screen } from "@/src/components/ui/Screen";
 import { colorsForScheme, DS_COLORS } from "@/src/lib/designTokens";
 import { resetPasswordSchema } from "@/src/features/auth/schemas";
@@ -340,11 +341,7 @@ export default function ResetPasswordScreen() {
             </View>
           </View>
 
-          {resetErrorMessage && (
-            <View className="bg-danger/10 mt-6 rounded-xl px-4 py-3">
-              <Text className="text-danger text-sm">{resetErrorMessage}</Text>
-            </View>
-          )}
+          <ErrorBanner message={resetErrorMessage} className="mt-6" />
         </ScrollView>
 
         {/* Rodapé */}

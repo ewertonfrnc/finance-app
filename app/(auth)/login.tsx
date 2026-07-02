@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import Animated from "react-native-reanimated";
 
+import { ErrorBanner } from "@/src/components/ui/ErrorBanner";
 import { Screen } from "@/src/components/ui/Screen";
 import { useLogin } from "@/src/features/auth/hooks/useLogin";
 import { normalizeEmail } from "@/src/features/auth/lib/normalizeEmail";
@@ -166,11 +167,7 @@ export default function LoginScreen() {
             </View>
           </View>
 
-          {error && (
-            <View className="bg-danger/10 mt-8 rounded-xl px-4 py-3">
-              <Text className="text-danger text-sm">{error.message}</Text>
-            </View>
-          )}
+          <ErrorBanner message={error?.message} className="mt-8" />
         </ScrollView>
 
         {/* Rodapé */}

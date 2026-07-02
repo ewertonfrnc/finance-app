@@ -12,6 +12,7 @@ import {
   useColorScheme,
 } from "react-native";
 
+import { ErrorBanner } from "@/src/components/ui/ErrorBanner";
 import { Screen } from "@/src/components/ui/Screen";
 import { colorsForScheme, DS_COLORS } from "@/src/lib/designTokens";
 import { forgotPasswordSchema } from "@/src/features/auth/schemas";
@@ -23,6 +24,7 @@ type Status = "idle" | "sent";
 const SUCCESS_COLORS = DS_COLORS.dark;
 const SUCCESS_BUTTON = DS_COLORS.light.bg;
 const RESEND_DELAY_SECONDS = 47;
+const CONNECTION_ERROR_MESSAGE = "Não foi possível conectar. Tente novamente.";
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -162,13 +164,10 @@ export default function ForgotPasswordScreen() {
             </View>
           </View>
 
-          {sendError && (
-            <View className="bg-danger/10 mt-4 rounded-xl px-4 py-3">
-              <Text className="text-danger text-sm">
-                Não foi possível conectar. Tente novamente.
-              </Text>
-            </View>
-          )}
+          <ErrorBanner
+            message={sendError ? CONNECTION_ERROR_MESSAGE : null}
+            className="mt-4"
+          />
         </ScrollView>
 
         {/* Rodapé */}
@@ -289,13 +288,10 @@ export default function ForgotPasswordScreen() {
             )}
           </View>
 
-          {sendError && (
-            <View className="bg-danger/10 mt-6 rounded-xl px-4 py-3">
-              <Text className="text-danger text-sm">
-                Não foi possível conectar. Tente novamente.
-              </Text>
-            </View>
-          )}
+          <ErrorBanner
+            message={sendError ? CONNECTION_ERROR_MESSAGE : null}
+            className="mt-6"
+          />
         </ScrollView>
 
         {/* Rodapé */}
