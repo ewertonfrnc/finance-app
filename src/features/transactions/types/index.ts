@@ -12,10 +12,4 @@ export type {
   TransactionType,
 } from "./api";
 
-export type {
-  DayBalance,
-  FormValues,
-  MonthSummary,
-  TagRef,
-  Transaction,
-} from "./domain";
+export type { DayBalance, FormValues, TagRef, Transaction } from "./domain";

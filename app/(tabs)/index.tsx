@@ -18,12 +18,6 @@ import { DAY_FILTER_OPTIONS } from "@/src/features/transactions/constants";
 import { useDateStore } from "@/src/stores/useDateStore";
 import { usePrivacyStore } from "@/src/stores/usePrivacyStore";
 
-const ALL_FILTER_VALUE = "todas";
-
-function getFilterTabValue(index: number) {
-  return DAY_FILTER_OPTIONS[index]?.value ?? ALL_FILTER_VALUE;
-}
-
 function useMonthFade(resetKey: string) {
   const opacity = useSharedValue(1);
   const [blocked, setBlocked] = useState(false);
@@ -57,13 +51,8 @@ export default function SaldosScreen() {
   } = useDailyBalances(selectedYear, selectedMonth);
   usePrefetchAdjacentBalances(selectedYear, selectedMonth);
   const router = useRouter();
-  const [filterTabValue, setFilterTabValue] = useState(() =>
-    getFilterTabValue(0),
-  );
-  const filter =
-    DAY_FILTER_OPTIONS.find(
-      (opt) => (opt.value ?? ALL_FILTER_VALUE) === filterTabValue,
-    ) ?? DAY_FILTER_OPTIONS[0];
+  const [filterIndex, setFilterIndex] = useState(0);
+  const filter = DAY_FILTER_OPTIONS[filterIndex];
 
   const { hideValues, toggleHideValues } = usePrivacyStore();
 
@@ -99,11 +88,9 @@ export default function SaldosScreen() {
         onToggleHide={toggleHideValues}
       />
 
-      {/* <BalanceSummaryHeader summary={monthSummary} /> */}
-
       <Tabs
-        value={filterTabValue}
-        onValueChange={setFilterTabValue}
+        value={String(filterIndex)}
+        onValueChange={(value) => setFilterIndex(Number(value))}
         variant="secondary"
         className="border-separator border-b px-4 pt-2"
       >
@@ -112,7 +99,7 @@ export default function SaldosScreen() {
           {DAY_FILTER_OPTIONS.map((opt, index) => (
             <Tabs.Trigger
               key={opt.label}
-              value={getFilterTabValue(index)}
+              value={String(index)}
               className="px-0 pt-0 pb-1"
             >
               <Tabs.Label className="text-sm font-medium">

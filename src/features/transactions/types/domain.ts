@@ -38,14 +38,6 @@ export interface DayBalance {
   savings: number; // centavos — economia
 }
 
-export interface MonthSummary {
-  currentBalance: number; // saldo do último dia com dados
-  peak: number; // maior saldo do mês
-  valley: number; // menor saldo do mês
-  totalIncome: number; // soma de todas entradas do mês
-  totalExpenses: number; // soma de todas saídas do mês
-}
-
 export interface FormValues {
   type: TransactionType;
   amountCents: number;
