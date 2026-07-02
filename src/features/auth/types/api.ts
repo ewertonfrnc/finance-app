@@ -30,25 +30,7 @@ export interface ApiAuthUser {
   updated_at: string;
 }
 
-export interface ApiAuthBudgetCategory {
-  id: string;
-  user_id: string;
-  slug: string;
-  label: string;
-  monthly_amount: number;
-  color: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ApiRegisterResponse {
-  token: string;
-  user: ApiAuthUser;
-  daily_budget: number;
-  categories: ApiAuthBudgetCategory[];
-}
-
-export interface ApiLoginResponse {
+export interface ApiAuthResponse {
   token: string;
   user: ApiAuthUser;
 }

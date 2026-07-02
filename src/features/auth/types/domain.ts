@@ -10,20 +10,7 @@ export interface AuthUser {
   updatedAt: string;
 }
 
-export interface AuthBudgetCategory {
-  id: string;
-  userId: string;
-  slug: string;
-  label: string;
-  monthlyAmount: number;
-  color: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface AuthResult {
   token: string;
   user: AuthUser;
-  dailyBudget?: number;
-  categories?: AuthBudgetCategory[];
 }

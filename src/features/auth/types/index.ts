@@ -1,10 +1,8 @@
 export type {
-  ApiAuthBudgetCategory,
+  ApiAuthResponse,
   ApiAuthUser,
   ApiLoginPayload,
-  ApiLoginResponse,
   ApiRegisterPayload,
-  ApiRegisterResponse,
 } from "./api";
 
-export type { AuthBudgetCategory, AuthResult, AuthUser } from "./domain";
+export type { AuthResult, AuthUser } from "./domain";
