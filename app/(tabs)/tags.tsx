@@ -1,30 +1,24 @@
+import { MonthNavigator } from "@/src/components/navigation/MonthNavigator";
+import { CurrencyText } from "@/src/components/ui/CurrencyText";
+import { Screen } from "@/src/components/ui/Screen";
+import { TagFlag } from "@/src/features/tags/components/TagFlag";
+import { TagFormModal } from "@/src/features/tags/components/TagFormModal";
+import { getTagColors } from "@/src/features/tags/constants";
+import { useTags } from "@/src/features/tags/hooks/useTags";
+import type { TagWithTotal } from "@/src/features/tags/types";
+import { colorsForScheme } from "@/src/lib/designTokens";
+import { useDateStore } from "@/src/stores/useDateStore";
 import { useFocusEffect, useRouter } from "expo-router";
 import { SearchField, useToast } from "heroui-native";
 import { ArrowUpDown, Plus } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  FlatList,
-  Pressable,
-  Text,
-  View,
-  useColorScheme,
-} from "react-native";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { FlatList, Pressable, Text, View, useColorScheme } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withDelay,
   withTiming,
 } from "react-native-reanimated";
-import { MonthNavigator } from "@/src/components/navigation/MonthNavigator";
-import { CurrencyText } from "@/src/components/ui/CurrencyText";
-import { Screen } from "@/src/components/ui/Screen";
-import { TagFlag } from "@/src/features/tags/components/TagFlag";
-import { getTagColors } from "@/src/features/tags/constants";
-import { TagFormModal } from "@/src/features/tags/components/TagFormModal";
-import { useTags } from "@/src/features/tags/hooks/useTags";
-import type { TagWithTotal } from "@/src/features/tags/types";
-import { colorsForScheme } from "@/src/lib/designTokens";
-import { useDateStore } from "@/src/stores/useDateStore";
 
 interface TagRowProps {
   tag: TagWithTotal;
@@ -33,10 +27,10 @@ interface TagRowProps {
   scheme: ReturnType<typeof useColorScheme>;
   animationDelayMs: number;
   animationKey: number;
-  onPress: () => void;
+  onPress: (tagId: string) => void;
 }
 
-function TagRow({
+const TagRow = memo(function TagRow({
   tag,
   maxMonthlyTotal,
   trackColor,
@@ -69,7 +63,7 @@ function TagRow({
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => onPress(tag.id)}
       className="flex-row items-center gap-3 px-4 py-3.5"
     >
       <View style={{ opacity: hasTotal ? 1 : 0.45 }}>
@@ -103,7 +97,7 @@ function TagRow({
       />
     </Pressable>
   );
-}
+});
 
 interface EmptyStateProps {
   hasSearch: boolean;
@@ -154,32 +148,35 @@ export default function TagsScreen() {
   const iconColor = colors.mute;
   const accentColor = colors.green;
 
-  const visibleTags = useMemo(() => {
+  const { visibleTags, firstUnusedIndex } = useMemo(() => {
     const q = search.trim().toLowerCase();
     const matches = q
       ? tags.filter((t) => t.name.toLowerCase().includes(q))
       : tags;
 
-    return [...matches].sort((a, b) => {
-      const aIsUnused = a.monthlyTotal <= 0;
-      const bIsUnused = b.monthlyTotal <= 0;
+    const used = matches.filter((t) => t.monthlyTotal > 0);
+    const unused = matches.filter((t) => t.monthlyTotal <= 0);
 
-      if (aIsUnused === bIsUnused) return 0;
-      return aIsUnused ? 1 : -1;
-    });
+    return {
+      visibleTags: [...used, ...unused],
+      firstUnusedIndex: unused.length > 0 ? used.length : -1,
+    };
   }, [tags, search]);
   const summary = useMemo(() => {
-    const total = tags.reduce((sum, tag) => sum + tag.monthlyTotal, 0);
-    const activeTags = tags.filter((tag) => tag.monthlyTotal > 0).length;
-    const maxMonthlyTotal = tags.reduce(
-      (max, tag) => Math.max(max, tag.monthlyTotal),
-      0,
-    );
-    const topTag = tags.reduce<TagWithTotal | null>((current, tag) => {
-      if (tag.monthlyTotal <= 0) return current;
-      if (current === null || tag.monthlyTotal > current.monthlyTotal) return tag;
-      return current;
-    }, null);
+    let total = 0;
+    let activeTags = 0;
+    let maxMonthlyTotal = 0;
+    let topTag: TagWithTotal | null = null;
+
+    for (const tag of tags) {
+      total += tag.monthlyTotal;
+      if (tag.monthlyTotal <= 0) continue;
+      activeTags += 1;
+      if (tag.monthlyTotal > maxMonthlyTotal)
+        maxMonthlyTotal = tag.monthlyTotal;
+      if (topTag === null || tag.monthlyTotal > topTag.monthlyTotal)
+        topTag = tag;
+    }
 
     return { activeTags, maxMonthlyTotal, topTag, total };
   }, [tags]);
@@ -204,6 +201,42 @@ export default function TagsScreen() {
   function openCreate() {
     setFormMode("create");
   }
+
+  const handleOpenTag = useCallback(
+    (tagId: string) => router.push(`/tags/${tagId}`),
+    [router],
+  );
+
+  const renderItem = useCallback(
+    ({ item, index }: { item: TagWithTotal; index: number }) => (
+      <>
+        {index === firstUnusedIndex ? (
+          <View className="px-4 pt-4 pb-1">
+            <Text className="text-muted text-label font-semibold tracking-widest">
+              SEM USO NESTE MÊS
+            </Text>
+          </View>
+        ) : null}
+        <TagRow
+          tag={item}
+          maxMonthlyTotal={summary.maxMonthlyTotal}
+          trackColor={colors.hair}
+          scheme={scheme}
+          animationDelayMs={Math.min(index * 24, 180)}
+          animationKey={barAnimationKey}
+          onPress={handleOpenTag}
+        />
+      </>
+    ),
+    [
+      firstUnusedIndex,
+      summary.maxMonthlyTotal,
+      colors.hair,
+      scheme,
+      barAnimationKey,
+      handleOpenTag,
+    ],
+  );
 
   return (
     <Screen className="bg-background">
@@ -302,32 +335,7 @@ export default function TagsScreen() {
         <FlatList
           data={visibleTags}
           keyExtractor={(item) => item.id}
-          renderItem={({ item, index }) => {
-            const startsUnusedGroup =
-              item.monthlyTotal <= 0 &&
-              (index === 0 || visibleTags[index - 1]?.monthlyTotal > 0);
-
-            return (
-              <>
-                {startsUnusedGroup ? (
-                  <View className="px-4 pb-1 pt-4">
-                    <Text className="text-muted text-label font-semibold tracking-widest">
-                      SEM USO NESTE MÊS
-                    </Text>
-                  </View>
-                ) : null}
-                <TagRow
-                  tag={item}
-                  maxMonthlyTotal={summary.maxMonthlyTotal}
-                  trackColor={colors.hair}
-                  scheme={scheme}
-                  animationDelayMs={Math.min(index * 24, 180)}
-                  animationKey={barAnimationKey}
-                  onPress={() => router.push(`/tags/${item.id}`)}
-                />
-              </>
-            );
-          }}
+          renderItem={renderItem}
           ItemSeparatorComponent={() => (
             <View className="bg-separator mx-4 h-px" />
           )}

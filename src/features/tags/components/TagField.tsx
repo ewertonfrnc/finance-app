@@ -13,8 +13,8 @@ import {
 import { colorsForScheme } from "@/src/lib/designTokens";
 import { useDateStore } from "@/src/stores/useDateStore";
 import { useTagPickerStore } from "@/src/stores/useTagPickerStore";
-import { useTags } from "../hooks/useTags";
 import { getTagColors } from "../constants";
+import { useTags } from "../hooks/useTags";
 
 interface TagFieldProps {
   selectedTagIds: string[];
@@ -36,7 +36,10 @@ export function TagField({
   const { selectedYear, selectedMonth } = useDateStore();
   const { data: tags = [] } = useTags(selectedYear, selectedMonth);
 
-  const selectedTags = tags.filter((t) => selectedTagIds.includes(t.id));
+  const selectedTags = useMemo(() => {
+    const selected = new Set(selectedTagIds);
+    return tags.filter((t) => selected.has(t.id));
+  }, [tags, selectedTagIds]);
   const frequentes = useMemo(
     () =>
       [...tags]

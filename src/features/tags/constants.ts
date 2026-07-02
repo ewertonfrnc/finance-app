@@ -1,4 +1,4 @@
-import { TAG_PALETTE, type Scheme, schemeKey } from "@/src/lib/designTokens";
+import { schemeKey, TAG_PALETTE, type Scheme } from "@/src/lib/designTokens";
 
 export const TAG_COLOR_PALETTE = TAG_PALETTE.map((item) => ({
   ...item,
@@ -19,25 +19,54 @@ const DARK_TAG_COLORS: Record<
   brown: { bg: "#4b3322", ink: "#ddbd9f", dot: "#aa7e5f" },
 };
 
-export function getTagPaletteForScheme(scheme: Scheme | null | undefined) {
-  if (schemeKey(scheme) !== "dark") return TAG_COLOR_PALETTE;
+const DARK_TAG_COLOR_PALETTE = TAG_COLOR_PALETTE.map((item) => ({
+  ...item,
+  ...DARK_TAG_COLORS[item.key],
+}));
 
-  return TAG_COLOR_PALETTE.map((item) => ({
-    ...item,
-    ...DARK_TAG_COLORS[item.key],
-  }));
+// The palette is fully static per scheme, so build each variant once at module
+// load instead of remapping on every call.
+const PALETTE_BY_SCHEME = {
+  light: TAG_COLOR_PALETTE,
+  dark: DARK_TAG_COLOR_PALETTE,
+} as const;
+
+type TagColors = {
+  label: string;
+  hex: string;
+  bg: string;
+  ink: string;
+  dot: string;
+};
+
+// O(1) color lookup keyed by every lowercased field a stored color might hold.
+// First palette entry wins per value, matching the previous `find` order.
+function buildColorLookup(palette: readonly TagColors[]) {
+  const lookup = new Map<string, TagColors>();
+  palette.forEach((item) => {
+    for (const value of [item.hex, item.bg, item.dot, item.ink]) {
+      const key = value.toLowerCase();
+      if (!lookup.has(key)) lookup.set(key, item);
+    }
+  });
+  return lookup;
+}
+
+const COLOR_LOOKUP_BY_SCHEME = {
+  light: buildColorLookup(TAG_COLOR_PALETTE),
+  dark: buildColorLookup(DARK_TAG_COLOR_PALETTE),
+} as const;
+
+export function getTagPaletteForScheme(scheme: Scheme | null | undefined) {
+  return PALETTE_BY_SCHEME[schemeKey(scheme)];
 }
 
 export function getTagColors(color: string, scheme?: Scheme | null) {
-  const palette = getTagPaletteForScheme(scheme);
+  const match = COLOR_LOOKUP_BY_SCHEME[schemeKey(scheme)].get(
+    color.toLowerCase(),
+  );
   return (
-    palette.find(
-      (item) =>
-        item.hex.toLowerCase() === color.toLowerCase() ||
-        item.bg.toLowerCase() === color.toLowerCase() ||
-        item.dot.toLowerCase() === color.toLowerCase() ||
-        item.ink.toLowerCase() === color.toLowerCase(),
-    ) ?? {
+    match ?? {
       label: "Personalizada",
       hex: color,
       bg: color,
@@ -70,7 +99,9 @@ export function formatTagSelectionSummary(
     .filter((name): name is string => Boolean(name));
 
   if (selectedNames.length === 0) {
-    return selectedTagIds.length === 1 ? "1 tag" : `${selectedTagIds.length} tags`;
+    return selectedTagIds.length === 1
+      ? "1 tag"
+      : `${selectedTagIds.length} tags`;
   }
 
   if (selectedNames.length <= 2) return selectedNames.join(", ");
