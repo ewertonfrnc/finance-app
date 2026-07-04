@@ -175,16 +175,16 @@
     --ds-green-soft: #a3d9d4;
     --ds-green-tint: #e3f4f2;
 
-    --ds-red: oklch(0.55 0.16 25);
-    --ds-red-strong: oklch(0.5 0.18 25);
-    --ds-red-soft-bg: oklch(0.96 0.025 25);
-    --ds-red-soft-text: oklch(0.5 0.16 25);
-    --ds-red-soft-surface: oklch(0.98 0.012 25);
-    --ds-red-ring: oklch(0.86 0.05 25);
+    --ds-red: #bd413f;
+    --ds-red-strong: #b32228;
+    --ds-red-soft-bg: #ffece9;
+    --ds-red-soft-text: #ac3031;
+    --ds-red-soft-surface: #fff6f4;
+    --ds-red-ring: #f0c5c1;
 
-    --ds-amber: oklch(0.55 0.14 75);
-    --ds-amber-bg: oklch(0.96 0.06 80);
-    --ds-amber-ring: oklch(0.86 0.05 75);
+    --ds-amber: #a06200;
+    --ds-amber-bg: #ffeec5;
+    --ds-amber-ring: #e5cdad;
 
     --cat-entrada-dot: #129868;
     --cat-entrada-bg: #dff5eb;
@@ -198,30 +198,30 @@
     --cat-economia-dot: #7cab2d;
     --cat-economia-bg: #edf7db;
     --cat-economia-ink: #4d7014;
-    --tag-gray-bg: oklch(0.92 0.005 160);
-    --tag-gray-ink: oklch(0.36 0.005 160);
-    --tag-gray-dot: oklch(0.78 0.005 160);
-    --tag-blue-bg: oklch(0.9 0.045 235);
-    --tag-blue-ink: oklch(0.38 0.08 235);
-    --tag-blue-dot: oklch(0.74 0.08 235);
-    --tag-yellow-bg: oklch(0.93 0.06 95);
-    --tag-yellow-ink: oklch(0.4 0.07 95);
-    --tag-yellow-dot: oklch(0.83 0.1 95);
-    --tag-green-bg: oklch(0.86 0.1 158);
-    --tag-green-ink: oklch(0.32 0.07 158);
-    --tag-green-dot: oklch(0.72 0.12 158);
-    --tag-red-bg: oklch(0.86 0.06 25);
-    --tag-red-ink: oklch(0.4 0.1 25);
-    --tag-red-dot: oklch(0.72 0.1 25);
-    --tag-purple-bg: oklch(0.86 0.06 295);
-    --tag-purple-ink: oklch(0.4 0.09 295);
-    --tag-purple-dot: oklch(0.72 0.08 295);
-    --tag-pink-bg: oklch(0.88 0.05 355);
-    --tag-pink-ink: oklch(0.4 0.09 355);
-    --tag-pink-dot: oklch(0.78 0.07 355);
-    --tag-brown-bg: oklch(0.82 0.04 60);
-    --tag-brown-ink: oklch(0.36 0.04 60);
-    --tag-brown-dot: oklch(0.68 0.05 60);
+    --tag-gray-bg: #e2e6e3;
+    --tag-gray-ink: #3b3e3c;
+    --tag-gray-dot: #b5b8b6;
+    --tag-blue-bg: #c2e4f8;
+    --tag-blue-ink: #014867;
+    --tag-blue-dot: #78b3d6;
+    --tag-yellow-bg: #f4e8bb;
+    --tag-yellow-ink: #544714;
+    --tag-yellow-dot: #dbc77a;
+    --tag-green-bg: #97e5b8;
+    --tag-green-ink: #073d25;
+    --tag-green-dot: #5abb88;
+    --tag-red-bg: #f6c2bd;
+    --tag-red-ink: #742e2b;
+    --tag-red-dot: #dc8c85;
+    --tag-purple-bg: #d3caf5;
+    --tag-purple-ink: #4c3c73;
+    --tag-purple-dot: #a89bd2;
+    --tag-pink-bg: #f4cbd9;
+    --tag-pink-ink: #6c314a;
+    --tag-pink-dot: #dda5ba;
+    --tag-brown-bg: #d8bfab;
+    --tag-brown-ink: #4d3827;
+    --tag-brown-dot: #b0927a;
 
     --saldo-dark-green-bg: #b8ecd4;
     --saldo-dark-green-ink: #114d36;
@@ -316,16 +316,16 @@
     --ds-green-soft: #4f9b94;
     --ds-green-tint: #163230;
 
-    --ds-red: oklch(0.70 0.15 25);
-    --ds-red-strong: oklch(0.70 0.15 25);
-    --ds-red-soft-bg: oklch(0.34 0.07 25);
-    --ds-red-soft-text: oklch(0.84 0.11 25);
-    --ds-red-soft-surface: oklch(0.30 0.05 25);
-    --ds-red-ring: oklch(0.42 0.07 25);
+    --ds-red: #ed756e;
+    --ds-red-strong: #ed756e;
+    --ds-red-soft-bg: #572825;
+    --ds-red-soft-text: #ffaea6;
+    --ds-red-soft-surface: #442321;
+    --ds-red-ring: #6e3d39;
 
-    --ds-amber: oklch(0.72 0.11 95);
-    --ds-amber-bg: oklch(0.34 0.06 95);
-    --ds-amber-ring: oklch(0.42 0.07 75);
+    --ds-amber: #baa44d;
+    --ds-amber-bg: #42370d;
+    --ds-amber-ring: #63471c;
 
     --cat-entrada-dot: #1e8f68;
     --cat-entrada-bg: #1d3d32;
@@ -339,30 +339,30 @@
     --cat-economia-dot: #779f47;
     --cat-economia-bg: #303d25;
     --cat-economia-ink: #f4ffe8;
-    --tag-gray-bg: oklch(0.32 0.006 160);
-    --tag-gray-ink: oklch(0.82 0.006 160);
-    --tag-gray-dot: oklch(0.58 0.006 160);
-    --tag-blue-bg: oklch(0.33 0.06 235);
-    --tag-blue-ink: oklch(0.82 0.09 235);
-    --tag-blue-dot: oklch(0.66 0.10 235);
-    --tag-yellow-bg: oklch(0.34 0.06 95);
-    --tag-yellow-ink: oklch(0.86 0.11 95);
-    --tag-yellow-dot: oklch(0.72 0.11 95);
-    --tag-green-bg: oklch(0.32 0.07 158);
-    --tag-green-ink: oklch(0.84 0.11 158);
-    --tag-green-dot: oklch(0.66 0.12 158);
-    --tag-red-bg: oklch(0.33 0.07 25);
-    --tag-red-ink: oklch(0.84 0.11 25);
-    --tag-red-dot: oklch(0.66 0.11 25);
-    --tag-purple-bg: oklch(0.34 0.07 295);
-    --tag-purple-ink: oklch(0.84 0.10 295);
-    --tag-purple-dot: oklch(0.68 0.09 295);
-    --tag-pink-bg: oklch(0.34 0.07 355);
-    --tag-pink-ink: oklch(0.85 0.09 355);
-    --tag-pink-dot: oklch(0.70 0.08 355);
-    --tag-brown-bg: oklch(0.32 0.04 60);
-    --tag-brown-ink: oklch(0.82 0.06 60);
-    --tag-brown-dot: oklch(0.62 0.06 60);
+    --tag-gray-bg: #303432;
+    --tag-gray-ink: #c1c5c3;
+    --tag-gray-dot: #777b79;
+    --tag-blue-bg: #0f3a50;
+    --tag-blue-ink: #89cef6;
+    --tag-blue-dot: #4d9cc7;
+    --tag-yellow-bg: #42370d;
+    --tag-yellow-ink: #e7d17a;
+    --tag-yellow-dot: #baa44d;
+    --tag-green-bg: #073d25;
+    --tag-green-ink: #8ae1af;
+    --tag-green-dot: #46a876;
+    --tag-red-bg: #542523;
+    --tag-red-ink: #ffaea6;
+    --tag-red-dot: #cd7670;
+    --tag-purple-bg: #3b3058;
+    --tag-purple-ink: #cfbeff;
+    --tag-purple-dot: #9c8dca;
+    --tag-pink-bg: #53273a;
+    --tag-pink-ink: #feb6d1;
+    --tag-pink-dot: #c78aa1;
+    --tag-brown-bg: #422e1e;
+    --tag-brown-ink: #e2bc9e;
+    --tag-brown-dot: #a27e62;
 
     --saldo-dark-green-bg: #214f3c;
     --saldo-dark-green-ink: #baf5d7;
@@ -375,7 +375,7 @@
     --saldo-dark-red-bg: #5a2530;
     --saldo-dark-red-ink: #ffd2da;
 
-    --overlay-standard: oklch(0% 0 0 / 35%);
+    --overlay-standard: rgba(0, 0, 0, 0.35);
     --overlay-delete: rgba(15, 25, 20, 0.35);
     --shadow-phone: 0 0 0 0 transparent inset;
     --shadow-sheet: 0 0 1px 0 rgba(255, 255, 255, 0.12) inset;
@@ -407,7 +407,7 @@
     --default-foreground: var(--ds-text);
 
     --accent: var(--ds-green);
-    --accent-foreground: oklch(0.165 0.012 160);
+    --accent-foreground: #0a100d;
 
     --field-background: var(--ds-canvas-bg);
     --field-foreground: var(--foreground);
@@ -418,10 +418,10 @@
     --success-foreground: var(--ds-text);
 
     --warning: var(--cat-diario-dot);
-    --warning-foreground: oklch(0.20 0.04 85);
+    --warning-foreground: #1e1400;
 
     --danger: var(--ds-red);
-    --danger-foreground: oklch(0.98 0.004 15);
+    --danger-foreground: #fbf7f7;
 
     --segment: var(--ds-green-tint);
     --segment-foreground: var(--ds-text);
